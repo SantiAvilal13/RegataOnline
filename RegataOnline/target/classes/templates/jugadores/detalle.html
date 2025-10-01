@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Jugador: ' + ${jugador.nombre} + ' - Regata Online'">Jugador - Regata Online</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        .player-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .experience-bar {
+            height: 10px;
+            background-color: #e9ecef;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .experience-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            transition: width 0.3s ease;
+        }
+        
+        .boat-card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        
+        .boat-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .status-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        
+        .action-buttons {
+            position: sticky;
+            top: 20px;
+            z-index: 100;
+        }
+        
+        .health-bar, .fuel-bar {
+            height: 6px;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .health-bar {
+            background-color: #f8d7da;
+        }
+        
+        .fuel-bar {
+            background-color: #fff3cd;
+        }
+        
+        .health-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #dc3545, #fd7e14, #ffc107, #28a745);
+        }
+        
+        .fuel-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffc107, #fd7e14);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-water"></i> Regata Online
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="bi bi-house"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-people"></i> Jugadores
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/jugadores">Ver Todos</a></li>
+                            <li><a class="dropdown-item" href="/jugadores/nuevo">Crear Nuevo</a></li>
+                            <li><a class="dropdown-item" href="/jugadores/ranking">Ranking</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-gear"></i> Modelos
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/modelos">Ver Todos</a></li>
+                            <li><a class="dropdown-item" href="/modelos/nuevo">Crear Nuevo</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-ship"></i> Barcos
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/barcos">Ver Todos</a></li>
+                            <li><a class="dropdown-item" href="/barcos/nuevo">Crear Nuevo</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="/jugadores">Jugadores</a></li>
+                <li class="breadcrumb-item active" th:text="${jugador.nombre}">Jugador</li>
+            </ol>
+        </nav>
+        
+        <!-- Flash Messages -->
+        <div th:if="${mensaje}" class="alert alert-dismissible fade show" 
+             th:classappend="${tipoMensaje == 'success' ? 'alert-success' : (tipoMensaje == 'error' ? 'alert-danger' : 'alert-info')}" 
+             role="alert">
+            <i th:class="${tipoMensaje == 'success' ? 'bi bi-check-circle' : (tipoMensaje == 'error' ? 'bi bi-exclamation-triangle' : 'bi bi-info-circle')}"></i>
+            <span th:text="${mensaje}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="row">
+            <!-- Main Content -->
+            <div class="col-lg-9">
+                <!-- Player Header -->
+                <div class="player-header">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h1 class="mb-2">
+                                <i class="bi bi-person-circle"></i>
+                                <span th:text="${jugador.nombre}">Nombre del Jugador</span>
+                            </h1>
+                            <p class="mb-2">
+                                <i class="bi bi-envelope"></i>
+                                <span th:text="${jugador.email}">email@ejemplo.com</span>
+                            </p>
+                            <p class="mb-0" th:if="${jugador.telefono}">
+                                <i class="bi bi-telephone"></i>
+                                <span th:text="${jugador.telefono}">Teléfono</span>
+                            </p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <div class="d-flex flex-column align-items-end">
+                                <span class="badge bg-light text-dark fs-6 mb-2">
+                                    ID: <span th:text="${jugador.id}">1</span>
+                                </span>
+                                <span class="badge bg-warning text-dark fs-6">
+                                    <i class="bi bi-ship"></i>
+                                    <span th:text="${jugador.barcos.size()}">0</span> Barcos
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Statistics Cards -->
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <div class="stat-card">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="text-success mb-0">
+                                    <i class="bi bi-graph-up"></i> Experiencia
+                                </h5>
+                                <span class="badge bg-success fs-6" th:text="${jugador.experiencia}">0</span>
+                            </div>
+                            <div class="experience-bar">
+                                <div class="experience-fill" 
+                                     th:style="'width: ' + ${jugador.experiencia > 1000 ? 100 : jugador.experiencia / 10} + '%'"></div>
+                            </div>
+                            <small class="text-muted mt-2 d-block">
+                                Nivel: <span th:text="${jugador.experiencia / 100}">0</span>
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <div class="stat-card">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="text-warning mb-0">
+                                    <i class="bi bi-trophy"></i> Victorias
+                                </h5>
+                                <span class="badge bg-warning text-dark fs-6" th:text="${jugador.victorias}">0</span>
+                            </div>
+                            <small class="text-muted mt-2 d-block" th:if="${jugador.barcos.size() > 0}">
+                                Promedio por barco: 
+                                <span th:text="${#numbers.formatDecimal(jugador.victorias / jugador.barcos.size(), 1, 1)}">0.0</span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Boats Section -->
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3>
+                            <i class="bi bi-ship"></i> Barcos
+                            <span class="badge bg-secondary" th:text="${jugador.barcos.size()}">0</span>
+                        </h3>
+                        <a th:href="@{/barcos/nuevo(jugadorId=${jugador.id})}" class="btn btn-outline-primary">
+                            <i class="bi bi-plus-circle"></i> Agregar Barco
+                        </a>
+                    </div>
+
+                    <div th:if="${jugador.barcos.empty}" class="text-center py-5">
+                        <i class="bi bi-ship text-muted" style="font-size: 4rem;"></i>
+                        <h4 class="text-muted mt-3">No hay barcos registrados</h4>
+                        <p class="text-muted">Este jugador aún no tiene barcos asignados.</p>
+                        <a th:href="@{/barcos/nuevo(jugadorId=${jugador.id})}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle"></i> Crear Primer Barco
+                        </a>
+                    </div>
+
+                    <div th:if="${!jugador.barcos.empty}" class="row">
+                        <div class="col-md-6 col-lg-4 mb-3" th:each="barco : ${jugador.barcos}">
+                            <div class="card boat-card position-relative">
+                                <!-- Status Badge -->
+                                <span class="badge status-badge" 
+                                      th:classappend="${barco.activo ? 'bg-success' : 'bg-secondary'}"
+                                      th:text="${barco.activo ? 'Activo' : 'Inactivo'}">Estado</span>
+                                
+                                <div class="card-body">
+                                    <h6 class="card-title">
+                                        <i class="bi bi-ship"></i>
+                                        <span th:text="${barco.nombre}">Nombre del Barco</span>
+                                    </h6>
+                                    
+                                    <p class="card-text small text-muted mb-2">
+                                        <strong>Modelo:</strong> <span th:text="${barco.modelo.nombre}">Modelo</span>
+                                    </p>
+                                    
+                                    <p class="card-text small text-muted mb-2">
+                                        <strong>Color:</strong> 
+                                        <span class="badge" th:style="'background-color: ' + ${barco.color}" 
+                                              th:text="${barco.color}">Color</span>
+                                    </p>
+                                    
+                                    <!-- Health Bar -->
+                                    <div class="mb-2">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <small class="text-muted">Salud:</small>
+                                            <small th:text="${barco.estadoSalud} + '%'">100%</small>
+                                        </div>
+                                        <div class="health-bar">
+                                            <div class="health-fill" th:style="'width: ' + ${barco.estadoSalud} + '%'"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Fuel Bar -->
+                                    <div class="mb-3">
+                                        <div class="d-flex justify-content-between align-items-center mb-1">
+                                            <small class="text-muted">Combustible:</small>
+                                            <small th:text="${barco.nivelCombustible} + '%'">100%</small>
+                                        </div>
+                                        <div class="fuel-bar">
+                                            <div class="fuel-fill" th:style="'width: ' + ${barco.nivelCombustible} + '%'"></div>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Stats -->
+                                    <div class="row text-center">
+                                        <div class="col-6">
+                                            <small class="text-muted d-block">Experiencia</small>
+                                            <span class="badge bg-info" th:text="${barco.experiencia}">0</span>
+                                        </div>
+                                        <div class="col-6">
+                                            <small class="text-muted d-block">Victorias</small>
+                                            <span class="badge bg-warning text-dark" th:text="${barco.carrerasGanadas}">0</span>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Actions -->
+                                    <div class="mt-3 d-flex gap-1">
+                                        <a th:href="@{/barcos/{id}(id=${barco.id})}" 
+                                           class="btn btn-sm btn-outline-primary flex-fill">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a th:href="@{/barcos/{id}/editar(id=${barco.id})}" 
+                                           class="btn btn-sm btn-outline-warning flex-fill">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Sidebar -->
+            <div class="col-lg-3">
+                <div class="action-buttons">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="card-title mb-0">
+                                <i class="bi bi-gear"></i> Acciones
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a th:href="@{/jugadores/{id}/editar(id=${jugador.id})}" 
+                                   class="btn btn-warning">
+                                    <i class="bi bi-pencil"></i> Editar Jugador
+                                </a>
+                                
+                                <a th:href="@{/jugadores/{id}/incrementar-experiencia(id=${jugador.id})}" 
+                                   class="btn btn-success">
+                                    <i class="bi bi-plus-circle"></i> Incrementar Experiencia
+                                </a>
+                                
+                                <a th:href="@{/jugadores/{id}/incrementar-victorias(id=${jugador.id})}" 
+                                   class="btn btn-info">
+                                    <i class="bi bi-trophy"></i> Incrementar Victorias
+                                </a>
+                                
+                                <a th:href="@{/barcos/nuevo(jugadorId=${jugador.id})}" 
+                                   class="btn btn-outline-primary">
+                                    <i class="bi bi-ship"></i> Nuevo Barco
+                                </a>
+                                
+                                <hr>
+                                
+                                <a href="/jugadores" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left"></i> Volver a Lista
+                                </a>
+                                
+                                <button type="button" class="btn btn-outline-danger" 
+                                        data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                    <i class="bi bi-trash"></i> Eliminar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Quick Stats -->
+                    <div class="card mt-3">
+                        <div class="card-header bg-info text-white">
+                            <h6 class="card-title mb-0">
+                                <i class="bi bi-graph-up"></i> Estadísticas Rápidas
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center">
+                                <div class="col-12 mb-2">
+                                    <small class="text-muted d-block">Barcos Activos</small>
+                                    <span class="badge bg-success" th:text="${#lists.size(#lists.select(jugador.barcos, barco.activo))}">0</span>
+                                </div>
+                                <div class="col-12 mb-2">
+                                    <small class="text-muted d-block">Experiencia Total</small>
+                                    <span class="badge bg-primary" th:text="${jugador.experiencia + #aggregates.sum(jugador.barcos.![experiencia])}">0</span>
+                                </div>
+                                <div class="col-12">
+                                    <small class="text-muted d-block">Victorias Totales</small>
+                                    <span class="badge bg-warning text-dark" th:text="${jugador.victorias + #aggregates.sum(jugador.barcos.![carrerasGanadas])}">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle text-danger"></i>
+                        Confirmar Eliminación
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar al jugador <strong th:text="${jugador.nombre}">Jugador</strong>?</p>
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Advertencia:</strong> Esta acción también eliminará todos los barcos asociados a este jugador.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <form th:action="@{/jugadores/{id}/eliminar(id=${jugador.id})}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

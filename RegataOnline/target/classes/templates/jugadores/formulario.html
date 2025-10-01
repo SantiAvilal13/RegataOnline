@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${accion + ' Jugador - Regata Online'}">Jugador - Regata Online</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        .form-section {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .form-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+            margin: -30px -30px 30px -30px;
+        }
+        
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+        }
+        
+        .help-text {
+            font-size: 0.875em;
+            color: #6c757d;
+        }
+        
+        .preview-section {
+            background-color: #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .experience-preview {
+            height: 8px;
+            background-color: #dee2e6;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .experience-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-water"></i> Regata Online
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="bi bi-house"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-people"></i> Jugadores
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/jugadores">Ver Todos</a></li>
+                            <li><a class="dropdown-item active" href="/jugadores/nuevo">Crear Nuevo</a></li>
+                            <li><a class="dropdown-item" href="/jugadores/ranking">Ranking</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-gear"></i> Modelos
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/modelos">Ver Todos</a></li>
+                            <li><a class="dropdown-item" href="/modelos/nuevo">Crear Nuevo</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-ship"></i> Barcos
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/barcos">Ver Todos</a></li>
+                            <li><a class="dropdown-item" href="/barcos/nuevo">Crear Nuevo</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="/jugadores">Jugadores</a></li>
+                <li class="breadcrumb-item active" th:text="${accion + ' Jugador'}">Crear Jugador</li>
+            </ol>
+        </nav>
+        
+        <!-- Flash Messages -->
+        <div th:if="${mensaje}" class="alert alert-dismissible fade show" 
+             th:classappend="${tipoMensaje == 'success' ? 'alert-success' : (tipoMensaje == 'error' ? 'alert-danger' : 'alert-info')}" 
+             role="alert">
+            <i th:class="${tipoMensaje == 'success' ? 'bi bi-check-circle' : (tipoMensaje == 'error' ? 'bi bi-exclamation-triangle' : 'bi bi-info-circle')}"></i>
+            <span th:text="${mensaje}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="row">
+            <!-- Form Section -->
+            <div class="col-lg-8">
+                <div class="form-section">
+                    <div class="form-header">
+                        <h2>
+                            <i class="bi bi-person"></i>
+                            <span th:text="${accion + ' Jugador'}">Crear Jugador</span>
+                        </h2>
+                        <p class="mb-0">
+                            <span th:if="${accion == 'Crear'}">Registra un nuevo jugador en el sistema</span>
+                            <span th:if="${accion == 'Editar'}">Modifica la información del jugador</span>
+                        </p>
+                    </div>
+
+                    <form th:action="${accion == 'Crear' ? '/jugadores' : '/jugadores/' + jugador.id}" 
+                          method="post" th:object="${jugador}" novalidate>
+                        
+                        <!-- Información Básica -->
+                        <div class="mb-4">
+                            <h5 class="text-primary mb-3">
+                                <i class="bi bi-info-circle"></i> Información Básica
+                            </h5>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="nombre" class="form-label required-field">Nombre</label>
+                                    <input type="text" class="form-control" id="nombre" th:field="*{nombre}" 
+                                           required maxlength="100" placeholder="Nombre completo del jugador">
+                                    <div class="help-text">Máximo 100 caracteres</div>
+                                    <div class="invalid-feedback">
+                                        Por favor, ingresa un nombre válido.
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="email" class="form-label required-field">Email</label>
+                                    <input type="email" class="form-control" id="email" th:field="*{email}" 
+                                           required maxlength="150" placeholder="correo@ejemplo.com">
+                                    <div class="help-text">Debe ser un email válido y único</div>
+                                    <div class="invalid-feedback">
+                                        Por favor, ingresa un email válido.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="telefono" class="form-label">Teléfono</label>
+                                    <input type="tel" class="form-control" id="telefono" th:field="*{telefono}" 
+                                           maxlength="20" placeholder="+34 123 456 789">
+                                    <div class="help-text">Opcional - Formato libre</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Estadísticas -->
+                        <div class="mb-4">
+                            <h5 class="text-success mb-3">
+                                <i class="bi bi-graph-up"></i> Estadísticas
+                            </h5>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="experiencia" class="form-label">Experiencia</label>
+                                    <input type="number" class="form-control" id="experiencia" th:field="*{experiencia}" 
+                                           min="0" max="999999" placeholder="0" oninput="actualizarPreview()">
+                                    <div class="help-text">Puntos de experiencia (0-999,999)</div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="victorias" class="form-label">Victorias</label>
+                                    <input type="number" class="form-control" id="victorias" th:field="*{victorias}" 
+                                           min="0" max="99999" placeholder="0" oninput="actualizarPreview()">
+                                    <div class="help-text">Número de carreras ganadas (0-99,999)</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de Acción -->
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <a href="/jugadores" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left"></i> Volver a la lista
+                                </a>
+                            </div>
+                            <div>
+                                <button type="reset" class="btn btn-outline-warning me-2">
+                                    <i class="bi bi-arrow-clockwise"></i> Limpiar
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i th:class="${accion == 'Crear' ? 'bi bi-plus-circle' : 'bi bi-check-circle'}"></i>
+                                    <span th:text="${accion == 'Crear' ? 'Crear Jugador' : 'Actualizar Jugador'}">Crear Jugador</span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Preview Section -->
+            <div class="col-lg-4">
+                <div class="preview-section sticky-top">
+                    <h5 class="mb-3">
+                        <i class="bi bi-eye"></i> Vista Previa
+                    </h5>
+                    
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="card-title mb-0">
+                                <i class="bi bi-person"></i>
+                                <span id="preview-nombre" th:text="${jugador.nombre ?: 'Nombre del jugador'}">Nombre del jugador</span>
+                            </h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <small class="text-muted">Email:</small><br>
+                                <span id="preview-email" th:text="${jugador.email ?: 'correo@ejemplo.com'}">correo@ejemplo.com</span>
+                            </div>
+                            
+                            <div class="mb-3" id="preview-telefono-section" th:style="${jugador.telefono ? '' : 'display: none;'}">
+                                <small class="text-muted">Teléfono:</small><br>
+                                <span id="preview-telefono" th:text="${jugador.telefono}">Teléfono</span>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <small class="text-muted">Experiencia:</small>
+                                    <span class="badge bg-info" id="preview-experiencia" th:text="${jugador.experiencia ?: 0}">0</span>
+                                </div>
+                                <div class="experience-preview">
+                                    <div class="experience-fill" id="preview-experiencia-bar" 
+                                         th:style="'width: ' + ${jugador.experiencia != null and jugador.experiencia > 1000 ? 100 : (jugador.experiencia != null ? jugador.experiencia / 10 : 0)} + '%'"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <small class="text-muted">Victorias:</small>
+                                <span class="badge bg-warning text-dark" id="preview-victorias" th:text="${jugador.victorias ?: 0}">0</span>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <small class="text-muted">Barcos:</small>
+                                <span class="badge bg-secondary" th:text="${jugador.barcos != null ? jugador.barcos.size() : 0}">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tips -->
+                    <div class="mt-4">
+                        <h6><i class="bi bi-lightbulb"></i> Consejos</h6>
+                        <ul class="list-unstyled small text-muted">
+                            <li><i class="bi bi-check text-success"></i> El email debe ser único en el sistema</li>
+                            <li><i class="bi bi-check text-success"></i> El nombre es obligatorio</li>
+                            <li><i class="bi bi-check text-success"></i> Las estadísticas se pueden modificar después</li>
+                            <li><i class="bi bi-check text-success"></i> El teléfono es opcional</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+        
+        // Form validation
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.getElementsByTagName('form');
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+        
+        // Real-time preview updates
+        function actualizarPreview() {
+            // Nombre
+            const nombre = document.getElementById('nombre').value || 'Nombre del jugador';
+            document.getElementById('preview-nombre').textContent = nombre;
+            
+            // Email
+            const email = document.getElementById('email').value || 'correo@ejemplo.com';
+            document.getElementById('preview-email').textContent = email;
+            
+            // Teléfono
+            const telefono = document.getElementById('telefono').value;
+            const telefonoSection = document.getElementById('preview-telefono-section');
+            if (telefono) {
+                document.getElementById('preview-telefono').textContent = telefono;
+                telefonoSection.style.display = 'block';
+            } else {
+                telefonoSection.style.display = 'none';
+            }
+            
+            // Experiencia
+            const experiencia = parseInt(document.getElementById('experiencia').value) || 0;
+            document.getElementById('preview-experiencia').textContent = experiencia;
+            const experienciaBar = document.getElementById('preview-experiencia-bar');
+            const porcentaje = experiencia > 1000 ? 100 : (experiencia / 10);
+            experienciaBar.style.width = porcentaje + '%';
+            
+            // Victorias
+            const victorias = parseInt(document.getElementById('victorias').value) || 0;
+            document.getElementById('preview-victorias').textContent = victorias;
+        }
+        
+        // Add event listeners for real-time updates
+        document.getElementById('nombre').addEventListener('input', actualizarPreview);
+        document.getElementById('email').addEventListener('input', actualizarPreview);
+        document.getElementById('telefono').addEventListener('input', actualizarPreview);
+        document.getElementById('experiencia').addEventListener('input', actualizarPreview);
+        document.getElementById('victorias').addEventListener('input', actualizarPreview);
+        
+        // Initialize preview
+        actualizarPreview();
+    </script>
+</body>
+</html>

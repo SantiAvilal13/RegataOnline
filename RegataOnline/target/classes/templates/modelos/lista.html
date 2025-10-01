@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modelos de Barcos - Regata Online</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-water"></i> Regata Online
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="bi bi-house"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-people"></i> Jugadores
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/jugadores">Ver Todos</a></li>
+                            <li><a class="dropdown-item" href="/jugadores/nuevo">Crear Nuevo</a></li>
+                            <li><a class="dropdown-item" href="/jugadores/ranking">Ranking</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-gear"></i> Modelos
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item active" href="/modelos">Ver Todos</a></li>
+                            <li><a class="dropdown-item" href="/modelos/nuevo">Crear Nuevo</a></li>
+                            <li><a class="dropdown-item" href="/modelos/populares">Populares</a></li>
+                            <li><a class="dropdown-item" href="/modelos/equilibrados">Equilibrados</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-ship"></i> Barcos
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/barcos">Ver Todos</a></li>
+                            <li><a class="dropdown-item" href="/barcos/nuevo">Crear Nuevo</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                <li class="breadcrumb-item active">Modelos de Barcos</li>
+            </ol>
+        </nav>
+        
+        <!-- Flash Messages -->
+        <div th:if="${mensaje}" class="alert alert-dismissible fade show" 
+             th:classappend="${tipoMensaje == 'success' ? 'alert-success' : (tipoMensaje == 'error' ? 'alert-danger' : 'alert-info')}" 
+             role="alert">
+            <i th:class="${tipoMensaje == 'success' ? 'bi bi-check-circle' : (tipoMensaje == 'error' ? 'bi bi-exclamation-triangle' : 'bi bi-info-circle')}"></i>
+            <span th:text="${mensaje}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <h1 class="mb-2">
+                        <i class="bi bi-gear-fill"></i> Modelos de Barcos
+                    </h1>
+                    <p class="mb-0">Gestiona los diferentes modelos de barcos disponibles en el sistema</p>
+                </div>
+                <div class="col-md-4 text-end">
+                    <a href="/modelos/nuevo" class="btn btn-light btn-lg">
+                        <i class="bi bi-plus-circle"></i> Nuevo Modelo
+                    </a>
+                </div>
+            </div>
+            
+            <!-- Search Form -->
+            <form method="get" class="mt-4">
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label for="nombre" class="form-label">Buscar por nombre:</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" 
+                               th:value="${param.nombre}" placeholder="Nombre del modelo">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="tipo" class="form-label">Tipo:</label>
+                        <select class="form-select" id="tipo" name="tipo">
+                            <option value="">Todos los tipos</option>
+                            <option th:each="tipoOption : ${tipos}" 
+                                    th:value="${tipoOption}" 
+                                    th:text="${tipoOption}"
+                                    th:selected="${param.tipo == tipoOption}">Tipo</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="velocidadMin" class="form-label">Velocidad mínima:</label>
+                        <input type="number" class="form-control" id="velocidadMin" name="velocidadMin" 
+                               th:value="${param.velocidadMin}" min="0" max="200" placeholder="0">
+                    </div>
+                    <div class="col-md-2 mb-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-light me-2">
+                            <i class="bi bi-search"></i> Buscar
+                        </button>
+                        <a href="/modelos" class="btn btn-outline-light">
+                            <i class="bi bi-arrow-clockwise"></i>
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Filters and View Toggle -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <div class="filter-section">
+                    <h6 class="mb-3"><i class="bi bi-funnel"></i> Filtros Rápidos</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="/modelos/populares" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-star"></i> Populares
+                        </a>
+                        <a href="/modelos/equilibrados" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-balance-scale"></i> Equilibrados
+                        </a>
+                        <a href="/modelos?velocidadMin=150" class="btn btn-outline-info btn-sm">
+                            <i class="bi bi-speedometer2"></i> Alta Velocidad
+                        </a>
+                        <a href="/modelos?resistenciaMin=80" class="btn btn-outline-warning btn-sm">
+                            <i class="bi bi-shield"></i> Alta Resistencia
+                        </a>
+                        <a href="/modelos?maniobrabilidadMin=80" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-arrow-left-right"></i> Alta Maniobrabilidad
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 d-flex align-items-end justify-content-end">
+                <div class="view-toggle">
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-outline-primary active" id="cardView">
+                            <i class="bi bi-grid"></i> Tarjetas
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" id="tableView">
+                            <i class="bi bi-table"></i> Tabla
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Results Summary -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <span class="text-muted">
+                Mostrando <strong th:text="${modelos.size()}">0</strong> modelos
+                <span th:if="${param.nombre or param.tipo or param.velocidadMin}">
+                    (filtrados)
+                </span>
+            </span>
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <i class="bi bi-sort-down"></i> Ordenar
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" href="?ordenar=nombre">Por Nombre</a></li>
+                    <li><a class="dropdown-item" href="?ordenar=velocidad">Por Velocidad</a></li>
+                    <li><a class="dropdown-item" href="?ordenar=resistencia">Por Resistencia</a></li>
+                    <li><a class="dropdown-item" href="?ordenar=tipo">Por Tipo</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Card View -->
+        <div id="cardContainer" class="row">
+            <div class="col-md-6 col-lg-4 mb-4" th:each="modelo : ${modelos}">
+                <div class="card model-card h-100">
+                    <div class="model-header">
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title mb-0" th:text="${modelo.nombre}">Nombre del Modelo</h5>
+                            <span class="badge type-badge" 
+                                  th:classappend="${modelo.tipo == 'Deportivo' ? 'bg-danger' : 
+                                                  (modelo.tipo == 'Crucero' ? 'bg-primary' : 
+                                                  (modelo.tipo == 'Yate' ? 'bg-warning text-dark' : 'bg-secondary'))}"
+                                  th:text="${modelo.tipo}">Tipo</span>
+                        </div>
+                        <p class="card-text text-muted small mb-0" th:text="${modelo.descripcion}">Descripción del modelo</p>
+                    </div>
+                    
+                    <div class="card-body">
+                        <!-- Statistics -->
+                        <div class="mb-3">
+                            <!-- Velocidad -->
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="bi bi-speedometer2 text-primary"></i> Velocidad
+                                    </small>
+                                    <span class="badge bg-primary" th:text="${modelo.velocidadMaxima}">0</span>
+                                </div>
+                                <div class="stat-bar">
+                                    <div class="stat-fill speed-fill" th:style="'width: ' + ${modelo.velocidadMaxima / 2} + '%'"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Resistencia -->
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="bi bi-shield text-success"></i> Resistencia
+                                    </small>
+                                    <span class="badge bg-success" th:text="${modelo.resistencia}">0</span>
+                                </div>
+                                <div class="stat-bar">
+                                    <div class="stat-fill resistance-fill" th:style="'width: ' + ${modelo.resistencia} + '%'"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Maniobrabilidad -->
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="bi bi-arrow-left-right text-warning"></i> Maniobrabilidad
+                                    </small>
+                                    <span class="badge bg-warning text-dark" th:text="${modelo.maniobrabilidad}">0</span>
+                                </div>
+                                <div class="stat-bar">
+                                    <div class="stat-fill maneuverability-fill" th:style="'width: ' + ${modelo.maniobrabilidad} + '%'"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Combustible -->
+                            <div class="mb-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">
+                                        <i class="bi bi-fuel-pump text-warning"></i> Combustible
+                                    </small>
+                                    <span class="badge bg-warning text-dark" th:text="${modelo.capacidadCombustible}">0</span>
+                                </div>
+                                <div class="stat-bar">
+                                    <div class="stat-fill fuel-fill" th:style="'width: ' + ${modelo.capacidadCombustible / 2} + '%'"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Barcos Count -->
+                        <div class="mb-3 text-center">
+                            <span class="badge bg-info">
+                                <i class="bi bi-ship"></i>
+                                <span th:text="${modelo.barcos.size()}">0</span> Barcos
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="card-footer bg-transparent">
+                        <div class="action-buttons d-flex justify-content-center gap-1">
+                            <a th:href="@{/modelos/{id}(id=${modelo.id})}" 
+                               class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-eye"></i> Ver
+                            </a>
+                            <a th:href="@{/modelos/{id}/editar(id=${modelo.id})}" 
+                               class="btn btn-outline-warning btn-sm">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                            <button type="button" class="btn btn-outline-danger btn-sm" 
+                                    onclick="confirmarEliminacion([[${modelo.id}]], '[[${modelo.nombre}]]')">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table View (Hidden by default) -->
+        <div id="tableContainer" class="d-none">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Tipo</th>
+                            <th>Velocidad</th>
+                            <th>Resistencia</th>
+                            <th>Maniobrabilidad</th>
+                            <th>Combustible</th>
+                            <th>Barcos</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="modelo : ${modelos}">
+                            <td>
+                                <strong th:text="${modelo.nombre}">Nombre</strong><br>
+                                <small class="text-muted" th:text="${modelo.descripcion}">Descripción</small>
+                            </td>
+                            <td>
+                                <span class="badge" 
+                                      th:classappend="${modelo.tipo == 'Deportivo' ? 'bg-danger' : 
+                                                      (modelo.tipo == 'Crucero' ? 'bg-primary' : 
+                                                      (modelo.tipo == 'Yate' ? 'bg-warning text-dark' : 'bg-secondary'))}"
+                                      th:text="${modelo.tipo}">Tipo</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-primary" th:text="${modelo.velocidadMaxima}">0</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-success" th:text="${modelo.resistencia}">0</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-warning text-dark" th:text="${modelo.maniobrabilidad}">0</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-info" th:text="${modelo.capacidadCombustible}">0</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary" th:text="${modelo.barcos.size()}">0</span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a th:href="@{/modelos/{id}(id=${modelo.id})}" 
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a th:href="@{/modelos/{id}/editar(id=${modelo.id})}" 
+                                       class="btn btn-outline-warning btn-sm">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-outline-danger btn-sm" 
+                                            onclick="confirmarEliminacion([[${modelo.id}]], '[[${modelo.nombre}]]')">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${modelos.empty}" class="text-center py-5">
+            <i class="bi bi-gear text-muted" style="font-size: 4rem;"></i>
+            <h3 class="text-muted mt-3">No hay modelos registrados</h3>
+            <p class="text-muted">
+                <span th:if="${param.nombre or param.tipo or param.velocidadMin}">
+                    No se encontraron modelos que coincidan con los criterios de búsqueda.
+                </span>
+                <span th:unless="${param.nombre or param.tipo or param.velocidadMin}">
+                    Comienza creando el primer modelo de barco.
+                </span>
+            </p>
+            <a href="/modelos/nuevo" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Crear Primer Modelo
+            </a>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle text-danger"></i>
+                        Confirmar Eliminación
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar el modelo <strong id="modeloNombre"></strong>?</p>
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Advertencia:</strong> Esta acción también afectará a todos los barcos que usen este modelo.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <form id="deleteForm" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Custom JS -->
+    <script th:src="@{/js/app.js}"></script>
+</body>
+</html>

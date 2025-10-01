@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${accion + ' Modelo - Regata Online'}">Modelo - Regata Online</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        .form-section {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .form-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px 10px 0 0;
+            margin: -30px -30px 30px -30px;
+        }
+        
+        .required-field::after {
+            content: " *";
+            color: #dc3545;
+        }
+        
+        .help-text {
+            font-size: 0.875em;
+            color: #6c757d;
+        }
+        
+        .preview-section {
+            background-color: #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+        }
+        
+        .stat-preview {
+            height: 8px;
+            background-color: #dee2e6;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        
+        .stat-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        
+        .speed-fill { background: linear-gradient(90deg, #007bff, #0056b3); }
+        .resistance-fill { background: linear-gradient(90deg, #28a745, #1e7e34); }
+        .maneuverability-fill { background: linear-gradient(90deg, #ffc107, #e0a800); }
+        .fuel-fill { background: linear-gradient(90deg, #fd7e14, #e55100); }
+        
+        .range-input {
+            width: 100%;
+        }
+        
+        .range-value {
+            font-weight: bold;
+            color: #495057;
+        }
+        
+        .score-circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+            margin: 0 auto;
+        }
+        
+        .type-selector {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 10px;
+        }
+        
+        .type-option {
+            position: relative;
+        }
+        
+        .type-option input[type="radio"] {
+            display: none;
+        }
+        
+        .type-option label {
+            display: block;
+            padding: 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .type-option input[type="radio"]:checked + label {
+            border-color: #007bff;
+            background-color: #e7f3ff;
+            color: #007bff;
+        }
+        
+        .type-option label:hover {
+            border-color: #007bff;
+            background-color: #f8f9fa;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-water"></i> Regata Online
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="bi bi-house"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-people"></i> Jugadores
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/jugadores">Ver Todos</a></li>
+                            <li><a class="dropdown-item" href="/jugadores/nuevo">Crear Nuevo</a></li>
+                            <li><a class="dropdown-item" href="/jugadores/ranking">Ranking</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-gear"></i> Modelos
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/modelos">Ver Todos</a></li>
+                            <li><a class="dropdown-item active" href="/modelos/nuevo">Crear Nuevo</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-ship"></i> Barcos
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/barcos">Ver Todos</a></li>
+                            <li><a class="dropdown-item" href="/barcos/nuevo">Crear Nuevo</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="/modelos">Modelos</a></li>
+                <li class="breadcrumb-item active" th:text="${accion + ' Modelo'}">Crear Modelo</li>
+            </ol>
+        </nav>
+        
+        <!-- Flash Messages -->
+        <div th:if="${mensaje}" class="alert alert-dismissible fade show" 
+             th:classappend="${tipoMensaje == 'success' ? 'alert-success' : (tipoMensaje == 'error' ? 'alert-danger' : 'alert-info')}" 
+             role="alert">
+            <i th:class="${tipoMensaje == 'success' ? 'bi bi-check-circle' : (tipoMensaje == 'error' ? 'bi bi-exclamation-triangle' : 'bi bi-info-circle')}"></i>
+            <span th:text="${mensaje}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="row">
+            <!-- Form Section -->
+            <div class="col-lg-8">
+                <div class="form-section">
+                    <div class="form-header">
+                        <h2>
+                            <i class="bi bi-gear"></i>
+                            <span th:text="${accion + ' Modelo'}">Crear Modelo</span>
+                        </h2>
+                        <p class="mb-0">
+                            <span th:if="${accion == 'Crear'}">Define las características de un nuevo modelo de barco</span>
+                            <span th:if="${accion == 'Editar'}">Modifica las características del modelo</span>
+                        </p>
+                    </div>
+
+                    <form th:action="${accion == 'Crear' ? '/modelos' : '/modelos/' + modelo.id}" 
+                          method="post" th:object="${modelo}" novalidate>
+                        
+                        <!-- Información Básica -->
+                        <div class="mb-4">
+                            <h5 class="text-primary mb-3">
+                                <i class="bi bi-info-circle"></i> Información Básica
+                            </h5>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="nombre" class="form-label required-field">Nombre del Modelo</label>
+                                    <input type="text" class="form-control" id="nombre" th:field="*{nombre}" 
+                                           required maxlength="100" placeholder="Ej: Speedster Pro">
+                                    <div class="help-text">Máximo 100 caracteres</div>
+                                    <div class="invalid-feedback">
+                                        Por favor, ingresa un nombre válido.
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label required-field">Tipo de Barco</label>
+                                    <div class="type-selector">
+                                        <div class="type-option">
+                                            <input type="radio" id="deportivo" th:field="*{tipo}" value="Deportivo" required>
+                                            <label for="deportivo">
+                                                <i class="bi bi-speedometer2 d-block mb-1"></i>
+                                                Deportivo
+                                            </label>
+                                        </div>
+                                        <div class="type-option">
+                                            <input type="radio" id="crucero" th:field="*{tipo}" value="Crucero" required>
+                                            <label for="crucero">
+                                                <i class="bi bi-compass d-block mb-1"></i>
+                                                Crucero
+                                            </label>
+                                        </div>
+                                        <div class="type-option">
+                                            <input type="radio" id="yate" th:field="*{tipo}" value="Yate" required>
+                                            <label for="yate">
+                                                <i class="bi bi-gem d-block mb-1"></i>
+                                                Yate
+                                            </label>
+                                        </div>
+                                        <div class="type-option">
+                                            <input type="radio" id="pesquero" th:field="*{tipo}" value="Pesquero" required>
+                                            <label for="pesquero">
+                                                <i class="bi bi-water d-block mb-1"></i>
+                                                Pesquero
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="invalid-feedback">
+                                        Por favor, selecciona un tipo de barco.
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="descripcion" class="form-label">Descripción</label>
+                                <textarea class="form-control" id="descripcion" th:field="*{descripcion}" 
+                                          rows="3" maxlength="500" 
+                                          placeholder="Describe las características principales del modelo..."></textarea>
+                                <div class="help-text">Máximo 500 caracteres</div>
+                            </div>
+                        </div>
+
+                        <!-- Características Técnicas -->
+                        <div class="mb-4">
+                            <h5 class="text-success mb-3">
+                                <i class="bi bi-sliders"></i> Características Técnicas
+                            </h5>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <label for="velocidadMaxima" class="form-label required-field">
+                                        <i class="bi bi-speedometer2 text-primary"></i> Velocidad Máxima
+                                    </label>
+                                    <div class="d-flex align-items-center">
+                                        <input type="range" class="range-input me-3" id="velocidadMaxima" 
+                                               th:field="*{velocidadMaxima}" min="50" max="200" step="5" 
+                                               oninput="actualizarValor('velocidadMaxima', this.value); actualizarPreview()">
+                                        <span class="range-value" id="velocidadMaximaValue" th:text="${modelo.velocidadMaxima ?: 100}">100</span>
+                                        <small class="text-muted ms-1">km/h</small>
+                                    </div>
+                                    <div class="help-text">Rango: 50-200 km/h</div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-4">
+                                    <label for="resistencia" class="form-label required-field">
+                                        <i class="bi bi-shield text-success"></i> Resistencia
+                                    </label>
+                                    <div class="d-flex align-items-center">
+                                        <input type="range" class="range-input me-3" id="resistencia" 
+                                               th:field="*{resistencia}" min="10" max="100" step="5" 
+                                               oninput="actualizarValor('resistencia', this.value); actualizarPreview()">
+                                        <span class="range-value" id="resistenciaValue" th:text="${modelo.resistencia ?: 50}">50</span>
+                                        <small class="text-muted ms-1">%</small>
+                                    </div>
+                                    <div class="help-text">Rango: 10-100%</div>
+                                </div>
+                            </div>
+                            
+                            <div class="row">
+                                <div class="col-md-6 mb-4">
+                                    <label for="maniobrabilidad" class="form-label required-field">
+                                        <i class="bi bi-arrow-left-right text-warning"></i> Maniobrabilidad
+                                    </label>
+                                    <div class="d-flex align-items-center">
+                                        <input type="range" class="range-input me-3" id="maniobrabilidad" 
+                                               th:field="*{maniobrabilidad}" min="10" max="100" step="5" 
+                                               oninput="actualizarValor('maniobrabilidad', this.value); actualizarPreview()">
+                                        <span class="range-value" id="maniobrabilidadValue" th:text="${modelo.maniobrabilidad ?: 50}">50</span>
+                                        <small class="text-muted ms-1">%</small>
+                                    </div>
+                                    <div class="help-text">Rango: 10-100%</div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-4">
+                                    <label for="capacidadCombustible" class="form-label required-field">
+                                        <i class="bi bi-fuel-pump text-info"></i> Capacidad de Combustible
+                                    </label>
+                                    <div class="d-flex align-items-center">
+                                        <input type="range" class="range-input me-3" id="capacidadCombustible" 
+                                               th:field="*{capacidadCombustible}" min="50" max="200" step="10" 
+                                               oninput="actualizarValor('capacidadCombustible', this.value); actualizarPreview()">
+                                        <span class="range-value" id="capacidadCombustibleValue" th:text="${modelo.capacidadCombustible ?: 100}">100</span>
+                                        <small class="text-muted ms-1">L</small>
+                                    </div>
+                                    <div class="help-text">Rango: 50-200 litros</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de Acción -->
+                        <div class="d-flex justify-content-between">
+                            <div>
+                                <a href="/modelos" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left"></i> Volver a la lista
+                                </a>
+                            </div>
+                            <div>
+                                <button type="reset" class="btn btn-outline-warning me-2" onclick="resetearFormulario()">
+                                    <i class="bi bi-arrow-clockwise"></i> Limpiar
+                                </button>
+                                <button type="submit" class="btn btn-primary">
+                                    <i th:class="${accion == 'Crear' ? 'bi bi-plus-circle' : 'bi bi-check-circle'}"></i>
+                                    <span th:text="${accion == 'Crear' ? 'Crear Modelo' : 'Actualizar Modelo'}">Crear Modelo</span>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Preview Section -->
+            <div class="col-lg-4">
+                <div class="preview-section sticky-top">
+                    <h5 class="mb-3">
+                        <i class="bi bi-eye"></i> Vista Previa
+                    </h5>
+                    
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h6 class="card-title mb-0">
+                                <i class="bi bi-gear"></i>
+                                <span id="preview-nombre" th:text="${modelo.nombre ?: 'Nombre del modelo'}">Nombre del modelo</span>
+                            </h6>
+                            <small id="preview-tipo" th:text="${modelo.tipo ?: 'Tipo'}">Tipo</small>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3" id="preview-descripcion-section" th:style="${modelo.descripcion ? '' : 'display: none;'}">
+                                <small class="text-muted">Descripción:</small><br>
+                                <span id="preview-descripcion" th:text="${modelo.descripcion}">Descripción</span>
+                            </div>
+                            
+                            <!-- Velocidad -->
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <small class="text-muted">
+                                        <i class="bi bi-speedometer2 text-primary"></i> Velocidad
+                                    </small>
+                                    <span class="badge bg-primary" id="preview-velocidad" th:text="${modelo.velocidadMaxima ?: 100}">100</span>
+                                </div>
+                                <div class="stat-preview">
+                                    <div class="stat-fill speed-fill" id="preview-velocidad-bar" 
+                                         th:style="'width: ' + ${modelo.velocidadMaxima != null ? modelo.velocidadMaxima / 2 : 50} + '%'"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Resistencia -->
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <small class="text-muted">
+                                        <i class="bi bi-shield text-success"></i> Resistencia
+                                    </small>
+                                    <span class="badge bg-success" id="preview-resistencia" th:text="${modelo.resistencia ?: 50}">50</span>
+                                </div>
+                                <div class="stat-preview">
+                                    <div class="stat-fill resistance-fill" id="preview-resistencia-bar" 
+                                         th:style="'width: ' + ${modelo.resistencia ?: 50} + '%'"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Maniobrabilidad -->
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <small class="text-muted">
+                                        <i class="bi bi-arrow-left-right text-warning"></i> Maniobrabilidad
+                                    </small>
+                                    <span class="badge bg-warning text-dark" id="preview-maniobrabilidad" th:text="${modelo.maniobrabilidad ?: 50}">50</span>
+                                </div>
+                                <div class="stat-preview">
+                                    <div class="stat-fill maneuverability-fill" id="preview-maniobrabilidad-bar" 
+                                         th:style="'width: ' + ${modelo.maniobrabilidad ?: 50} + '%'"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Combustible -->
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <small class="text-muted">
+                                        <i class="bi bi-fuel-pump text-info"></i> Combustible
+                                    </small>
+                                    <span class="badge bg-info" id="preview-combustible" th:text="${modelo.capacidadCombustible ?: 100}">100</span>
+                                </div>
+                                <div class="stat-preview">
+                                    <div class="stat-fill fuel-fill" id="preview-combustible-bar" 
+                                         th:style="'width: ' + ${modelo.capacidadCombustible != null ? modelo.capacidadCombustible / 2 : 50} + '%'"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Puntuación Total -->
+                            <div class="text-center mt-4">
+                                <small class="text-muted d-block">Puntuación Total</small>
+                                <div class="score-circle" id="preview-score-circle" 
+                                     th:style="'background: linear-gradient(135deg, ' + 
+                                              (${modelo.velocidadMaxima != null and modelo.resistencia != null and modelo.maniobrabilidad != null and modelo.capacidadCombustible != null} ? 
+                                               (#numbers.formatInteger((modelo.velocidadMaxima + modelo.resistencia + modelo.maniobrabilidad + modelo.capacidadCombustible) / 4, 0) >= 80 ? '#28a745, #20c997' : 
+                                                (#numbers.formatInteger((modelo.velocidadMaxima + modelo.resistencia + modelo.maniobrabilidad + modelo.capacidadCombustible) / 4, 0) >= 60 ? '#ffc107, #fd7e14' : '#dc3545, #c82333')) : 
+                                               '#6c757d, #495057') + ')'">
+                                    <span id="preview-score" th:text="${modelo.velocidadMaxima != null and modelo.resistencia != null and modelo.maniobrabilidad != null and modelo.capacidadCombustible != null ? #numbers.formatInteger((modelo.velocidadMaxima + modelo.resistencia + modelo.maniobrabilidad + modelo.capacidadCombustible) / 4, 0) : 62}">62</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tips -->
+                    <div class="mt-4">
+                        <h6><i class="bi bi-lightbulb"></i> Consejos</h6>
+                        <ul class="list-unstyled small text-muted">
+                            <li><i class="bi bi-check text-success"></i> Deportivos: Alta velocidad, baja resistencia</li>
+                            <li><i class="bi bi-check text-success"></i> Cruceros: Equilibrio entre todas las características</li>
+                            <li><i class="bi bi-check text-success"></i> Yates: Alta maniobrabilidad y combustible</li>
+                            <li><i class="bi bi-check text-success"></i> Pesqueros: Alta resistencia, baja velocidad</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+        
+        // Form validation
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.getElementsByTagName('form');
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+        
+        // Update range values
+        function actualizarValor(campo, valor) {
+            document.getElementById(campo + 'Value').textContent = valor;
+        }
+        
+        // Real-time preview updates
+        function actualizarPreview() {
+            // Nombre
+            const nombre = document.getElementById('nombre').value || 'Nombre del modelo';
+            document.getElementById('preview-nombre').textContent = nombre;
+            
+            // Tipo
+            const tipoSeleccionado = document.querySelector('input[name="tipo"]:checked');
+            const tipo = tipoSeleccionado ? tipoSeleccionado.value : 'Tipo';
+            document.getElementById('preview-tipo').textContent = tipo;
+            
+            // Descripción
+            const descripcion = document.getElementById('descripcion').value;
+            const descripcionSection = document.getElementById('preview-descripcion-section');
+            if (descripcion) {
+                document.getElementById('preview-descripcion').textContent = descripcion;
+                descripcionSection.style.display = 'block';
+            } else {
+                descripcionSection.style.display = 'none';
+            }
+            
+            // Estadísticas
+            const velocidad = parseInt(document.getElementById('velocidadMaxima').value) || 100;
+            const resistencia = parseInt(document.getElementById('resistencia').value) || 50;
+            const maniobrabilidad = parseInt(document.getElementById('maniobrabilidad').value) || 50;
+            const combustible = parseInt(document.getElementById('capacidadCombustible').value) || 100;
+            
+            document.getElementById('preview-velocidad').textContent = velocidad;
+            document.getElementById('preview-resistencia').textContent = resistencia;
+            document.getElementById('preview-maniobrabilidad').textContent = maniobrabilidad;
+            document.getElementById('preview-combustible').textContent = combustible;
+            
+            // Barras de progreso
+            document.getElementById('preview-velocidad-bar').style.width = (velocidad / 2) + '%';
+            document.getElementById('preview-resistencia-bar').style.width = resistencia + '%';
+            document.getElementById('preview-maniobrabilidad-bar').style.width = maniobrabilidad + '%';
+            document.getElementById('preview-combustible-bar').style.width = (combustible / 2) + '%';
+            
+            // Puntuación total
+            const score = Math.round((velocidad + resistencia + maniobrabilidad + combustible) / 4);
+            document.getElementById('preview-score').textContent = score;
+            
+            // Color del círculo de puntuación
+            const scoreCircle = document.getElementById('preview-score-circle');
+            let gradient;
+            if (score >= 80) {
+                gradient = 'linear-gradient(135deg, #28a745, #20c997)';
+            } else if (score >= 60) {
+                gradient = 'linear-gradient(135deg, #ffc107, #fd7e14)';
+            } else {
+                gradient = 'linear-gradient(135deg, #dc3545, #c82333)';
+            }
+            scoreCircle.style.background = gradient;
+        }
+        
+        // Reset form
+        function resetearFormulario() {
+            // Reset range values
+            document.getElementById('velocidadMaximaValue').textContent = '100';
+            document.getElementById('resistenciaValue').textContent = '50';
+            document.getElementById('maniobrabilidadValue').textContent = '50';
+            document.getElementById('capacidadCombustibleValue').textContent = '100';
+            
+            // Update preview after reset
+            setTimeout(actualizarPreview, 100);
+        }
+        
+        // Add event listeners for real-time updates
+        document.getElementById('nombre').addEventListener('input', actualizarPreview);
+        document.getElementById('descripcion').addEventListener('input', actualizarPreview);
+        
+        // Add event listeners for radio buttons
+        document.querySelectorAll('input[name="tipo"]').forEach(function(radio) {
+            radio.addEventListener('change', actualizarPreview);
+        });
+        
+        // Initialize preview
+        actualizarPreview();
+    </script>
+</body>
+</html>

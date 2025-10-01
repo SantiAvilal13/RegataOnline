@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${modelo.nombre + ' - Regata Online'}">Modelo - Regata Online</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        .model-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 0;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            height: 100%;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-progress {
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        
+        .stat-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .speed-theme { background: linear-gradient(135deg, #007bff, #0056b3); }
+        .resistance-theme { background: linear-gradient(135deg, #28a745, #1e7e34); }
+        .maneuverability-theme { background: linear-gradient(135deg, #ffc107, #e0a800); }
+        .fuel-theme { background: linear-gradient(135deg, #fd7e14, #e55100); }
+        
+        .boats-section {
+            background-color: #f8f9fa;
+            border-radius: 15px;
+            padding: 30px;
+            margin-top: 30px;
+        }
+        
+        .boat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .boat-card:hover {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .boat-status {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .status-active { background-color: #28a745; }
+        .status-inactive { background-color: #dc3545; }
+        
+        .health-bar, .fuel-bar {
+            height: 6px;
+            background-color: #e9ecef;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        
+        .health-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #dc3545, #ffc107, #28a745);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        
+        .fuel-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #dc3545, #ffc107, #17a2b8);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            color: white;
+            margin: 0 auto 20px;
+            position: relative;
+        }
+        
+        .score-circle::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, rgba(255,255,255,0.3), transparent);
+            z-index: -1;
+        }
+        
+        .type-badge {
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+        
+        .action-buttons .btn {
+            margin: 5px;
+            border-radius: 25px;
+            padding: 10px 20px;
+            font-weight: 500;
+        }
+        
+        .info-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-water"></i> Regata Online
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="bi bi-house"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-people"></i> Jugadores
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/jugadores">Ver Todos</a></li>
+                            <li><a class="dropdown-item" href="/jugadores/nuevo">Crear Nuevo</a></li>
+                            <li><a class="dropdown-item" href="/jugadores/ranking">Ranking</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-gear"></i> Modelos
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/modelos">Ver Todos</a></li>
+                            <li><a class="dropdown-item" href="/modelos/nuevo">Crear Nuevo</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-ship"></i> Barcos
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/barcos">Ver Todos</a></li>
+                            <li><a class="dropdown-item" href="/barcos/nuevo">Crear Nuevo</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                <li class="breadcrumb-item"><a href="/modelos">Modelos</a></li>
+                <li class="breadcrumb-item active" th:text="${modelo.nombre}">Modelo</li>
+            </ol>
+        </nav>
+        
+        <!-- Flash Messages -->
+        <div th:if="${mensaje}" class="alert alert-dismissible fade show" 
+             th:classappend="${tipoMensaje == 'success' ? 'alert-success' : (tipoMensaje == 'error' ? 'alert-danger' : 'alert-info')}" 
+             role="alert">
+            <i th:class="${tipoMensaje == 'success' ? 'bi bi-check-circle' : (tipoMensaje == 'error' ? 'bi bi-exclamation-triangle' : 'bi bi-info-circle')}"></i>
+            <span th:text="${mensaje}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Model Header -->
+        <div class="model-header">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-8">
+                        <h1 class="display-4 mb-2">
+                            <i class="bi bi-gear"></i>
+                            <span th:text="${modelo.nombre}">Nombre del Modelo</span>
+                        </h1>
+                        <div class="mb-3">
+                            <span class="type-badge" 
+                                  th:classappend="${modelo.tipo == 'Deportivo' ? 'bg-primary' : 
+                                                  (modelo.tipo == 'Crucero' ? 'bg-success' : 
+                                                  (modelo.tipo == 'Yate' ? 'bg-warning text-dark' : 'bg-info'))}"
+                                  th:text="${modelo.tipo}">Tipo</span>
+                        </div>
+                        <p class="lead mb-0" th:text="${modelo.descripcion ?: 'Sin descripción disponible'}">
+                            Descripción del modelo
+                        </p>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        <div class="score-circle" 
+                             th:style="'background: linear-gradient(135deg, ' + 
+                                      (${(modelo.velocidadMaxima + modelo.resistencia + modelo.maniobrabilidad + modelo.capacidadCombustible) / 4} >= 80 ? '#28a745, #20c997' : 
+                                       (${(modelo.velocidadMaxima + modelo.resistencia + modelo.maniobrabilidad + modelo.capacidadCombustible) / 4} >= 60 ? '#ffc107, #fd7e14' : '#dc3545, #c82333')) + ')'">
+                            <span th:text="${#numbers.formatInteger((modelo.velocidadMaxima + modelo.resistencia + modelo.maniobrabilidad + modelo.capacidadCombustible) / 4, 0)}">75</span>
+                        </div>
+                        <h6 class="text-white-50">Puntuación Total</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Model Information -->
+            <div class="col-lg-8">
+                <!-- Basic Information -->
+                <div class="info-section">
+                    <h5 class="mb-3">
+                        <i class="bi bi-info-circle text-primary"></i> Información Básica
+                    </h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <p><strong>ID:</strong> <span th:text="${modelo.id}">1</span></p>
+                            <p><strong>Nombre:</strong> <span th:text="${modelo.nombre}">Nombre</span></p>
+                            <p><strong>Tipo:</strong> <span th:text="${modelo.tipo}">Tipo</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <p><strong>Barcos Activos:</strong> 
+                                <span class="badge bg-success" th:text="${#lists.size(modelo.barcos)}">0</span>
+                            </p>
+                            <p><strong>Descripción:</strong></p>
+                            <p class="text-muted" th:text="${modelo.descripcion ?: 'Sin descripción'}">Descripción</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Technical Specifications -->
+                <div class="row">
+                    <div class="col-md-6 col-lg-3 mb-4">
+                        <div class="stat-card">
+                            <div class="stat-icon speed-theme">
+                                <i class="bi bi-speedometer2 text-white"></i>
+                            </div>
+                            <div class="stat-value text-primary" th:text="${modelo.velocidadMaxima}">120</div>
+                            <div class="text-muted">Velocidad Máxima</div>
+                            <small class="text-muted">km/h</small>
+                            <div class="stat-progress">
+                                <div class="stat-fill speed-theme" 
+                                     th:style="'width: ' + ${modelo.velocidadMaxima / 2} + '%'"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-3 mb-4">
+                        <div class="stat-card">
+                            <div class="stat-icon resistance-theme">
+                                <i class="bi bi-shield text-white"></i>
+                            </div>
+                            <div class="stat-value text-success" th:text="${modelo.resistencia}">75</div>
+                            <div class="text-muted">Resistencia</div>
+                            <small class="text-muted">%</small>
+                            <div class="stat-progress">
+                                <div class="stat-fill resistance-theme" 
+                                     th:style="'width: ' + ${modelo.resistencia} + '%'"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-3 mb-4">
+                        <div class="stat-card">
+                            <div class="stat-icon maneuverability-theme">
+                                <i class="bi bi-arrow-left-right text-white"></i>
+                            </div>
+                            <div class="stat-value text-warning" th:text="${modelo.maniobrabilidad}">60</div>
+                            <div class="text-muted">Maniobrabilidad</div>
+                            <small class="text-muted">%</small>
+                            <div class="stat-progress">
+                                <div class="stat-fill maneuverability-theme" 
+                                     th:style="'width: ' + ${modelo.maniobrabilidad} + '%'"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6 col-lg-3 mb-4">
+                        <div class="stat-card">
+                            <div class="stat-icon fuel-theme">
+                                <i class="bi bi-fuel-pump text-white"></i>
+                            </div>
+                            <div class="stat-value text-info" th:text="${modelo.capacidadCombustible}">150</div>
+                            <div class="text-muted">Capacidad Combustible</div>
+                            <small class="text-muted">L</small>
+                            <div class="stat-progress">
+                                <div class="stat-fill fuel-theme" 
+                                     th:style="'width: ' + ${modelo.capacidadCombustible / 2} + '%'"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Associated Boats -->
+                <div class="boats-section">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h5 class="mb-0">
+                            <i class="bi bi-ship text-primary"></i> 
+                            Barcos con este Modelo 
+                            <span class="badge bg-primary" th:text="${#lists.size(modelo.barcos)}">0</span>
+                        </h5>
+                        <a th:href="@{/barcos/nuevo(modeloId=${modelo.id})}" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-plus-circle"></i> Crear Barco
+                        </a>
+                    </div>
+                    
+                    <div th:if="${#lists.isEmpty(modelo.barcos)}" class="text-center py-5">
+                        <i class="bi bi-ship text-muted" style="font-size: 3rem;"></i>
+                        <h6 class="text-muted mt-3">No hay barcos con este modelo</h6>
+                        <p class="text-muted">Crea el primer barco con este modelo</p>
+                        <a th:href="@{/barcos/nuevo(modeloId=${modelo.id})}" class="btn btn-primary">
+                            <i class="bi bi-plus-circle"></i> Crear Primer Barco
+                        </a>
+                    </div>
+                    
+                    <div th:each="barco : ${modelo.barcos}" class="boat-card">
+                        <div class="row align-items-center">
+                            <div class="col-md-4">
+                                <h6 class="mb-1">
+                                    <span class="boat-status" 
+                                          th:classappend="${barco.activo ? 'status-active' : 'status-inactive'}"></span>
+                                    <a th:href="@{/barcos/{id}(id=${barco.id})}" 
+                                       class="text-decoration-none" th:text="${barco.nombre}">Nombre del Barco</a>
+                                </h6>
+                                <small class="text-muted">
+                                    Propietario: 
+                                    <a th:href="@{/jugadores/{id}(id=${barco.jugador.id})}" 
+                                       class="text-decoration-none" th:text="${barco.jugador.nombre}">Jugador</a>
+                                </small>
+                            </div>
+                            <div class="col-md-2">
+                                <div class="text-center">
+                                    <div class="badge" 
+                                         th:style="'background-color: ' + ${barco.color} + '; color: white;'"
+                                         th:text="${barco.color}">Color</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="mb-2">
+                                    <small class="text-muted">Salud: </small>
+                                    <span th:text="${barco.estadoSalud + '%'}">100%</span>
+                                    <div class="health-bar">
+                                        <div class="health-fill" th:style="'width: ' + ${barco.estadoSalud} + '%'"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <small class="text-muted">Combustible: </small>
+                                    <span th:text="${barco.nivelCombustible + '%'}">80%</span>
+                                    <div class="fuel-bar">
+                                        <div class="fuel-fill" th:style="'width: ' + ${barco.nivelCombustible} + '%'"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3 text-end">
+                                <div class="mb-1">
+                                    <small class="text-muted">Experiencia:</small>
+                                    <span class="badge bg-info" th:text="${barco.experiencia}">0</span>
+                                </div>
+                                <div>
+                                    <small class="text-muted">Victorias:</small>
+                                    <span class="badge bg-success" th:text="${barco.carrerasGanadas}">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Panel -->
+            <div class="col-lg-4">
+                <div class="info-section sticky-top">
+                    <h5 class="mb-3">
+                        <i class="bi bi-tools text-primary"></i> Acciones
+                    </h5>
+                    
+                    <div class="action-buttons d-grid gap-2">
+                        <a th:href="@{/modelos/{id}/editar(id=${modelo.id})}" class="btn btn-primary">
+                            <i class="bi bi-pencil"></i> Editar Modelo
+                        </a>
+                        
+                        <a th:href="@{/barcos/nuevo(modeloId=${modelo.id})}" class="btn btn-success">
+                            <i class="bi bi-plus-circle"></i> Crear Barco con este Modelo
+                        </a>
+                        
+                        <a th:href="@{/modelos/comparar(ids=${modelo.id})}" class="btn btn-info">
+                            <i class="bi bi-bar-chart"></i> Comparar con Otros
+                        </a>
+                        
+                        <hr>
+                        
+                        <a href="/modelos" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left"></i> Volver a la Lista
+                        </a>
+                        
+                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            <i class="bi bi-trash"></i> Eliminar Modelo
+                        </button>
+                    </div>
+                    
+                    <!-- Model Statistics -->
+                    <div class="mt-4">
+                        <h6><i class="bi bi-graph-up"></i> Estadísticas</h6>
+                        <ul class="list-unstyled small">
+                            <li class="d-flex justify-content-between">
+                                <span>Barcos Totales:</span>
+                                <span class="badge bg-primary" th:text="${#lists.size(modelo.barcos)}">0</span>
+                            </li>
+                            <li class="d-flex justify-content-between">
+                                <span>Barcos Activos:</span>
+                                <span class="badge bg-success" th:text="${#lists.size(#lists.select(modelo.barcos, 'activo'))}">0</span>
+                            </li>
+                            <li class="d-flex justify-content-between">
+                                <span>Puntuación Promedio:</span>
+                                <span class="badge bg-info" th:text="${#numbers.formatInteger((modelo.velocidadMaxima + modelo.resistencia + modelo.maniobrabilidad + modelo.capacidadCombustible) / 4, 0)}">75</span>
+                            </li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Model Recommendations -->
+                    <div class="mt-4">
+                        <h6><i class="bi bi-lightbulb"></i> Recomendaciones</h6>
+                        <div class="small text-muted">
+                            <div th:if="${modelo.tipo == 'Deportivo'}">
+                                <i class="bi bi-check text-success"></i> Ideal para carreras de velocidad<br>
+                                <i class="bi bi-info text-info"></i> Requiere piloto experimentado
+                            </div>
+                            <div th:if="${modelo.tipo == 'Crucero'}">
+                                <i class="bi bi-check text-success"></i> Perfecto para principiantes<br>
+                                <i class="bi bi-info text-info"></i> Equilibrio entre todas las características
+                            </div>
+                            <div th:if="${modelo.tipo == 'Yate'}">
+                                <i class="bi bi-check text-success"></i> Excelente maniobrabilidad<br>
+                                <i class="bi bi-info text-info"></i> Ideal para aguas complicadas
+                            </div>
+                            <div th:if="${modelo.tipo == 'Pesquero'}">
+                                <i class="bi bi-check text-success"></i> Muy resistente<br>
+                                <i class="bi bi-info text-info"></i> Perfecto para largas distancias
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="bi bi-exclamation-triangle text-warning"></i>
+                        Confirmar Eliminación
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar el modelo <strong th:text="${modelo.nombre}">Modelo</strong>?</p>
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        <strong>Advertencia:</strong> Esta acción no se puede deshacer. 
+                        <span th:if="${#lists.size(modelo.barcos) > 0}">
+                            Este modelo tiene <strong th:text="${#lists.size(modelo.barcos)}">0</strong> barco(s) asociado(s) que también serán eliminados.
+                        </span>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle"></i> Cancelar
+                    </button>
+                    <form th:action="@{/modelos/{id}/eliminar(id=${modelo.id})}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Eliminar Definitivamente
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+        
+        // Animate progress bars on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const progressBars = document.querySelectorAll('.stat-fill');
+            progressBars.forEach(function(bar) {
+                const width = bar.style.width;
+                bar.style.width = '0%';
+                setTimeout(function() {
+                    bar.style.width = width;
+                }, 500);
+            });
+        });
+    </script>
+</body>
+</html>

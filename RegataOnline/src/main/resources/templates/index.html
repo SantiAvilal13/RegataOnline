@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Regata Online - Inicio</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-water"></i> Regata Online
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">
+                            <i class="bi bi-house"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-people"></i> Jugadores
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/jugadores">Ver Todos</a></li>
+                            <li><a class="dropdown-item" href="/jugadores/nuevo">Crear Nuevo</a></li>
+                            <li><a class="dropdown-item" href="/jugadores/ranking">Ranking</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-gear"></i> Modelos
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/modelos">Ver Todos</a></li>
+                            <li><a class="dropdown-item" href="/modelos/nuevo">Crear Nuevo</a></li>
+                            <li><a class="dropdown-item" href="/modelos/populares">Populares</a></li>
+                            <li><a class="dropdown-item" href="/modelos/equilibrados">Equilibrados</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-ship"></i> Barcos
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/barcos">Ver Todos</a></li>
+                            <li><a class="dropdown-item" href="/barcos/nuevo">Crear Nuevo</a></li>
+                            <li><a class="dropdown-item" href="/barcos/ranking">Ranking</a></li>
+                            <li><a class="dropdown-item" href="/barcos/problemas">Problemas</a></li>
+                        </ul>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/h2-console" target="_blank">
+                            <i class="bi bi-database"></i> Base de Datos
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="container text-center">
+            <h1 class="display-4 fw-bold mb-4">
+                <i class="bi bi-water"></i> Regata Online
+            </h1>
+            <p class="lead mb-4">
+                Sistema de gestión para carreras de barcos multijugador
+            </p>
+            <p class="mb-4">
+                Administra jugadores, modelos de barcos y flotas en un entorno intuitivo y moderno
+            </p>
+            <div class="row justify-content-center">
+                <div class="col-md-8">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <a href="/jugadores" class="btn btn-light btn-lg w-100">
+                                <i class="bi bi-people"></i><br>
+                                Gestionar Jugadores
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="/modelos" class="btn btn-light btn-lg w-100">
+                                <i class="bi bi-gear"></i><br>
+                                Gestionar Modelos
+                            </a>
+                        </div>
+                        <div class="col-md-4">
+                            <a href="/barcos" class="btn btn-light btn-lg w-100">
+                                <i class="bi bi-ship"></i><br>
+                                Gestionar Barcos
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <div class="container">
+        <!-- Flash Messages -->
+        <div th:if="${mensaje}" class="alert alert-dismissible fade show" 
+             th:classappend="${tipoMensaje == 'success' ? 'alert-success' : (tipoMensaje == 'error' ? 'alert-danger' : 'alert-info')}" 
+             role="alert">
+            <i th:class="${tipoMensaje == 'success' ? 'bi bi-check-circle' : (tipoMensaje == 'error' ? 'bi bi-exclamation-triangle' : 'bi bi-info-circle')}"></i>
+            <span th:text="${mensaje}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="row mb-5">
+            <div class="col-md-4 mb-3">
+                <div class="card stats-card">
+                    <div class="card-body text-center">
+                        <i class="bi bi-people icon-large"></i>
+                        <h3 th:text="${totalJugadores != null ? totalJugadores : '0'}">0</h3>
+                        <p class="mb-0">Jugadores Registrados</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card stats-card">
+                    <div class="card-body text-center">
+                        <i class="bi bi-gear icon-large"></i>
+                        <h3 th:text="${totalModelos != null ? totalModelos : '0'}">0</h3>
+                        <p class="mb-0">Modelos de Barcos</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <div class="card stats-card">
+                    <div class="card-body text-center">
+                        <i class="bi bi-ship icon-large"></i>
+                        <h3 th:text="${totalBarcos != null ? totalBarcos : '0'}">0</h3>
+                        <p class="mb-0">Barcos en Flota</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <h2 class="text-center mb-4">Características Principales</h2>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-people-fill text-primary icon-large"></i>
+                        <h5 class="card-title">Gestión de Jugadores</h5>
+                        <p class="card-text">
+                            Administra perfiles de jugadores con estadísticas de experiencia, 
+                            victorias y información de contacto.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-gear-fill text-success icon-large"></i>
+                        <h5 class="card-title">Modelos de Barcos</h5>
+                        <p class="card-text">
+                            Define características técnicas como velocidad, resistencia, 
+                            maniobrabilidad y capacidad de combustible.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card feature-card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-ship text-info icon-large"></i>
+                        <h5 class="card-title">Flota de Barcos</h5>
+                        <p class="card-text">
+                            Controla el estado de cada barco: combustible, salud, 
+                            experiencia y historial de carreras.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <h2 class="text-center mb-4">Acciones Rápidas</h2>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="/jugadores/nuevo" class="quick-action-btn btn btn-outline-primary">
+                    <i class="bi bi-person-plus icon-large"></i>
+                    <span>Nuevo Jugador</span>
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="/modelos/nuevo" class="quick-action-btn btn btn-outline-success">
+                    <i class="bi bi-plus-circle icon-large"></i>
+                    <span>Nuevo Modelo</span>
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="/barcos/nuevo" class="quick-action-btn btn btn-outline-info">
+                    <i class="bi bi-plus-square icon-large"></i>
+                    <span>Nuevo Barco</span>
+                </a>
+            </div>
+            <div class="col-md-3 mb-3">
+                <a href="/h2-console" target="_blank" class="quick-action-btn btn btn-outline-secondary">
+                    <i class="bi bi-database icon-large"></i>
+                    <span>Base de Datos</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5><i class="bi bi-water"></i> Regata Online</h5>
+                    <p class="text-muted">Sistema de gestión para carreras de barcos multijugador</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <p class="text-muted">
+                        <small>
+                            Desarrollado con Spring Boot y Thymeleaf<br>
+                            <i class="bi bi-calendar"></i> <span th:text="${#dates.format(#dates.createNow(), 'yyyy')}"></span>
+                        </small>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+    </script>
+</body>
+</html>

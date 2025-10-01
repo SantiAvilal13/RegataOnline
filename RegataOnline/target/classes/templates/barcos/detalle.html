@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${barco.nombre} + ' - Regata Online'">Detalle del Barco - Regata Online</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+    <!-- Navegación -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" th:href="@{/}">
+                <i class="bi bi-water"></i> Regata Online
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/}">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/jugadores}">Jugadores</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/modelos}">Modelos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" th:href="@{/barcos}">Barcos</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Encabezado del Barco -->
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="barco-icon me-3">
+                        <i class="bi bi-sailboat display-4" th:style="'color: ' + ${barco.color}"></i>
+                    </div>
+                    <div>
+                        <h1 class="display-6 mb-1" th:text="${barco.nombre}">Nombre del Barco</h1>
+                        <div class="d-flex align-items-center">
+                            <span th:class="'badge me-2 ' + (${barco.activo} ? 'bg-success' : 'bg-secondary')"
+                                  th:text="${barco.activo} ? 'Activo' : 'Inactivo'"></span>
+                            <span class="text-muted">
+                                ID: <span th:text="${barco.id}"></span> | 
+                                Creado: <span th:text="${#temporals.format(barco.fechaCreacion, 'dd/MM/yyyy')}"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/}">Inicio</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/barcos}">Barcos</a></li>
+                        <li class="breadcrumb-item active" th:text="${barco.nombre}">Barco</li>
+                    </ol>
+                </nav>
+            </div>
+            <div class="col-md-4 text-end">
+                <div class="btn-group" role="group">
+                    <a th:href="@{/barcos/{id}/editar(id=${barco.id})}" class="btn btn-warning">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                    <button type="button" class="btn btn-danger" onclick="confirmarEliminacion()">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mensajes Flash -->
+        <div th:if="${mensaje}" th:class="'alert alert-' + ${tipoMensaje} + ' alert-dismissible fade show'" role="alert">
+            <span th:text="${mensaje}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="row">
+            <!-- Información Principal -->
+            <div class="col-lg-8">
+                <!-- Información Básica -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-info-circle"></i> Información Básica
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted">Propietario</label>
+                                    <div>
+                                        <a th:href="@{/jugadores/{id}(id=${barco.jugador.id})}" 
+                                           class="text-decoration-none h6" th:text="${barco.jugador.nombre}"></a>
+                                        <br>
+                                        <small class="text-muted" th:text="${barco.jugador.email}"></small>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label text-muted">Modelo</label>
+                                    <div>
+                                        <a th:href="@{/modelos/{id}(id=${barco.modelo.id})}" 
+                                           class="text-decoration-none h6" th:text="${barco.modelo.nombre}"></a>
+                                        <br>
+                                        <small class="text-muted" th:text="${barco.modelo.tipo}"></small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label class="form-label text-muted">Color</label>
+                                    <div>
+                                        <span class="color-badge h6" th:style="'background-color: ' + ${barco.color}" 
+                                              th:text="${barco.color}"></span>
+                                    </div>
+                                </div>
+                                
+                                <div class="mb-3">
+                                    <label class="form-label text-muted">Fecha de Creación</label>
+                                    <div class="h6" th:text="${#temporals.format(barco.fechaCreacion, 'dd/MM/yyyy HH:mm')}"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Estado Actual -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-speedometer2"></i> Estado Actual
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Salud</label>
+                                <div class="progress mb-2" style="height: 25px;">
+                                    <div class="progress-bar" 
+                                         th:classappend="${barco.salud >= 80} ? 'bg-success' : ${barco.salud >= 50} ? 'bg-warning' : 'bg-danger'"
+                                         th:style="'width: ' + ${barco.salud} + '%'"
+                                         th:text="${barco.salud} + '%'"></div>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <small class="text-muted">Estado: 
+                                        <span th:class="${barco.salud >= 80} ? 'text-success' : ${barco.salud >= 50} ? 'text-warning' : 'text-danger'"
+                                              th:text="${barco.salud >= 80} ? 'Excelente' : ${barco.salud >= 50} ? 'Bueno' : 'Necesita reparación'"></span>
+                                    </small>
+                                    <form th:if="${barco.salud < 100}" th:action="@{/barcos/{id}/reparar(id=${barco.id})}" method="post" style="display: inline;">
+                                        <button type="submit" class="btn btn-sm btn-outline-success">
+                                            <i class="bi bi-tools"></i> Reparar
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Combustible</label>
+                                <div class="progress mb-2" style="height: 25px;">
+                                    <div class="progress-bar" 
+                                         th:classappend="${barco.nivelCombustible >= 50} ? 'bg-success' : ${barco.nivelCombustible >= 25} ? 'bg-warning' : 'bg-danger'"
+                                         th:style="'width: ' + ${barco.nivelCombustible} + '%'"
+                                         th:text="${barco.nivelCombustible} + '%'"></div>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <small class="text-muted">Nivel: 
+                                        <span th:class="${barco.nivelCombustible >= 50} ? 'text-success' : ${barco.nivelCombustible >= 25} ? 'text-warning' : 'text-danger'"
+                                              th:text="${barco.nivelCombustible >= 50} ? 'Alto' : ${barco.nivelCombustible >= 25} ? 'Medio' : 'Bajo'"></span>
+                                    </small>
+                                    <form th:if="${barco.nivelCombustible < 100}" th:action="@{/barcos/{id}/recargar(id=${barco.id})}" method="post" style="display: inline;">
+                                        <button type="submit" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-fuel-pump"></i> Recargar
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Características del Modelo -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-gear"></i> Características del Modelo
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Velocidad Máxima</label>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar bg-info" 
+                                         th:style="'width: ' + ${barco.modelo.velocidadMaxima} + '%'"
+                                         th:text="${barco.modelo.velocidadMaxima}"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Resistencia</label>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar bg-success" 
+                                         th:style="'width: ' + ${barco.modelo.resistencia} + '%'"
+                                         th:text="${barco.modelo.resistencia}"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Maniobrabilidad</label>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar bg-warning" 
+                                         th:style="'width: ' + ${barco.modelo.maniobrabilidad} + '%'"
+                                         th:text="${barco.modelo.maniobrabilidad}"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label text-muted">Capacidad de Combustible</label>
+                                <div class="progress" style="height: 20px;">
+                                    <div class="progress-bar bg-danger" 
+                                         th:style="'width: ' + ${barco.modelo.capacidadCombustible} + '%'"
+                                         th:text="${barco.modelo.capacidadCombustible}"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel Lateral -->
+            <div class="col-lg-4">
+                <!-- Estadísticas -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-graph-up"></i> Estadísticas
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row text-center">
+                            <div class="col-6 mb-3">
+                                <div class="border rounded p-3">
+                                    <div class="h4 mb-1 text-info" th:text="${barco.experiencia}">0</div>
+                                    <small class="text-muted">Experiencia</small>
+                                </div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <div class="border rounded p-3">
+                                    <div class="h4 mb-1 text-success" th:text="${barco.victorias}">0</div>
+                                    <small class="text-muted">Victorias</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Acciones de Estadísticas -->
+                        <div class="d-grid gap-2">
+                            <form th:action="@{/barcos/{id}/experiencia(id=${barco.id})}" method="post" class="d-flex">
+                                <input type="number" name="puntos" value="10" min="1" max="100" class="form-control form-control-sm me-2">
+                                <button type="submit" class="btn btn-sm btn-outline-info">
+                                    <i class="bi bi-plus"></i> EXP
+                                </button>
+                            </form>
+                            
+                            <form th:action="@{/barcos/{id}/victoria(id=${barco.id})}" method="post">
+                                <button type="submit" class="btn btn-sm btn-outline-success w-100">
+                                    <i class="bi bi-trophy"></i> Registrar Victoria
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Acciones Rápidas -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-lightning"></i> Acciones Rápidas
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <!-- Activar/Desactivar -->
+                            <form th:action="${barco.activo} ? @{/barcos/{id}/desactivar(id=${barco.id})} : @{/barcos/{id}/activar(id=${barco.id})}" method="post">
+                                <button type="submit" th:class="'btn w-100 ' + (${barco.activo} ? 'btn-outline-warning' : 'btn-outline-success')">
+                                    <i th:class="'bi ' + (${barco.activo} ? 'bi-pause' : 'bi-play')"></i>
+                                    <span th:text="${barco.activo} ? 'Desactivar' : 'Activar'"></span>
+                                </button>
+                            </form>
+                            
+                            <!-- Reparar (si es necesario) -->
+                            <form th:if="${barco.salud < 100}" th:action="@{/barcos/{id}/reparar(id=${barco.id})}" method="post">
+                                <button type="submit" class="btn btn-outline-success w-100">
+                                    <i class="bi bi-tools"></i> Reparar Completamente
+                                </button>
+                            </form>
+                            
+                            <!-- Recargar Combustible (si es necesario) -->
+                            <form th:if="${barco.nivelCombustible < 100}" th:action="@{/barcos/{id}/recargar(id=${barco.id})}" method="post">
+                                <button type="submit" class="btn btn-outline-primary w-100">
+                                    <i class="bi bi-fuel-pump"></i> Recargar Combustible
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enlaces Relacionados -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-link"></i> Enlaces Relacionados
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-grid gap-2">
+                            <a th:href="@{/jugadores/{id}(id=${barco.jugador.id})}" class="btn btn-outline-primary">
+                                <i class="bi bi-person"></i> Ver Propietario
+                            </a>
+                            
+                            <a th:href="@{/modelos/{id}(id=${barco.modelo.id})}" class="btn btn-outline-info">
+                                <i class="bi bi-gear"></i> Ver Modelo
+                            </a>
+                            
+                            <a th:href="@{/barcos/jugador/{id}(id=${barco.jugador.id})}" class="btn btn-outline-secondary">
+                                <i class="bi bi-sailboat"></i> Otros Barcos del Jugador
+                            </a>
+                            
+                            <a th:href="@{/barcos/modelo/{id}(id=${barco.modelo.id})}" class="btn btn-outline-secondary">
+                                <i class="bi bi-collection"></i> Barcos del Mismo Modelo
+                            </a>
+                            
+                            <a th:href="@{/barcos}" class="btn btn-outline-dark">
+                                <i class="bi bi-arrow-left"></i> Volver a la Lista
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmación de Eliminación -->
+    <div class="modal fade" id="modalEliminar" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>¿Estás seguro de que deseas eliminar el barco <strong th:text="${barco.nombre}"></strong>?</p>
+                    <p class="text-danger">Esta acción no se puede deshacer y se perderán todas las estadísticas del barco.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <form th:action="@{/barcos/{id}/eliminar(id=${barco.id})}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-danger">Eliminar Barco</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/app.js}"></script>
+    <script>
+        function confirmarEliminacion() {
+            new bootstrap.Modal(document.getElementById('modalEliminar')).show();
+        }
+    </script>
+</body>
+</html>

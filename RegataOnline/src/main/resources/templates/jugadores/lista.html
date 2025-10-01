@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jugadores - Regata Online</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <style>
+        .search-section {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .player-card {
+            transition: transform 0.2s ease;
+        }
+        
+        .player-card:hover {
+            transform: translateY(-2px);
+        }
+        
+        .experience-bar {
+            height: 8px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .experience-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745, #20c997);
+            transition: width 0.3s ease;
+        }
+        
+        .victory-badge {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #333;
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="bi bi-water"></i> Regata Online
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="bi bi-house"></i> Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle active" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-people"></i> Jugadores
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item active" href="/jugadores">Ver Todos</a></li>
+                            <li><a class="dropdown-item" href="/jugadores/nuevo">Crear Nuevo</a></li>
+                            <li><a class="dropdown-item" href="/jugadores/ranking">Ranking</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-gear"></i> Modelos
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/modelos">Ver Todos</a></li>
+                            <li><a class="dropdown-item" href="/modelos/nuevo">Crear Nuevo</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="bi bi-ship"></i> Barcos
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/barcos">Ver Todos</a></li>
+                            <li><a class="dropdown-item" href="/barcos/nuevo">Crear Nuevo</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container mt-4">
+        <!-- Breadcrumb -->
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+                <li class="breadcrumb-item active">Jugadores</li>
+            </ol>
+        </nav>
+        
+        <!-- Flash Messages -->
+        <div th:if="${mensaje}" class="alert alert-dismissible fade show" 
+             th:classappend="${tipoMensaje == 'success' ? 'alert-success' : (tipoMensaje == 'error' ? 'alert-danger' : 'alert-info')}" 
+             role="alert">
+            <i th:class="${tipoMensaje == 'success' ? 'bi bi-check-circle' : (tipoMensaje == 'error' ? 'bi bi-exclamation-triangle' : 'bi bi-info-circle')}"></i>
+            <span th:text="${mensaje}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1><i class="bi bi-people"></i> Gestión de Jugadores</h1>
+                <p class="text-muted">Administra los jugadores registrados en el sistema</p>
+            </div>
+            <div>
+                <a href="/jugadores/nuevo" class="btn btn-primary">
+                    <i class="bi bi-person-plus"></i> Nuevo Jugador
+                </a>
+                <a href="/jugadores/ranking" class="btn btn-outline-warning">
+                    <i class="bi bi-trophy"></i> Ranking
+                </a>
+            </div>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-section">
+            <form method="get" action="/jugadores/buscar">
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label for="nombre" class="form-label">Buscar por nombre</label>
+                        <input type="text" class="form-control" id="nombre" name="nombre" 
+                               th:value="${terminoBusqueda}" placeholder="Nombre del jugador">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="experienciaMin" class="form-label">Experiencia mínima</label>
+                        <input type="number" class="form-control" id="experienciaMin" name="experienciaMin" 
+                               th:value="${experienciaMin}" min="0" placeholder="0">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="victoriasMin" class="form-label">Victorias mínimas</label>
+                        <input type="number" class="form-control" id="victoriasMin" name="victoriasMin" 
+                               th:value="${victoriasMin}" min="0" placeholder="0">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">&nbsp;</label>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-outline-primary">
+                                <i class="bi bi-search"></i> Buscar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-12">
+                        <a href="/jugadores" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-arrow-clockwise"></i> Limpiar filtros
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Results Info -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+                <span class="text-muted">
+                    Mostrando <strong th:text="${jugadores.size()}">0</strong> jugador(es)
+                    <span th:if="${terminoBusqueda}">
+                        para "<strong th:text="${terminoBusqueda}"></strong>"
+                    </span>
+                </span>
+            </div>
+            <div class="btn-group" role="group">
+                <input type="radio" class="btn-check" name="vista" id="vista-cards" checked>
+                <label class="btn btn-outline-secondary btn-sm" for="vista-cards">
+                    <i class="bi bi-grid"></i> Tarjetas
+                </label>
+                
+                <input type="radio" class="btn-check" name="vista" id="vista-tabla">
+                <label class="btn btn-outline-secondary btn-sm" for="vista-tabla">
+                    <i class="bi bi-list"></i> Tabla
+                </label>
+            </div>
+        </div>
+
+        <!-- Cards View -->
+        <div id="cards-view">
+            <div class="row" th:if="${jugadores.size() > 0}">
+                <div class="col-md-6 col-lg-4 mb-4" th:each="jugador : ${jugadores}">
+                    <div class="card player-card h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">
+                                <i class="bi bi-person"></i>
+                                <span th:text="${jugador.nombre}">Nombre</span>
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <small class="text-muted">Email:</small><br>
+                                <span th:text="${jugador.email}">email@ejemplo.com</span>
+                            </div>
+                            
+                            <div class="mb-3" th:if="${jugador.telefono}">
+                                <small class="text-muted">Teléfono:</small><br>
+                                <span th:text="${jugador.telefono}">Teléfono</span>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between align-items-center mb-1">
+                                    <small class="text-muted">Experiencia:</small>
+                                    <span class="badge bg-info" th:text="${jugador.experiencia}">0</span>
+                                </div>
+                                <div class="experience-bar">
+                                    <div class="experience-fill" 
+                                         th:style="'width: ' + ${jugador.experiencia > 1000 ? 100 : (jugador.experiencia / 10)} + '%'"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <small class="text-muted">Victorias:</small>
+                                <span class="victory-badge" th:text="${jugador.victorias}">0</span>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <small class="text-muted">Barcos:</small>
+                                <span class="badge bg-secondary" th:text="${jugador.barcos.size()}">0</span>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="btn-group w-100" role="group">
+                                <a th:href="@{/jugadores/{id}(id=${jugador.id})}" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-eye"></i> Ver
+                                </a>
+                                <a th:href="@{/jugadores/{id}/editar(id=${jugador.id})}" class="btn btn-outline-warning btn-sm">
+                                    <i class="bi bi-pencil"></i> Editar
+                                </a>
+                                <form th:action="@{/jugadores/{id}/eliminar(id=${jugador.id})}" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-outline-danger btn-sm" 
+                                            onclick="return confirmarEliminacion('¿Eliminar jugador?')">
+                                        <i class="bi bi-trash"></i> Eliminar
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Table View -->
+        <div id="table-view" style="display: none;">
+            <div class="table-responsive" th:if="${jugadores.size() > 0}">
+                <table class="table table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Email</th>
+                            <th>Teléfono</th>
+                            <th>Experiencia</th>
+                            <th>Victorias</th>
+                            <th>Barcos</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="jugador : ${jugadores}">
+                            <td th:text="${jugador.id}">1</td>
+                            <td>
+                                <strong th:text="${jugador.nombre}">Nombre</strong>
+                            </td>
+                            <td th:text="${jugador.email}">email@ejemplo.com</td>
+                            <td th:text="${jugador.telefono ?: 'N/A'}">Teléfono</td>
+                            <td>
+                                <span class="badge bg-info" th:text="${jugador.experiencia}">0</span>
+                            </td>
+                            <td>
+                                <span class="victory-badge" th:text="${jugador.victorias}">0</span>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary" th:text="${jugador.barcos.size()}">0</span>
+                            </td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a th:href="@{/jugadores/{id}(id=${jugador.id})}" class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a th:href="@{/jugadores/{id}/editar(id=${jugador.id})}" class="btn btn-outline-warning btn-sm">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form th:action="@{/jugadores/{id}/eliminar(id=${jugador.id})}" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-outline-danger btn-sm" 
+                                                onclick="return confirmarEliminacion('¿Eliminar jugador?')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Empty State -->
+        <div th:if="${jugadores.size() == 0}" class="text-center py-5">
+            <i class="bi bi-people text-muted" style="font-size: 4rem;"></i>
+            <h3 class="text-muted mt-3">No se encontraron jugadores</h3>
+            <p class="text-muted">
+                <span th:if="${terminoBusqueda}">
+                    No hay jugadores que coincidan con tu búsqueda.
+                </span>
+                <span th:unless="${terminoBusqueda}">
+                    Aún no hay jugadores registrados en el sistema.
+                </span>
+            </p>
+            <a href="/jugadores/nuevo" class="btn btn-primary">
+                <i class="bi bi-person-plus"></i> Crear primer jugador
+            </a>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(function(alert) {
+                const bsAlert = new bootstrap.Alert(alert);
+                bsAlert.close();
+            });
+        }, 5000);
+        
+        // View toggle functionality
+        document.getElementById('vista-cards').addEventListener('change', function() {
+            if (this.checked) {
+                document.getElementById('cards-view').style.display = 'block';
+                document.getElementById('table-view').style.display = 'none';
+            }
+        });
+        
+        document.getElementById('vista-tabla').addEventListener('change', function() {
+            if (this.checked) {
+                document.getElementById('cards-view').style.display = 'none';
+                document.getElementById('table-view').style.display = 'block';
+            }
+        });
+        
+        // Confirmation for delete actions
+        function confirmarEliminacion(mensaje) {
+            return confirm(mensaje || '¿Estás seguro de que deseas eliminar este elemento?');
+        }
+    </script>
+</body>
+</html>

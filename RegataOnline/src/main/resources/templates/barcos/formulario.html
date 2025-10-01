@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${accion} + ' Barco - Regata Online'">Crear Barco - Regata Online</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+    <!-- Navegación -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" th:href="@{/}">
+                <i class="bi bi-water"></i> Regata Online
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/}">Inicio</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/jugadores}">Jugadores</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/modelos}">Modelos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" th:href="@{/barcos}">Barcos</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-4">
+        <!-- Encabezado -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h1 class="display-6">
+                    <i class="bi bi-sailboat text-primary"></i>
+                    <span th:text="${accion} + ' Barco'">Crear Barco</span>
+                </h1>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a th:href="@{/}">Inicio</a></li>
+                        <li class="breadcrumb-item"><a th:href="@{/barcos}">Barcos</a></li>
+                        <li class="breadcrumb-item active" th:text="${accion}">Crear</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+
+        <!-- Mensajes Flash -->
+        <div th:if="${mensaje}" th:class="'alert alert-' + ${tipoMensaje} + ' alert-dismissible fade show'" role="alert">
+            <span th:text="${mensaje}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="row">
+            <!-- Formulario -->
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-form"></i> Información del Barco
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form th:action="${barco.id != null} ? @{/barcos/{id}(id=${barco.id})} : @{/barcos}" 
+                              th:object="${barco}" method="post">
+                            
+                            <!-- Información Básica -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h6 class="text-primary border-bottom pb-2">
+                                        <i class="bi bi-info-circle"></i> Información Básica
+                                    </h6>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="nombre" class="form-label">Nombre del Barco *</label>
+                                    <input type="text" class="form-control" id="nombre" th:field="*{nombre}" 
+                                           placeholder="Ej: Viento del Mar" required maxlength="100">
+                                    <div class="form-text">Nombre único para identificar el barco</div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="color" class="form-label">Color *</label>
+                                    <div class="input-group">
+                                        <input type="color" class="form-control form-control-color" id="colorPicker" 
+                                               th:value="${barco.color != null} ? ${barco.color} : '#0066cc'"
+                                               onchange="actualizarColor()">
+                                        <input type="text" class="form-control" id="color" th:field="*{color}" 
+                                               placeholder="#0066cc" required pattern="^#[0-9A-Fa-f]{6}$">
+                                    </div>
+                                    <div class="form-text">Color del barco en formato hexadecimal</div>
+                                </div>
+                            </div>
+
+                            <!-- Asignaciones -->
+                            <div class="row mb-4">
+                                <div class="col-12">
+                                    <h6 class="text-primary border-bottom pb-2">
+                                        <i class="bi bi-people"></i> Asignaciones
+                                    </h6>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="jugador" class="form-label">Jugador Propietario *</label>
+                                    <select class="form-select" id="jugador" th:field="*{jugador.id}" required>
+                                        <option value="">Seleccionar jugador...</option>
+                                        <option th:each="jugador : ${jugadores}" 
+                                                th:value="${jugador.id}" 
+                                                th:text="${jugador.nombre} + ' (' + ${jugador.email} + ')'"
+                                                th:selected="${barco.jugador != null and barco.jugador.id == jugador.id}"></option>
+                                    </select>
+                                    <div class="form-text">Jugador que será propietario del barco</div>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <label for="modelo" class="form-label">Modelo del Barco *</label>
+                                    <select class="form-select" id="modelo" th:field="*{modelo.id}" required onchange="actualizarInfoModelo()">
+                                        <option value="">Seleccionar modelo...</option>
+                                        <option th:each="modelo : ${modelos}" 
+                                                th:value="${modelo.id}" 
+                                                th:text="${modelo.nombre} + ' (' + ${modelo.tipo} + ')'"
+                                                th:selected="${barco.modelo != null and barco.modelo.id == modelo.id}"
+                                                th:data-velocidad="${modelo.velocidadMaxima}"
+                                                th:data-resistencia="${modelo.resistencia}"
+                                                th:data-maniobrabilidad="${modelo.maniobrabilidad}"
+                                                th:data-combustible="${modelo.capacidadCombustible}"></option>
+                                    </select>
+                                    <div class="form-text">Modelo que determinará las características del barco</div>
+                                </div>
+                            </div>
+
+                            <!-- Estadísticas (solo para edición) -->
+                            <div class="row mb-4" th:if="${barco.id != null}">
+                                <div class="col-12">
+                                    <h6 class="text-primary border-bottom pb-2">
+                                        <i class="bi bi-graph-up"></i> Estadísticas
+                                    </h6>
+                                </div>
+                                
+                                <div class="col-md-3 mb-3">
+                                    <label for="salud" class="form-label">Salud (%)</label>
+                                    <input type="range" class="form-range" id="saludRange" 
+                                           th:value="${barco.salud}" min="0" max="100" 
+                                           oninput="actualizarValor('salud', this.value)">
+                                    <input type="number" class="form-control" id="salud" th:field="*{salud}" 
+                                           min="0" max="100" readonly>
+                                </div>
+                                
+                                <div class="col-md-3 mb-3">
+                                    <label for="nivelCombustible" class="form-label">Combustible (%)</label>
+                                    <input type="range" class="form-range" id="combustibleRange" 
+                                           th:value="${barco.nivelCombustible}" min="0" max="100" 
+                                           oninput="actualizarValor('nivelCombustible', this.value)">
+                                    <input type="number" class="form-control" id="nivelCombustible" th:field="*{nivelCombustible}" 
+                                           min="0" max="100" readonly>
+                                </div>
+                                
+                                <div class="col-md-3 mb-3">
+                                    <label for="experiencia" class="form-label">Experiencia</label>
+                                    <input type="number" class="form-control" id="experiencia" th:field="*{experiencia}" 
+                                           min="0" readonly>
+                                </div>
+                                
+                                <div class="col-md-3 mb-3">
+                                    <label for="victorias" class="form-label">Victorias</label>
+                                    <input type="number" class="form-control" id="victorias" th:field="*{victorias}" 
+                                           min="0" readonly>
+                                </div>
+                            </div>
+
+                            <!-- Estado (solo para edición) -->
+                            <div class="row mb-4" th:if="${barco.id != null}">
+                                <div class="col-12">
+                                    <h6 class="text-primary border-bottom pb-2">
+                                        <i class="bi bi-toggle-on"></i> Estado
+                                    </h6>
+                                </div>
+                                
+                                <div class="col-md-6 mb-3">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="activo" th:field="*{activo}">
+                                        <label class="form-check-label" for="activo">
+                                            Barco Activo
+                                        </label>
+                                    </div>
+                                    <div class="form-text">Los barcos inactivos no pueden participar en regatas</div>
+                                </div>
+                            </div>
+
+                            <!-- Botones de Acción -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <hr>
+                                    <div class="d-flex justify-content-between">
+                                        <div>
+                                            <button type="submit" class="btn btn-primary me-2">
+                                                <i class="bi bi-check-circle"></i>
+                                                <span th:text="${barco.id != null} ? 'Actualizar' : 'Crear'">Crear</span>
+                                            </button>
+                                            <a th:href="@{/barcos}" class="btn btn-outline-secondary">
+                                                <i class="bi bi-arrow-left"></i> Cancelar
+                                            </a>
+                                        </div>
+                                        <div th:if="${barco.id != null}">
+                                            <a th:href="@{/barcos/{id}(id=${barco.id})}" class="btn btn-outline-info">
+                                                <i class="bi bi-eye"></i> Ver Detalles
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel de Vista Previa -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="bi bi-eye"></i> Vista Previa
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="text-center mb-3">
+                            <div class="barco-preview" id="barcoPreview">
+                                <i class="bi bi-sailboat display-1" style="color: #0066cc;"></i>
+                            </div>
+                            <h6 class="mt-2" id="previewNombre">Nombre del Barco</h6>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>Propietario:</strong>
+                            <span id="previewJugador" class="text-muted">No seleccionado</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>Modelo:</strong>
+                            <span id="previewModelo" class="text-muted">No seleccionado</span>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <strong>Color:</strong>
+                            <span id="previewColor" class="color-badge" style="background-color: #0066cc;">#0066cc</span>
+                        </div>
+                        
+                        <!-- Características del Modelo -->
+                        <div id="caracteristicasModelo" style="display: none;">
+                            <h6 class="text-primary border-bottom pb-1">Características del Modelo</h6>
+                            
+                            <div class="mb-2">
+                                <small class="text-muted">Velocidad Máxima</small>
+                                <div class="progress" style="height: 15px;">
+                                    <div class="progress-bar bg-info" id="previewVelocidad" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-2">
+                                <small class="text-muted">Resistencia</small>
+                                <div class="progress" style="height: 15px;">
+                                    <div class="progress-bar bg-success" id="previewResistencia" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-2">
+                                <small class="text-muted">Maniobrabilidad</small>
+                                <div class="progress" style="height: 15px;">
+                                    <div class="progress-bar bg-warning" id="previewManiobrabilidad" style="width: 0%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-2">
+                                <small class="text-muted">Capacidad de Combustible</small>
+                                <div class="progress" style="height: 15px;">
+                                    <div class="progress-bar bg-danger" id="previewCombustible" style="width: 0%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Estadísticas (solo para edición) -->
+                        <div th:if="${barco.id != null}">
+                            <h6 class="text-primary border-bottom pb-1 mt-3">Estado Actual</h6>
+                            
+                            <div class="mb-2">
+                                <small class="text-muted">Salud</small>
+                                <div class="progress" style="height: 15px;">
+                                    <div class="progress-bar" id="previewSalud" 
+                                         th:style="'width: ' + ${barco.salud} + '%'"
+                                         th:classappend="${barco.salud >= 80} ? 'bg-success' : ${barco.salud >= 50} ? 'bg-warning' : 'bg-danger'"
+                                         th:text="${barco.salud} + '%'"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-2">
+                                <small class="text-muted">Combustible</small>
+                                <div class="progress" style="height: 15px;">
+                                    <div class="progress-bar" id="previewCombustibleActual" 
+                                         th:style="'width: ' + ${barco.nivelCombustible} + '%'"
+                                         th:classappend="${barco.nivelCombustible >= 50} ? 'bg-success' : ${barco.nivelCombustible >= 25} ? 'bg-warning' : 'bg-danger'"
+                                         th:text="${barco.nivelCombustible} + '%'"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="row text-center mt-3">
+                                <div class="col-6">
+                                    <div class="border rounded p-2">
+                                        <div class="h5 mb-0 text-info" th:text="${barco.experiencia}">0</div>
+                                        <small class="text-muted">Experiencia</small>
+                                    </div>
+                                </div>
+                                <div class="col-6">
+                                    <div class="border rounded p-2">
+                                        <div class="h5 mb-0 text-success" th:text="${barco.victorias}">0</div>
+                                        <small class="text-muted">Victorias</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/app.js}"></script>
+    <script>
+        // Actualizar color
+        function actualizarColor() {
+            const colorPicker = document.getElementById('colorPicker');
+            const colorInput = document.getElementById('color');
+            const previewColor = document.getElementById('previewColor');
+            const barcoIcon = document.querySelector('#barcoPreview i');
+            
+            colorInput.value = colorPicker.value;
+            previewColor.textContent = colorPicker.value;
+            previewColor.style.backgroundColor = colorPicker.value;
+            barcoIcon.style.color = colorPicker.value;
+        }
+        
+        // Actualizar valor de range
+        function actualizarValor(campo, valor) {
+            document.getElementById(campo).value = valor;
+            
+            if (campo === 'salud') {
+                const progressBar = document.getElementById('previewSalud');
+                if (progressBar) {
+                    progressBar.style.width = valor + '%';
+                    progressBar.textContent = valor + '%';
+                    progressBar.className = 'progress-bar ' + 
+                        (valor >= 80 ? 'bg-success' : valor >= 50 ? 'bg-warning' : 'bg-danger');
+                }
+            } else if (campo === 'nivelCombustible') {
+                const progressBar = document.getElementById('previewCombustibleActual');
+                if (progressBar) {
+                    progressBar.style.width = valor + '%';
+                    progressBar.textContent = valor + '%';
+                    progressBar.className = 'progress-bar ' + 
+                        (valor >= 50 ? 'bg-success' : valor >= 25 ? 'bg-warning' : 'bg-danger');
+                }
+            }
+        }
+        
+        // Actualizar información del modelo
+        function actualizarInfoModelo() {
+            const modeloSelect = document.getElementById('modelo');
+            const selectedOption = modeloSelect.options[modeloSelect.selectedIndex];
+            
+            if (selectedOption.value) {
+                const velocidad = selectedOption.dataset.velocidad;
+                const resistencia = selectedOption.dataset.resistencia;
+                const maniobrabilidad = selectedOption.dataset.maniobrabilidad;
+                const combustible = selectedOption.dataset.combustible;
+                
+                document.getElementById('previewModelo').textContent = selectedOption.text;
+                document.getElementById('caracteristicasModelo').style.display = 'block';
+                
+                document.getElementById('previewVelocidad').style.width = velocidad + '%';
+                document.getElementById('previewVelocidad').textContent = velocidad;
+                
+                document.getElementById('previewResistencia').style.width = resistencia + '%';
+                document.getElementById('previewResistencia').textContent = resistencia;
+                
+                document.getElementById('previewManiobrabilidad').style.width = maniobrabilidad + '%';
+                document.getElementById('previewManiobrabilidad').textContent = maniobrabilidad;
+                
+                document.getElementById('previewCombustible').style.width = combustible + '%';
+                document.getElementById('previewCombustible').textContent = combustible;
+            } else {
+                document.getElementById('previewModelo').textContent = 'No seleccionado';
+                document.getElementById('caracteristicasModelo').style.display = 'none';
+            }
+        }
+        
+        // Actualizar vista previa en tiempo real
+        document.addEventListener('DOMContentLoaded', function() {
+            // Nombre
+            document.getElementById('nombre').addEventListener('input', function() {
+                document.getElementById('previewNombre').textContent = this.value || 'Nombre del Barco';
+            });
+            
+            // Jugador
+            document.getElementById('jugador').addEventListener('change', function() {
+                const selectedOption = this.options[this.selectedIndex];
+                document.getElementById('previewJugador').textContent = 
+                    selectedOption.value ? selectedOption.text : 'No seleccionado';
+            });
+            
+            // Color
+            document.getElementById('color').addEventListener('input', function() {
+                if (this.value.match(/^#[0-9A-Fa-f]{6}$/)) {
+                    document.getElementById('colorPicker').value = this.value;
+                    document.getElementById('previewColor').textContent = this.value;
+                    document.getElementById('previewColor').style.backgroundColor = this.value;
+                    document.querySelector('#barcoPreview i').style.color = this.value;
+                }
+            });
+            
+            // Inicializar valores
+            actualizarInfoModelo();
+            actualizarColor();
+        });
+    </script>
+</body>
+</html>
