@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.List;
 
@@ -82,7 +83,7 @@ public class HomeController {
     }
     
     @GetMapping("/test-simple")
-    public String testSimple() {
+    public RedirectView testSimple() {
         try {
             System.out.println("=== TEST SIMPLE ===");
             Jugador testJugador = new Jugador();
@@ -92,11 +93,11 @@ public class HomeController {
             
             Jugador saved = jugadorService.save(testJugador);
             System.out.println("Jugador guardado en test simple: " + saved);
-            return "redirect:/jugadores";
+            return new RedirectView("/jugadores");
         } catch (Exception e) {
             System.out.println("Error en test simple: " + e.getMessage());
             e.printStackTrace();
-            return "redirect:/jugadores";
+            return new RedirectView("/jugadores");
         }
     }
     
@@ -106,11 +107,11 @@ public class HomeController {
             System.out.println("=== RESET DATABASE ===");
             // La base de datos H2 en memoria se resetea automáticamente al reiniciar
             // Este endpoint es solo para forzar un reinicio de datos
-            return "redirect:/";
+            return new RedirectView("/");
         } catch (Exception e) {
             System.out.println("Error en reset: " + e.getMessage());
             e.printStackTrace();
-            return "redirect:/";
+            return new RedirectView("/");
         }
     }
     

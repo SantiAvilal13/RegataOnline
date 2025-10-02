@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 
 import jakarta.validation.Valid;
 import java.util.List;
@@ -41,14 +42,14 @@ public class ModeloController {
     }
     
     @PostMapping("/guardar")
-    public String guardarModelo(@RequestParam(required = false) Long id,
-                               @RequestParam String nombre,
-                               @RequestParam String color,
-                               @RequestParam(required = false) String descripcion,
-                               @RequestParam Integer velocidadMaxima,
-                               @RequestParam Integer resistencia,
-                               @RequestParam Integer maniobrabilidad,
-                               RedirectAttributes redirectAttributes) {
+    public RedirectView guardarModelo(@RequestParam(required = false) Long id,
+                                     @RequestParam String nombre,
+                                     @RequestParam String color,
+                                     @RequestParam(required = false) String descripcion,
+                                     @RequestParam Integer velocidadMaxima,
+                                     @RequestParam Integer resistencia,
+                                     @RequestParam Integer maniobrabilidad,
+                                     RedirectAttributes redirectAttributes) {
         System.out.println("=== GUARDANDO/ACTUALIZANDO MODELO ===");
         System.out.println("Método POST /modelos/guardar llamado");
         System.out.println("Parámetros recibidos:");
@@ -86,7 +87,7 @@ public class ModeloController {
                 redirectAttributes.addFlashAttribute("success", "Modelo actualizado exitosamente");
             }
 
-            return "redirect:/modelos";
+            return new RedirectView("/modelos");
         } catch (Exception e) {
             System.out.println("❌ ERROR al guardar/actualizar modelo:");
             System.out.println("  - Mensaje: " + e.getMessage());
@@ -110,12 +111,12 @@ public class ModeloController {
                 return "modelos/editar";
             } else {
                 System.out.println("❌ Modelo no encontrado con ID: " + id);
-                return "redirect:/modelos";
+                return new RedirectView("/modelos");
             }
         } catch (Exception e) {
             System.out.println("ERROR en mostrarFormularioEditar: " + e.getMessage());
             e.printStackTrace();
-            return "redirect:/modelos";
+            return new RedirectView("/modelos");
         }
     }
     
@@ -150,7 +151,7 @@ public class ModeloController {
             Modelo updatedModelo = modeloService.update(id, modelo);
             System.out.println("✅ Modelo actualizado exitosamente: " + updatedModelo);
             redirectAttributes.addFlashAttribute("success", "Modelo actualizado exitosamente");
-            return "redirect:/modelos";
+            return new RedirectView("/modelos");
         } catch (Exception e) {
             System.out.println("❌ ERROR al actualizar modelo:");
             System.out.println("  - Mensaje: " + e.getMessage());
@@ -162,14 +163,14 @@ public class ModeloController {
     }
     
     @GetMapping("/eliminar/{id}")
-    public String eliminarModelo(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public RedirectView eliminarModelo(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             modeloService.deleteById(id);
             redirectAttributes.addFlashAttribute("success", "Modelo eliminado exitosamente");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/modelos";
+        return new RedirectView("/modelos");
     }
     
     @GetMapping("/detalle/{id}")
@@ -179,7 +180,7 @@ public class ModeloController {
             model.addAttribute("modelo", modelo.get());
             return "modelos/detail";
         } else {
-            return "redirect:/modelos";
+            return new RedirectView("/modelos");
         }
     }
     

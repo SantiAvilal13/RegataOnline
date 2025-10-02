@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 
 import jakarta.validation.Valid;
 import java.util.List;
@@ -64,11 +65,11 @@ public class JugadorController {
     }
     
     @PostMapping("/guardar")
-    public String guardarJugador(@RequestParam(required = false) Long id,
-                                @RequestParam String nombre,
-                                @RequestParam String email,
-                                @RequestParam(required = false, defaultValue = "0") Integer puntosTotales,
-                                RedirectAttributes redirectAttributes) {
+    public RedirectView guardarJugador(@RequestParam(required = false) Long id,
+                                      @RequestParam String nombre,
+                                      @RequestParam String email,
+                                      @RequestParam(required = false, defaultValue = "0") Integer puntosTotales,
+                                      RedirectAttributes redirectAttributes) {
         System.out.println("\n" + "=".repeat(80));
         System.out.println("🔥 JUGADOR CONTROLLER - MÉTODO GUARDAR INICIADO");
         System.out.println("=".repeat(80));
@@ -134,9 +135,9 @@ public class JugadorController {
                 System.out.println("🔄 REDIRIGIENDO A: /jugadores");
             }
             
-            System.out.println("✅ CONTROLLER COMPLETADO EXITOSAMENTE");
-            System.out.println("=".repeat(80) + "\n");
-            return "redirect:/jugadores";
+                    System.out.println("✅ CONTROLLER COMPLETADO EXITOSAMENTE");
+                    System.out.println("=".repeat(80) + "\n");
+                    return new RedirectView("/jugadores");
             
         } catch (Exception e) {
             System.out.println("💥 ERROR CRÍTICO EN CONTROLLER:");
@@ -151,7 +152,7 @@ public class JugadorController {
             redirectAttributes.addFlashAttribute("error", "Error al " + action + " jugador: " + e.getMessage());
             System.out.println("❌ CONTROLLER TERMINADO CON ERROR");
             System.out.println("=".repeat(80) + "\n");
-            return (id == null) ? "redirect:/jugadores/nuevo" : "redirect:/jugadores/editar/" + id;
+            return (id == null) ? new RedirectView("/jugadores/nuevo") : new RedirectView("/jugadores/editar/" + id);
         }
     }
     
@@ -210,14 +211,14 @@ public class JugadorController {
     }
     
     @GetMapping("/eliminar/{id}")
-    public String eliminarJugador(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public RedirectView eliminarJugador(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             jugadorService.deleteById(id);
             redirectAttributes.addFlashAttribute("success", "Jugador eliminado exitosamente");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("error", e.getMessage());
         }
-        return "redirect:/jugadores";
+        return new RedirectView("/jugadores");
     }
     
     @GetMapping("/detalle/{id}")

@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.servlet.view.RedirectView;
 
 import jakarta.validation.Valid;
 import java.util.List;
@@ -55,7 +56,7 @@ public class BarcoController {
     }
     
     @PostMapping("/guardar")
-    public String guardarBarco(@RequestParam(required = false) Long id,
+    public RedirectView guardarBarco(@RequestParam(required = false) Long id,
                               @RequestParam String nombre,
                               @RequestParam(required = false, defaultValue = "0") Integer puntosGanados,
                               @RequestParam("jugador.id") Long jugadorId,
@@ -100,7 +101,7 @@ public class BarcoController {
                 redirectAttributes.addFlashAttribute("success", "Barco actualizado exitosamente");
             }
 
-            return "redirect:/barcos";
+            return new RedirectView("/barcos");
         } catch (Exception e) {
             System.out.println("❌ ERROR al guardar/actualizar barco:");
             System.out.println("  - Mensaje: " + e.getMessage());
@@ -128,12 +129,12 @@ public class BarcoController {
                 return "barcos/editar";
             } else {
                 System.out.println("❌ Barco no encontrado con ID: " + id);
-                return "redirect:/barcos";
+                return new RedirectView("/barcos");
             }
         } catch (Exception e) {
             System.out.println("ERROR en mostrarFormularioEditar: " + e.getMessage());
             e.printStackTrace();
-            return "redirect:/barcos";
+            return new RedirectView("/barcos");
         }
     }
     
@@ -167,7 +168,7 @@ public class BarcoController {
             Barco updatedBarco = barcoService.update(id, barco);
             System.out.println("✅ Barco actualizado exitosamente: " + updatedBarco);
             redirectAttributes.addFlashAttribute("success", "Barco actualizado exitosamente");
-            return "redirect:/barcos";
+            return new RedirectView("/barcos");
         } catch (Exception e) {
             System.out.println("❌ ERROR al actualizar barco:");
             System.out.println("  - Mensaje: " + e.getMessage());
@@ -179,10 +180,10 @@ public class BarcoController {
     }
     
     @GetMapping("/eliminar/{id}")
-    public String eliminarBarco(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public RedirectView eliminarBarco(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         barcoService.deleteById(id);
         redirectAttributes.addFlashAttribute("success", "Barco eliminado exitosamente");
-        return "redirect:/barcos";
+        return new RedirectView("/barcos");
     }
     
     @GetMapping("/detalle/{id}")
@@ -192,7 +193,7 @@ public class BarcoController {
             model.addAttribute("barco", barco.get());
             return "barcos/detail";
         } else {
-            return "redirect:/barcos";
+            return new RedirectView("/barcos");
         }
     }
     
@@ -249,18 +250,18 @@ public class BarcoController {
     }
     
     @PostMapping("/ganar-puntos/{id}")
-    public String ganarPuntos(@PathVariable Long id, 
-                            @RequestParam Integer puntos, 
-                            RedirectAttributes redirectAttributes) {
+    public RedirectView ganarPuntos(@PathVariable Long id, 
+                                   @RequestParam Integer puntos, 
+                                   RedirectAttributes redirectAttributes) {
         barcoService.ganarPuntos(id, puntos);
         redirectAttributes.addFlashAttribute("success", "Puntos agregados exitosamente");
-        return "redirect:/barcos/detalle/" + id;
+        return new RedirectView("/barcos/detalle/" + id);
     }
     
     @PostMapping("/resetear-estadisticas/{id}")
-    public String resetearEstadisticas(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public RedirectView resetearEstadisticas(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         barcoService.resetearEstadisticas(id);
         redirectAttributes.addFlashAttribute("success", "Estadísticas reseteadas exitosamente");
-        return "redirect:/barcos/detalle/" + id;
+        return new RedirectView("/barcos/detalle/" + id);
     }
 }
