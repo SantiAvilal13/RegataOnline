@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="${modelo.id != null ? 'Editar Modelo' : 'Nuevo Modelo'} + ' - Regata Online'">Modelo - Regata Online</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" th:href="@{/}">
+                <i class="fas fa-ship me-2"></i>Regata Online
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/}">
+                            <i class="fas fa-home me-1"></i>Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/jugadores}">
+                            <i class="fas fa-users me-1"></i>Jugadores
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" th:href="@{/modelos}">
+                            <i class="fas fa-cog me-1"></i>Modelos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/barcos}">
+                            <i class="fas fa-ship me-1"></i>Barcos
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mt-4">
+        <!-- Flash Messages -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-cog me-2"></i>
+                <span th:text="${modelo.id != null ? 'Editar Modelo' : 'Nuevo Modelo'}">Nuevo Modelo</span>
+            </h2>
+            <a th:href="@{/modelos}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Volver a Modelos
+            </a>
+        </div>
+
+        <!-- Form -->
+        <div class="card">
+            <div class="card-body">
+                <form th:action="@{${modelo.id != null ? '/modelos/actualizar/' + modelo.id : '/modelos/guardar'}}" 
+                      th:object="${modelo}" method="post">
+                    
+                    <!-- Validation Errors -->
+                    <div th:if="${#fields.hasErrors('*')}" class="alert alert-danger">
+                        <h6><i class="fas fa-exclamation-triangle me-2"></i>Por favor, corrige los siguientes errores:</h6>
+                        <ul class="mb-0">
+                            <li th:each="err : ${#fields.errors('*')}" th:text="${err}">Error</li>
+                        </ul>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="nombre" class="form-label">Nombre del Modelo *</label>
+                                <input type="text" class="form-control" id="nombre" th:field="*{nombre}" 
+                                       th:class="${#fields.hasErrors('nombre')} ? 'form-control is-invalid' : 'form-control'">
+                                <div th:if="${#fields.hasErrors('nombre')}" class="invalid-feedback">
+                                    <span th:errors="*{nombre}">Error</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="velocidadMaxima" class="form-label">Velocidad Máxima (km/h) *</label>
+                                <input type="number" class="form-control" id="velocidadMaxima" th:field="*{velocidadMaxima}" 
+                                       min="1" max="200" step="1"
+                                       th:class="${#fields.hasErrors('velocidadMaxima')} ? 'form-control is-invalid' : 'form-control'">
+                                <div th:if="${#fields.hasErrors('velocidadMaxima')}" class="invalid-feedback">
+                                    <span th:errors="*{velocidadMaxima}">Error</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <textarea class="form-control" id="descripcion" th:field="*{descripcion}" rows="3"
+                                  th:class="${#fields.hasErrors('descripcion')} ? 'form-control is-invalid' : 'form-control'"></textarea>
+                        <div th:if="${#fields.hasErrors('descripcion')}" class="invalid-feedback">
+                            <span th:errors="*{descripcion}">Error</span>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="resistencia" class="form-label">Resistencia (puntos) *</label>
+                                <input type="number" class="form-control" id="resistencia" th:field="*{resistencia}" 
+                                       min="1" max="100" step="1"
+                                       th:class="${#fields.hasErrors('resistencia')} ? 'form-control is-invalid' : 'form-control'">
+                                <div th:if="${#fields.hasErrors('resistencia')}" class="invalid-feedback">
+                                    <span th:errors="*{resistencia}">Error</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="maniobrabilidad" class="form-label">Maniobrabilidad (puntos) *</label>
+                                <input type="number" class="form-control" id="maniobrabilidad" th:field="*{maniobrabilidad}" 
+                                       min="1" max="100" step="1"
+                                       th:class="${#fields.hasErrors('maniobrabilidad')} ? 'form-control is-invalid' : 'form-control'">
+                                <div th:if="${#fields.hasErrors('maniobrabilidad')}" class="invalid-feedback">
+                                    <span th:errors="*{maniobrabilidad}">Error</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a th:href="@{/modelos}" class="btn btn-outline-secondary">
+                            <i class="fas fa-times me-2"></i>Cancelar
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>
+                            <span th:text="${modelo.id != null ? 'Actualizar' : 'Guardar'}">Guardar</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light mt-5 py-4">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2024 Regata Online - Sistema de Gestión de Carreras de Barcos</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>
