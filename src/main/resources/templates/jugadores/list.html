@@ -100,9 +100,13 @@
             <div class="card-body">
                 <div th:if="${#lists.isEmpty(jugadores)}" class="text-center py-4">
                     <i class="fas fa-users fa-3x text-muted mb-3"></i>
-                    <p class="text-muted">No hay jugadores registrados</p>
+                    <p th:if="${mensaje}" class="text-muted" th:text="${mensaje}">Mensaje de búsqueda</p>
+                    <p th:unless="${mensaje}" class="text-muted">No hay jugadores registrados</p>
                     <a th:href="@{/jugadores/nuevo}" class="btn btn-primary">
-                        <i class="fas fa-plus me-2"></i>Crear Primer Jugador
+                        <i class="fas fa-plus me-2"></i>Crear Nuevo Jugador
+                    </a>
+                    <a th:if="${busqueda}" th:href="@{/jugadores}" class="btn btn-outline-secondary ms-2">
+                        <i class="fas fa-list me-2"></i>Ver Todos
                     </a>
                 </div>
                 

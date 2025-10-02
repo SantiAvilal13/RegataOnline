@@ -17,6 +17,7 @@ public class Jugador {
     @Column(nullable = false)
     private String nombre;
     
+    @NotBlank(message = "El email es obligatorio")
     @Email(message = "El email debe ser válido")
     @Column(unique = true)
     private String email;

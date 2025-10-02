@@ -22,6 +22,18 @@ public class Barco {
     @Column(name = "velocidad_actual")
     private Integer velocidadActual = 0;
     
+    @Column(name = "velocidad_x")
+    private Integer velocidadX = 0;
+    
+    @Column(name = "velocidad_y")
+    private Integer velocidadY = 0;
+    
+    @Column(name = "pos_x")
+    private Integer posX = 0;
+    
+    @Column(name = "pos_y")
+    private Integer posY = 0;
+    
     @Column(name = "resistencia_actual")
     private Integer resistenciaActual;
     
@@ -82,6 +94,38 @@ public class Barco {
     
     public void setVelocidadActual(Integer velocidadActual) {
         this.velocidadActual = velocidadActual;
+    }
+    
+    public Integer getVelocidadX() {
+        return velocidadX;
+    }
+    
+    public void setVelocidadX(Integer velocidadX) {
+        this.velocidadX = velocidadX;
+    }
+    
+    public Integer getVelocidadY() {
+        return velocidadY;
+    }
+    
+    public void setVelocidadY(Integer velocidadY) {
+        this.velocidadY = velocidadY;
+    }
+    
+    public Integer getPosX() {
+        return posX;
+    }
+    
+    public void setPosX(Integer posX) {
+        this.posX = posX;
+    }
+    
+    public Integer getPosY() {
+        return posY;
+    }
+    
+    public void setPosY(Integer posY) {
+        this.posY = posY;
     }
     
     public Integer getResistenciaActual() {

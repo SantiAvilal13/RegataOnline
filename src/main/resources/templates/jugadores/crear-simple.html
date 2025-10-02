@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Crear Jugador - Regata Online</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background: #f5f5f5; text-align: center; }
+        h1 { color: #333; }
+        form { background: white; padding: 20px; border-radius: 8px; max-width: 400px; margin: 0 auto; text-align: left; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ddd; border-radius: 4px; }
+        button { background: #007bff; color: white; padding: 10px 20px; border: none; border-radius: 4px; margin-top: 15px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        a { color: #007bff; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <h1>🧑‍💼 CREAR JUGADOR</h1>
+    
+    <form action="/jugadores/guardar" method="post" id="crearJugadorForm">
+        <p>
+            <label>Nombre:</label><br>
+            <input type="text" name="nombre" value="" required>
+        </p>
+        
+        <p>
+            <label>Email:</label><br>
+            <input type="email" name="email" value="" required>
+        </p>
+        
+        <p>
+            <label>Puntos:</label><br>
+            <input type="number" name="puntosTotales" value="0">
+        </p>
+        
+        <p>
+            <button type="submit" id="btnCrearJugador">🚀 CREAR JUGADOR</button>
+        </p>
+    </form>
+    
+    <p><a href="/jugadores">← Volver a Jugadores</a></p>
+    
+    <script>
+        console.log('🔥 CREAR JUGADOR SCRIPT CARGADO');
+        
+        document.getElementById('btnCrearJugador').addEventListener('click', function(e) {
+            console.log('🔥🔥🔥 CLICK EN CREAR JUGADOR DETECTADO 🔥🔥🔥');
+            console.log('Formulario:', document.getElementById('crearJugadorForm'));
+            console.log('Action:', document.getElementById('crearJugadorForm').action);
+            console.log('Method:', document.getElementById('crearJugadorForm').method);
+        });
+        
+        document.getElementById('crearJugadorForm').addEventListener('submit', function(e) {
+            console.log('🚀🚀🚀 SUBMIT CREAR JUGADOR DETECTADO 🚀🚀🚀');
+            const formData = new FormData(this);
+            for (let [key, value] of formData.entries()) {
+                console.log(`JUGADOR FIELD: ${key} = ${value}`);
+            }
+        });
+    </script>
+</body>
+</html>

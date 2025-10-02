@@ -18,6 +18,10 @@ public class Modelo {
     @Column(nullable = false)
     private String nombre;
     
+    @NotBlank(message = "El color es obligatorio")
+    @Column(nullable = false)
+    private String color;
+    
     @Column(columnDefinition = "TEXT")
     private String descripcion;
     
@@ -42,9 +46,10 @@ public class Modelo {
     // Constructores
     public Modelo() {}
     
-    public Modelo(String nombre, String descripcion, Integer velocidadMaxima, 
+    public Modelo(String nombre, String color, String descripcion, Integer velocidadMaxima, 
                   Integer resistencia, Integer maniobrabilidad) {
         this.nombre = nombre;
+        this.color = color;
         this.descripcion = descripcion;
         this.velocidadMaxima = velocidadMaxima;
         this.resistencia = resistencia;
@@ -66,6 +71,14 @@ public class Modelo {
     
     public void setNombre(String nombre) {
         this.nombre = nombre;
+    }
+    
+    public String getColor() {
+        return color;
+    }
+    
+    public void setColor(String color) {
+        this.color = color;
     }
     
     public String getDescripcion() {
@@ -113,6 +126,7 @@ public class Modelo {
         return "Modelo{" +
                 "id=" + id +
                 ", nombre='" + nombre + '\'' +
+                ", color='" + color + '\'' +
                 ", descripcion='" + descripcion + '\'' +
                 ", velocidadMaxima=" + velocidadMaxima +
                 ", resistencia=" + resistencia +

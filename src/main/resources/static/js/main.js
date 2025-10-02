@@ -1,14 +1,34 @@
 // Regata Online - Main JavaScript
 
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('\n' + '🌟'.repeat(60));
+    console.log('🚀 REGATA ONLINE - JAVASCRIPT INICIADO');
+    console.log('🌟'.repeat(60));
+    console.log('📅 Timestamp:', new Date().toISOString());
+    console.log('🌐 URL actual:', window.location.href);
+    console.log('📄 Título de página:', document.title);
+    console.log('🔍 User Agent:', navigator.userAgent);
+    console.log('📱 Viewport:', `${window.innerWidth}x${window.innerHeight}`);
+    
+    console.log('🎯 ANÁLISIS DEL DOM:');
+    console.log('   ├── Total elementos:', document.querySelectorAll('*').length);
+    console.log('   ├── Formularios:', document.querySelectorAll('form').length);
+    console.log('   ├── Botones:', document.querySelectorAll('button').length);
+    console.log('   ├── Inputs:', document.querySelectorAll('input').length);
+    console.log('   └── Links:', document.querySelectorAll('a').length);
+    
     // Initialize tooltips
+    console.log('🔧 INICIALIZANDO TOOLTIPS...');
     var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+    console.log(`   └── Tooltips encontrados: ${tooltipTriggerList.length}`);
     var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
 
     // Initialize popovers
+    console.log('🔧 INICIALIZANDO POPOVERS...');
     var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+    console.log(`   └── Popovers encontrados: ${popoverTriggerList.length}`);
     var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
         return new bootstrap.Popover(popoverTriggerEl);
     });
@@ -102,15 +122,180 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Loading states for forms
+    // SUPER DETAILED BUTTON CLICK LOGGING
     const submitButtons = document.querySelectorAll('button[type="submit"]');
-    submitButtons.forEach(function(button) {
-        button.addEventListener('click', function() {
+    console.log('🔘 INICIALIZANDO LOGS DE BOTONES SUBMIT');
+    console.log(`📊 Botones submit encontrados: ${submitButtons.length}`);
+    
+    submitButtons.forEach(function(button, index) {
+        console.log(`   └── Botón ${index + 1}: "${button.textContent.trim()}" (ID: ${button.id || 'SIN ID'})`);
+        
+        button.addEventListener('click', function(e) {
+            console.log('\n' + '🔘'.repeat(50));
+            console.log('🖱️  CLICK EN BOTÓN SUBMIT DETECTADO');
+            console.log('🔘'.repeat(50));
+            console.log('📅 Timestamp click:', new Date().toISOString());
+            console.log('🎯 INFORMACIÓN DEL BOTÓN:');
+            console.log('   ├── Texto del botón:', this.textContent.trim());
+            console.log('   ├── ID del botón:', this.id || 'SIN ID');
+            console.log('   ├── Clases CSS:', this.className || 'SIN CLASES');
+            console.log('   ├── Tipo:', this.type);
+            console.log('   ├── Deshabilitado:', this.disabled);
+            console.log('   └── Posición en DOM:', Array.from(this.parentNode.children).indexOf(this));
+            
             const form = this.closest('form');
-            if (form && form.checkValidity()) {
-                this.innerHTML = '<span class="loading"></span> Procesando...';
-                this.disabled = true;
+            console.log('🔍 ANÁLISIS DEL FORMULARIO ASOCIADO:');
+            if (form) {
+                console.log('   ├── Formulario encontrado: ✅');
+                console.log('   ├── ID del formulario:', form.id || 'SIN ID');
+                console.log('   ├── Action:', form.action);
+                console.log('   ├── Method:', form.method);
+                console.log('   ├── Válido HTML5:', form.checkValidity());
+                console.log('   └── Número de campos:', form.elements.length);
+                
+                // Análisis detallado de validez
+                const invalidFields = form.querySelectorAll(':invalid');
+                console.log('🚨 CAMPOS INVÁLIDOS:');
+                if (invalidFields.length > 0) {
+                    console.log(`   ├── Total campos inválidos: ${invalidFields.length}`);
+                    invalidFields.forEach((field, idx) => {
+                        console.log(`   ├── Campo inválido ${idx + 1}:`);
+                        console.log(`   │   ├── Nombre: ${field.name}`);
+                        console.log(`   │   ├── Valor: "${field.value}"`);
+                        console.log(`   │   ├── Mensaje validación: ${field.validationMessage}`);
+                        console.log(`   │   └── Tipo error: ${field.validity.valueMissing ? 'REQUERIDO' : field.validity.typeMismatch ? 'TIPO INCORRECTO' : 'OTRO'}`);
+                    });
+                } else {
+                    console.log('   └── ✅ Todos los campos son válidos');
+                }
+                
+                if (form.checkValidity()) {
+                    console.log('✅ FORMULARIO VÁLIDO - APLICANDO ESTADO DE CARGA');
+                    const originalText = this.innerHTML;
+                    console.log('   ├── Texto original guardado:', originalText);
+                    this.innerHTML = '<span class="loading"></span> Procesando...';
+                    this.disabled = true;
+                    console.log('   ├── Botón deshabilitado: ✅');
+                    console.log('   └── Texto cambiado a "Procesando...": ✅');
+                    
+                    // Re-enable button after 10 seconds as fallback
+                    setTimeout(() => {
+                        console.log('⏰ TIMEOUT DE SEGURIDAD ACTIVADO (10s)');
+                        console.log('   ├── Restaurando texto original...');
+                        this.innerHTML = originalText;
+                        this.disabled = false;
+                        console.log('   └── Botón rehabilitado por timeout');
+                    }, 10000);
+                } else {
+                    console.log('❌ FORMULARIO INVÁLIDO - NO SE APLICA ESTADO DE CARGA');
+                    console.log('   └── El usuario debe corregir los errores primero');
+                }
+            } else {
+                console.log('   └── ❌ NO SE ENCONTRÓ FORMULARIO ASOCIADO');
             }
+            
+            console.log('🔘'.repeat(50) + '\n');
+        });
+    });
+
+    // Enhanced form validation for CRUD forms with SUPER DETAILED LOGGING
+    const crudForms = document.querySelectorAll('#formCrearJugador, #formEditarJugador, #formCrearModelo, #formEditarModelo, #formCrearBarco, #formEditarBarco');
+    console.log('🔍 INICIALIZANDO LOGS DETALLADOS DE FORMULARIOS');
+    console.log('📋 Formularios CRUD encontrados:', crudForms.length);
+    crudForms.forEach((form, index) => {
+        console.log(`   └── Formulario ${index + 1}: ${form.id || 'SIN ID'} (${form.tagName})`);
+    });
+    
+    crudForms.forEach(function(form) {
+        console.log(`🎯 CONFIGURANDO LISTENERS PARA: ${form.id}`);
+        
+        form.addEventListener('submit', function(e) {
+            console.log('\n' + '🚀'.repeat(50));
+            console.log('🔥 EVENTO SUBMIT DETECTADO EN FRONTEND');
+            console.log('🚀'.repeat(50));
+            console.log('📅 Timestamp:', new Date().toISOString());
+            console.log('🎯 INFORMACIÓN DEL FORMULARIO:');
+            console.log('   ├── ID del formulario:', this.id || 'SIN ID');
+            console.log('   ├── Clase CSS:', this.className || 'SIN CLASE');
+            console.log('   ├── Action URL:', this.action || 'SIN ACTION');
+            console.log('   ├── Método HTTP:', this.method || 'GET');
+            console.log('   ├── Encoding:', this.enctype || 'application/x-www-form-urlencoded');
+            console.log('   └── Número de campos:', this.elements.length);
+            
+            console.log('📊 ANÁLISIS DETALLADO DE CAMPOS:');
+            const formData = new FormData(this);
+            let fieldCount = 0;
+            for (let [key, value] of formData.entries()) {
+                fieldCount++;
+                const field = this.querySelector(`[name="${key}"]`);
+                console.log(`   ├── Campo ${fieldCount}:`);
+                console.log(`   │   ├── Nombre: "${key}"`);
+                console.log(`   │   ├── Valor: "${value}" (length: ${value.length})`);
+                console.log(`   │   ├── Tipo: ${field ? field.type : 'DESCONOCIDO'}`);
+                console.log(`   │   ├── Requerido: ${field ? field.required : 'DESCONOCIDO'}`);
+                console.log(`   │   └── Válido: ${field ? field.checkValidity() : 'DESCONOCIDO'}`);
+            }
+            console.log(`   └── Total campos con datos: ${fieldCount}`);
+            
+            console.log('🔍 VALIDACIÓN FRONTEND:');
+            const requiredFields = this.querySelectorAll('[required]');
+            console.log(`   ├── Campos requeridos encontrados: ${requiredFields.length}`);
+            let isValid = true;
+            let invalidFields = [];
+            
+            requiredFields.forEach(function(field, index) {
+                const isEmpty = !field.value.trim();
+                console.log(`   ├── Campo requerido ${index + 1}: "${field.name}"`);
+                console.log(`   │   ├── Valor: "${field.value}"`);
+                console.log(`   │   ├── Vacío: ${isEmpty}`);
+                console.log(`   │   └── Válido HTML5: ${field.checkValidity()}`);
+                
+                if (isEmpty) {
+                    invalidFields.push(field.name);
+                    field.classList.add('is-invalid');
+                    isValid = false;
+                } else {
+                    field.classList.remove('is-invalid');
+                    field.classList.add('is-valid');
+                }
+            });
+            
+            console.log(`   └── Resultado validación: ${isValid ? '✅ VÁLIDO' : '❌ INVÁLIDO'}`);
+            if (!isValid) {
+                console.log(`   └── Campos inválidos: [${invalidFields.join(', ')}]`);
+            }
+            
+            if (!isValid) {
+                console.log('🚫 CANCELANDO ENVÍO - FORMULARIO INVÁLIDO');
+                console.log('🚀'.repeat(50) + '\n');
+                e.preventDefault();
+                return false;
+            }
+            
+            console.log('✅ FORMULARIO VÁLIDO - PROCEDIENDO CON ENVÍO');
+            console.log('🌐 ENVIANDO REQUEST HTTP...');
+            console.log('🚀'.repeat(50) + '\n');
+        });
+        
+        // Real-time validation
+        const inputs = form.querySelectorAll('input, select, textarea');
+        inputs.forEach(function(input) {
+            input.addEventListener('blur', function() {
+                if (this.hasAttribute('required') && !this.value.trim()) {
+                    this.classList.add('is-invalid');
+                    this.classList.remove('is-valid');
+                } else if (this.value.trim()) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                }
+            });
+            
+            input.addEventListener('input', function() {
+                if (this.classList.contains('is-invalid') && this.value.trim()) {
+                    this.classList.remove('is-invalid');
+                    this.classList.add('is-valid');
+                }
+            });
         });
     });
 
@@ -271,5 +456,15 @@ document.addEventListener('DOMContentLoaded', function() {
         observer.observe(element);
     });
 
-    console.log('Regata Online - JavaScript initialized successfully');
+    console.log('✅ INICIALIZACIÓN COMPLETADA EXITOSAMENTE');
+    console.log('🌟'.repeat(60));
+    console.log('🎉 REGATA ONLINE - LISTO PARA DEBUGGING');
+    console.log('🌟'.repeat(60));
+    console.log('📝 INSTRUCCIONES DE DEBUGGING:');
+    console.log('   ├── Abre las DevTools (F12)');
+    console.log('   ├── Ve a la pestaña "Console"');
+    console.log('   ├── Haz click en cualquier botón de formulario');
+    console.log('   ├── Observa los logs detallados con emojis');
+    console.log('   └── Reporta cualquier error o comportamiento extraño');
+    console.log('🌟'.repeat(60) + '\n');
 });

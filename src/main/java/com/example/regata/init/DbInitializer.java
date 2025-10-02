@@ -45,16 +45,16 @@ public class DbInitializer implements CommandLineRunner {
         jugador5 = jugadorService.save(jugador5);
         
         // Crear 10 modelos de barcos
-        Modelo modelo1 = new Modelo("Velero Clásico", "Barco tradicional de vela con gran maniobrabilidad", 15, 80, 90);
-        Modelo modelo2 = new Modelo("Catamarán Rápido", "Embarcación de doble casco para alta velocidad", 25, 60, 70);
-        Modelo modelo3 = new Modelo("Yate de Lujo", "Barco elegante con excelente resistencia", 20, 95, 60);
-        Modelo modelo4 = new Modelo("Lancha Deportiva", "Embarcación ágil para carreras", 30, 50, 85);
-        Modelo modelo5 = new Modelo("Fragata de Guerra", "Barco robusto con gran resistencia", 18, 100, 55);
-        Modelo modelo6 = new Modelo("Corbeta Ligera", "Embarcación rápida y maniobrable", 28, 65, 80);
-        Modelo modelo7 = new Modelo("Galeón Comercial", "Barco resistente para largas travesías", 12, 90, 50);
-        Modelo modelo8 = new Modelo("Bote de Carreras", "Embarcación ultraligera para velocidad", 35, 40, 95);
-        Modelo modelo9 = new Modelo("Crucero Familiar", "Barco cómodo y estable", 16, 75, 65);
-        Modelo modelo10 = new Modelo("Dragón de Mar", "Embarcación mítica con poderes especiales", 22, 85, 75);
+        Modelo modelo1 = new Modelo("Velero Clásico", "Azul", "Barco tradicional de vela con gran maniobrabilidad", 15, 80, 90);
+        Modelo modelo2 = new Modelo("Catamarán Rápido", "Blanco", "Embarcación de doble casco para alta velocidad", 25, 60, 70);
+        Modelo modelo3 = new Modelo("Yate de Lujo", "Dorado", "Barco elegante con excelente resistencia", 20, 95, 60);
+        Modelo modelo4 = new Modelo("Lancha Deportiva", "Rojo", "Embarcación ágil para carreras", 30, 50, 85);
+        Modelo modelo5 = new Modelo("Fragata de Guerra", "Gris", "Barco robusto con gran resistencia", 18, 100, 55);
+        Modelo modelo6 = new Modelo("Corbeta Ligera", "Verde", "Embarcación rápida y maniobrable", 28, 65, 80);
+        Modelo modelo7 = new Modelo("Galeón Comercial", "Marrón", "Barco resistente para largas travesías", 12, 90, 50);
+        Modelo modelo8 = new Modelo("Bote de Carreras", "Amarillo", "Embarcación ultraligera para velocidad", 35, 40, 95);
+        Modelo modelo9 = new Modelo("Crucero Familiar", "Celeste", "Barco cómodo y estable", 16, 75, 65);
+        Modelo modelo10 = new Modelo("Dragón de Mar", "Negro", "Embarcación mítica con poderes especiales", 22, 85, 75);
         
         modelo1 = modeloService.save(modelo1);
         modelo2 = modeloService.save(modelo2);

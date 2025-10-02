@@ -69,7 +69,7 @@ public class HomeController {
     public String testDatabase(Model model) {
         try {
             // Crear un jugador de prueba
-            Jugador testJugador = new Jugador("Test Usuario", "test@test.com");
+            Jugador testJugador = new Jugador("Test Usuario " + System.currentTimeMillis(), "test" + System.currentTimeMillis() + "@test.com");
             Jugador saved = jugadorService.save(testJugador);
             
             model.addAttribute("message", "Jugador de prueba creado: " + saved);
@@ -77,6 +77,108 @@ public class HomeController {
         } catch (Exception e) {
             model.addAttribute("error", "Error en test: " + e.getMessage());
             e.printStackTrace();
+            return "home";
+        }
+    }
+    
+    @GetMapping("/test-simple")
+    public String testSimple() {
+        try {
+            System.out.println("=== TEST SIMPLE ===");
+            Jugador testJugador = new Jugador();
+            testJugador.setNombre("Test Simple " + System.currentTimeMillis());
+            testJugador.setEmail("simple" + System.currentTimeMillis() + "@test.com");
+            testJugador.setPuntosTotales(50);
+            
+            Jugador saved = jugadorService.save(testJugador);
+            System.out.println("Jugador guardado en test simple: " + saved);
+            return "redirect:/jugadores";
+        } catch (Exception e) {
+            System.out.println("Error en test simple: " + e.getMessage());
+            e.printStackTrace();
+            return "redirect:/jugadores";
+        }
+    }
+    
+    @GetMapping("/reset-db")
+    public String resetDatabase() {
+        try {
+            System.out.println("=== RESET DATABASE ===");
+            // La base de datos H2 en memoria se resetea automáticamente al reiniciar
+            // Este endpoint es solo para forzar un reinicio de datos
+            return "redirect:/";
+        } catch (Exception e) {
+            System.out.println("Error en reset: " + e.getMessage());
+            e.printStackTrace();
+            return "redirect:/";
+        }
+    }
+    
+    @GetMapping("/test-form")
+    public String showTestForm() {
+        return "test-form";
+    }
+    
+    @GetMapping("/test-simple-form")
+    public String showTestSimpleForm() {
+        return "test-simple-form";
+    }
+    
+    @GetMapping("/test-debug")
+    public String showTestDebugForm() {
+        System.out.println("🔥🔥🔥 MOSTRANDO FORMULARIO TEST DEBUG 🔥🔥🔥");
+        return "test-debug";
+    }
+
+    @GetMapping("/mapa")
+    public String mostrarMapa() {
+        System.out.println("=== MOSTRAR MAPA DE REGATA ===");
+        return "mapa";
+    }
+    
+    @GetMapping("/test-crud")
+    public String testCrud(Model model) {
+        try {
+            System.out.println("=== TEST CRUD COMPLETO ===");
+            
+            // Crear jugador de prueba
+            Jugador jugador = new Jugador();
+            jugador.setNombre("Test CRUD " + System.currentTimeMillis());
+            jugador.setEmail("crud" + System.currentTimeMillis() + "@test.com");
+            jugador.setPuntosTotales(100);
+            
+            Jugador savedJugador = jugadorService.save(jugador);
+            System.out.println("✅ Jugador creado: " + savedJugador);
+            
+            // Crear modelo de prueba
+            Modelo modelo = new Modelo();
+            modelo.setNombre("Test Modelo " + System.currentTimeMillis());
+            modelo.setColor("Azul");
+            modelo.setDescripcion("Modelo de prueba");
+            modelo.setVelocidadMaxima(25);
+            modelo.setResistencia(80);
+            modelo.setManiobrabilidad(75);
+            
+            Modelo savedModelo = modeloService.save(modelo);
+            System.out.println("✅ Modelo creado: " + savedModelo);
+            
+            // Crear barco de prueba
+            Barco barco = new Barco();
+            barco.setNombre("Test Barco " + System.currentTimeMillis());
+            barco.setJugador(savedJugador);
+            barco.setModelo(savedModelo);
+            barco.setPuntosGanados(50);
+            
+            Barco savedBarco = barcoService.save(barco);
+            System.out.println("✅ Barco creado: " + savedBarco);
+            
+            model.addAttribute("success", "CRUD test completado exitosamente");
+            return "home";
+            
+        } catch (Exception e) {
+            System.out.println("❌ ERROR en test CRUD: " + e.getMessage());
+            e.printStackTrace();
+            model.addAttribute("error", "Error en test CRUD: " + e.getMessage());
             return "home";
         }
     }

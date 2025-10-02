@@ -43,64 +43,139 @@ public class BarcoController {
     
     @GetMapping("/nuevo")
     public String mostrarFormularioCrear(Model model) {
-        model.addAttribute("barco", new Barco());
-        List<Jugador> jugadores = jugadorService.findAll();
-        List<Modelo> modelos = modeloService.findAll();
-        model.addAttribute("jugadores", jugadores);
-        model.addAttribute("modelos", modelos);
-        return "barcos/form";
+        System.out.println("=== MOSTRAR FORMULARIO CREAR BARCO SIMPLE ===");
+        try {
+            return "barcos/crear-simple";
+        } catch (Exception e) {
+            System.out.println("ERROR en mostrarFormularioCrear: " + e.getMessage());
+            e.printStackTrace();
+            model.addAttribute("error", "Error al mostrar formulario: " + e.getMessage());
+            return "barcos/list";
+        }
     }
     
     @PostMapping("/guardar")
-    public String guardarBarco(@Valid @ModelAttribute("barco") Barco barco, 
-                              BindingResult result, 
-                              Model model,
+    public String guardarBarco(@RequestParam(required = false) Long id,
+                              @RequestParam String nombre,
+                              @RequestParam(required = false, defaultValue = "0") Integer puntosGanados,
+                              @RequestParam("jugador.id") Long jugadorId,
+                              @RequestParam("modelo.id") Long modeloId,
                               RedirectAttributes redirectAttributes) {
-        if (result.hasErrors()) {
-            List<Jugador> jugadores = jugadorService.findAll();
-            List<Modelo> modelos = modeloService.findAll();
-            model.addAttribute("jugadores", jugadores);
-            model.addAttribute("modelos", modelos);
-            return "barcos/form";
+        System.out.println("=== GUARDANDO/ACTUALIZANDO BARCO ===");
+        System.out.println("Método POST /barcos/guardar llamado");
+        System.out.println("Parámetros recibidos:");
+        System.out.println("  - ID: " + id);
+        System.out.println("  - Nombre: '" + nombre + "'");
+        System.out.println("  - Jugador ID: " + jugadorId);
+        System.out.println("  - Modelo ID: " + modeloId);
+        System.out.println("  - Puntos: " + puntosGanados);
+
+        try {
+            // Buscar el jugador y modelo
+            Jugador jugador = jugadorService.findById(jugadorId)
+                .orElseThrow(() -> new RuntimeException("Jugador no encontrado"));
+            Modelo modelo = modeloService.findById(modeloId)
+                .orElseThrow(() -> new RuntimeException("Modelo no encontrado"));
+
+            Barco barco = new Barco();
+            barco.setId(id); // Puede ser null para crear, o tener valor para actualizar
+            barco.setNombre(nombre);
+            barco.setPuntosGanados(puntosGanados);
+            barco.setJugador(jugador);
+            barco.setModelo(modelo);
+
+            if (id == null) {
+                // CREAR NUEVO
+                System.out.println("Creando nuevo barco...");
+                Barco savedBarco = barcoService.save(barco);
+                System.out.println("✅ Barco creado exitosamente:");
+                System.out.println("  - ID asignado: " + savedBarco.getId());
+                redirectAttributes.addFlashAttribute("success", "Barco creado exitosamente");
+            } else {
+                // ACTUALIZAR EXISTENTE
+                System.out.println("Actualizando barco existente...");
+                Barco updatedBarco = barcoService.update(id, barco);
+                System.out.println("✅ Barco actualizado exitosamente:");
+                System.out.println("  - ID: " + updatedBarco.getId());
+                redirectAttributes.addFlashAttribute("success", "Barco actualizado exitosamente");
+            }
+
+            return "redirect:/barcos";
+        } catch (Exception e) {
+            System.out.println("❌ ERROR al guardar/actualizar barco:");
+            System.out.println("  - Mensaje: " + e.getMessage());
+            System.out.println("  - Tipo: " + e.getClass().getSimpleName());
+            e.printStackTrace();
+            String action = (id == null) ? "crear" : "actualizar";
+            redirectAttributes.addFlashAttribute("error", "Error al " + action + " barco: " + e.getMessage());
+            return (id == null) ? "redirect:/barcos/nuevo" : "redirect:/barcos/editar/" + id;
         }
-        
-        barcoService.save(barco);
-        redirectAttributes.addFlashAttribute("success", "Barco creado exitosamente");
-        return "redirect:/barcos";
     }
     
     @GetMapping("/editar/{id}")
     public String mostrarFormularioEditar(@PathVariable Long id, Model model) {
-        Optional<Barco> barco = barcoService.findById(id);
-        if (barco.isPresent()) {
-            model.addAttribute("barco", barco.get());
-            List<Jugador> jugadores = jugadorService.findAll();
-            List<Modelo> modelos = modeloService.findAll();
-            model.addAttribute("jugadores", jugadores);
-            model.addAttribute("modelos", modelos);
-            return "barcos/form";
-        } else {
+        System.out.println("=== MOSTRAR FORMULARIO EDITAR BARCO ===");
+        System.out.println("ID a editar: " + id);
+        try {
+            Optional<Barco> barco = barcoService.findById(id);
+            if (barco.isPresent()) {
+                System.out.println("Barco encontrado: " + barco.get());
+                model.addAttribute("barco", barco.get());
+                List<Jugador> jugadores = jugadorService.findAll();
+                List<Modelo> modelos = modeloService.findAll();
+                model.addAttribute("jugadores", jugadores);
+                model.addAttribute("modelos", modelos);
+                return "barcos/editar";
+            } else {
+                System.out.println("❌ Barco no encontrado con ID: " + id);
+                return "redirect:/barcos";
+            }
+        } catch (Exception e) {
+            System.out.println("ERROR en mostrarFormularioEditar: " + e.getMessage());
+            e.printStackTrace();
             return "redirect:/barcos";
         }
     }
     
     @PostMapping("/actualizar/{id}")
-    public String actualizarBarco(@PathVariable Long id, 
-                                 @Valid @ModelAttribute("barco") Barco barco, 
-                                 BindingResult result, 
-                                 Model model,
+    public String actualizarBarco(@PathVariable Long id,
+                                 @RequestParam String nombre,
+                                 @RequestParam(required = false, defaultValue = "0") Integer puntosGanados,
+                                 @RequestParam("jugador.id") Long jugadorId,
+                                 @RequestParam("modelo.id") Long modeloId,
                                  RedirectAttributes redirectAttributes) {
-        if (result.hasErrors()) {
-            List<Jugador> jugadores = jugadorService.findAll();
-            List<Modelo> modelos = modeloService.findAll();
-            model.addAttribute("jugadores", jugadores);
-            model.addAttribute("modelos", modelos);
-            return "barcos/form";
+        System.out.println("=== ACTUALIZANDO BARCO ===");
+        System.out.println("Parámetros recibidos para ID " + id + ":");
+        System.out.println("  - Nombre: '" + nombre + "'");
+        System.out.println("  - Jugador ID: " + jugadorId);
+        System.out.println("  - Modelo ID: " + modeloId);
+        System.out.println("  - Puntos: " + puntosGanados);
+
+        try {
+            Jugador jugador = jugadorService.findById(jugadorId)
+                .orElseThrow(() -> new RuntimeException("Jugador no encontrado"));
+            Modelo modelo = modeloService.findById(modeloId)
+                .orElseThrow(() -> new RuntimeException("Modelo no encontrado"));
+
+            Barco barco = new Barco();
+            barco.setId(id); // Importante para que el servicio sepa que es una actualización
+            barco.setNombre(nombre);
+            barco.setPuntosGanados(puntosGanados);
+            barco.setJugador(jugador);
+            barco.setModelo(modelo);
+
+            Barco updatedBarco = barcoService.update(id, barco);
+            System.out.println("✅ Barco actualizado exitosamente: " + updatedBarco);
+            redirectAttributes.addFlashAttribute("success", "Barco actualizado exitosamente");
+            return "redirect:/barcos";
+        } catch (Exception e) {
+            System.out.println("❌ ERROR al actualizar barco:");
+            System.out.println("  - Mensaje: " + e.getMessage());
+            System.out.println("  - Tipo: " + e.getClass().getSimpleName());
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "Error al actualizar barco: " + e.getMessage());
+            return "redirect:/barcos/editar/" + id;
         }
-        
-        barcoService.update(id, barco);
-        redirectAttributes.addFlashAttribute("success", "Barco actualizado exitosamente");
-        return "redirect:/barcos";
     }
     
     @GetMapping("/eliminar/{id}")
@@ -123,14 +198,36 @@ public class BarcoController {
     
     @GetMapping("/buscar")
     public String buscarBarcos(@RequestParam String nombre, Model model) {
-        List<Barco> barcos = barcoService.findByNombreContaining(nombre);
-        List<Jugador> jugadores = jugadorService.findAll();
-        List<Modelo> modelos = modeloService.findAll();
-        model.addAttribute("barcos", barcos);
-        model.addAttribute("jugadores", jugadores);
-        model.addAttribute("modelos", modelos);
-        model.addAttribute("busqueda", nombre);
-        return "barcos/list";
+        System.out.println("=== BUSCAR BARCOS ===");
+        System.out.println("Término de búsqueda: '" + nombre + "'");
+        
+        try {
+            List<Barco> barcos = barcoService.findByNombreContaining(nombre);
+            List<Jugador> jugadores = jugadorService.findAll();
+            List<Modelo> modelos = modeloService.findAll();
+            
+            System.out.println("Barcos encontrados: " + barcos.size());
+            
+            model.addAttribute("barcos", barcos);
+            model.addAttribute("jugadores", jugadores);
+            model.addAttribute("modelos", modelos);
+            model.addAttribute("busqueda", nombre);
+            
+            if (barcos.isEmpty()) {
+                model.addAttribute("mensaje", "No se encontraron barcos con el nombre '" + nombre + "'");
+                System.out.println("❌ No se encontraron barcos");
+            } else {
+                System.out.println("✅ Barcos encontrados:");
+                barcos.forEach(b -> System.out.println("  - " + b.getNombre() + " (Jugador: " + b.getJugador().getNombre() + ")"));
+            }
+            
+            return "barcos/list";
+        } catch (Exception e) {
+            System.out.println("❌ ERROR en búsqueda: " + e.getMessage());
+            e.printStackTrace();
+            model.addAttribute("error", "Error al buscar barcos: " + e.getMessage());
+            return "barcos/list";
+        }
     }
     
     @GetMapping("/por-jugador/{jugadorId}")

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${modelo.id != null ? 'Editar Modelo' : 'Crear Modelo'}">Formulario Modelo - Regata Online</title>
+    <title>Crear Modelo - Regata Online</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link th:href="@{/css/style.css}" rel="stylesheet">
@@ -38,7 +38,7 @@
 
     <div class="container mt-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 th:text="${modelo.id != null ? 'Editar Modelo' : 'Crear Nuevo Modelo'}"></h2>
+            <h2><i class="fas fa-plus-circle me-2"></i>Crear Nuevo Modelo</h2>
             <a th:href="@{/modelos}" class="btn btn-outline-secondary">
                 <i class="fas fa-arrow-left me-2"></i>Volver a Modelos
             </a>
@@ -46,15 +46,15 @@
 
         <div class="card">
             <div class="card-body">
-                <!-- FORMULARIO SIMPLE QUE FUNCIONA -->
-                <form action="/modelos/guardar" method="post">
+                <!-- FORMULARIO PARA CREAR NUEVO MODELO -->
+                <!-- NO enviamos ID - H2 lo asigna automáticamente -->
+                <form action="/modelos/guardar" method="post" id="formCrearModelo">
                     
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="nombre" class="form-label">Nombre del Modelo *</label>
-                                <input type="text" class="form-control" id="nombre" name="nombre" 
-                                       th:value="${modelo.nombre}" required>
+                                <input type="text" class="form-control" id="nombre" name="nombre" required>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -62,16 +62,16 @@
                                 <label for="color" class="form-label">Color *</label>
                                 <select class="form-control" id="color" name="color" required>
                                     <option value="">Selecciona un color</option>
-                                    <option value="Azul" th:selected="${modelo.color == 'Azul'}">Azul</option>
-                                    <option value="Rojo" th:selected="${modelo.color == 'Rojo'}">Rojo</option>
-                                    <option value="Verde" th:selected="${modelo.color == 'Verde'}">Verde</option>
-                                    <option value="Amarillo" th:selected="${modelo.color == 'Amarillo'}">Amarillo</option>
-                                    <option value="Blanco" th:selected="${modelo.color == 'Blanco'}">Blanco</option>
-                                    <option value="Negro" th:selected="${modelo.color == 'Negro'}">Negro</option>
-                                    <option value="Gris" th:selected="${modelo.color == 'Gris'}">Gris</option>
-                                    <option value="Dorado" th:selected="${modelo.color == 'Dorado'}">Dorado</option>
-                                    <option value="Celeste" th:selected="${modelo.color == 'Celeste'}">Celeste</option>
-                                    <option value="Marrón" th:selected="${modelo.color == 'Marrón'}">Marrón</option>
+                                    <option value="Azul">Azul</option>
+                                    <option value="Rojo">Rojo</option>
+                                    <option value="Verde">Verde</option>
+                                    <option value="Amarillo">Amarillo</option>
+                                    <option value="Blanco">Blanco</option>
+                                    <option value="Negro">Negro</option>
+                                    <option value="Gris">Gris</option>
+                                    <option value="Dorado">Dorado</option>
+                                    <option value="Celeste">Celeste</option>
+                                    <option value="Marrón">Marrón</option>
                                 </select>
                             </div>
                         </div>
@@ -82,14 +82,13 @@
                             <div class="mb-3">
                                 <label for="velocidadMaxima" class="form-label">Velocidad Máxima (km/h) *</label>
                                 <input type="number" class="form-control" id="velocidadMaxima" name="velocidadMaxima" 
-                                       th:value="${modelo.velocidadMaxima}" min="1" max="200" step="1" required>
+                                       min="1" max="200" step="1" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="descripcion" class="form-label">Descripción</label>
-                                <textarea class="form-control" id="descripcion" name="descripcion" rows="3" 
-                                          th:text="${modelo.descripcion}"></textarea>
+                                <textarea class="form-control" id="descripcion" name="descripcion" rows="3"></textarea>
                             </div>
                         </div>
                     </div>
@@ -99,14 +98,14 @@
                             <div class="mb-3">
                                 <label for="resistencia" class="form-label">Resistencia (puntos) *</label>
                                 <input type="number" class="form-control" id="resistencia" name="resistencia" 
-                                       th:value="${modelo.resistencia}" min="1" max="100" step="1" required>
+                                       min="1" max="100" step="1" required>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="maniobrabilidad" class="form-label">Maniobrabilidad (puntos) *</label>
                                 <input type="number" class="form-control" id="maniobrabilidad" name="maniobrabilidad" 
-                                       th:value="${modelo.maniobrabilidad}" min="1" max="100" step="1" required>
+                                       min="1" max="100" step="1" required>
                             </div>
                         </div>
                     </div>
@@ -115,9 +114,8 @@
                         <a th:href="@{/modelos}" class="btn btn-outline-secondary">
                             <i class="fas fa-times me-2"></i>Cancelar
                         </a>
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save me-2"></i>
-                            <span th:text="${modelo.id != null ? 'Actualizar' : 'Guardar'}">Guardar</span>
+                        <button type="submit" class="btn btn-primary" id="btnGuardar">
+                            <i class="fas fa-save me-2"></i>Guardar Modelo
                         </button>
                     </div>
                 </form>

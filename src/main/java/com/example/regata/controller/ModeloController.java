@@ -29,46 +29,136 @@ public class ModeloController {
     
     @GetMapping("/nuevo")
     public String mostrarFormularioCrear(Model model) {
-        model.addAttribute("modelo", new Modelo());
-        return "modelos/form";
+        System.out.println("=== MOSTRAR FORMULARIO CREAR MODELO SIMPLE ===");
+        try {
+            return "modelos/crear-simple";
+        } catch (Exception e) {
+            System.out.println("ERROR en mostrarFormularioCrear: " + e.getMessage());
+            e.printStackTrace();
+            model.addAttribute("error", "Error al mostrar formulario: " + e.getMessage());
+            return "modelos/list";
+        }
     }
     
     @PostMapping("/guardar")
-    public String guardarModelo(@Valid @ModelAttribute("modelo") Modelo modelo, 
-                               BindingResult result, 
+    public String guardarModelo(@RequestParam(required = false) Long id,
+                               @RequestParam String nombre,
+                               @RequestParam String color,
+                               @RequestParam(required = false) String descripcion,
+                               @RequestParam Integer velocidadMaxima,
+                               @RequestParam Integer resistencia,
+                               @RequestParam Integer maniobrabilidad,
                                RedirectAttributes redirectAttributes) {
-        if (result.hasErrors()) {
-            return "modelos/form";
+        System.out.println("=== GUARDANDO/ACTUALIZANDO MODELO ===");
+        System.out.println("Método POST /modelos/guardar llamado");
+        System.out.println("Parámetros recibidos:");
+        System.out.println("  - ID: " + id);
+        System.out.println("  - Nombre: '" + nombre + "'");
+        System.out.println("  - Color: '" + color + "'");
+        System.out.println("  - Descripción: '" + descripcion + "'");
+        System.out.println("  - Velocidad: " + velocidadMaxima);
+        System.out.println("  - Resistencia: " + resistencia);
+        System.out.println("  - Maniobrabilidad: " + maniobrabilidad);
+
+        try {
+            Modelo modelo = new Modelo();
+            modelo.setId(id); // Puede ser null para crear, o tener valor para actualizar
+            modelo.setNombre(nombre);
+            modelo.setColor(color);
+            modelo.setDescripcion(descripcion);
+            modelo.setVelocidadMaxima(velocidadMaxima);
+            modelo.setResistencia(resistencia);
+            modelo.setManiobrabilidad(maniobrabilidad);
+
+            if (id == null) {
+                // CREAR NUEVO
+                System.out.println("Creando nuevo modelo...");
+                Modelo savedModelo = modeloService.save(modelo);
+                System.out.println("✅ Modelo creado exitosamente:");
+                System.out.println("  - ID asignado: " + savedModelo.getId());
+                redirectAttributes.addFlashAttribute("success", "Modelo creado exitosamente");
+            } else {
+                // ACTUALIZAR EXISTENTE
+                System.out.println("Actualizando modelo existente...");
+                Modelo updatedModelo = modeloService.update(id, modelo);
+                System.out.println("✅ Modelo actualizado exitosamente:");
+                System.out.println("  - ID: " + updatedModelo.getId());
+                redirectAttributes.addFlashAttribute("success", "Modelo actualizado exitosamente");
+            }
+
+            return "redirect:/modelos";
+        } catch (Exception e) {
+            System.out.println("❌ ERROR al guardar/actualizar modelo:");
+            System.out.println("  - Mensaje: " + e.getMessage());
+            System.out.println("  - Tipo: " + e.getClass().getSimpleName());
+            e.printStackTrace();
+            String action = (id == null) ? "crear" : "actualizar";
+            redirectAttributes.addFlashAttribute("error", "Error al " + action + " modelo: " + e.getMessage());
+            return (id == null) ? "redirect:/modelos/nuevo" : "redirect:/modelos/editar/" + id;
         }
-        
-        modeloService.save(modelo);
-        redirectAttributes.addFlashAttribute("success", "Modelo creado exitosamente");
-        return "redirect:/modelos";
     }
     
     @GetMapping("/editar/{id}")
     public String mostrarFormularioEditar(@PathVariable Long id, Model model) {
-        Optional<Modelo> modelo = modeloService.findById(id);
-        if (modelo.isPresent()) {
-            model.addAttribute("modelo", modelo.get());
-            return "modelos/form";
-        } else {
+        System.out.println("=== MOSTRAR FORMULARIO EDITAR MODELO ===");
+        System.out.println("ID a editar: " + id);
+        try {
+            Optional<Modelo> modelo = modeloService.findById(id);
+            if (modelo.isPresent()) {
+                System.out.println("Modelo encontrado: " + modelo.get());
+                model.addAttribute("modelo", modelo.get());
+                return "modelos/editar";
+            } else {
+                System.out.println("❌ Modelo no encontrado con ID: " + id);
+                return "redirect:/modelos";
+            }
+        } catch (Exception e) {
+            System.out.println("ERROR en mostrarFormularioEditar: " + e.getMessage());
+            e.printStackTrace();
             return "redirect:/modelos";
         }
     }
     
     @PostMapping("/actualizar/{id}")
-    public String actualizarModelo(@PathVariable Long id, 
-                                  @Valid @ModelAttribute("modelo") Modelo modelo, 
-                                  BindingResult result, 
+    public String actualizarModelo(@PathVariable Long id,
+                                  @RequestParam String nombre,
+                                  @RequestParam String color,
+                                  @RequestParam(required = false) String descripcion,
+                                  @RequestParam Integer velocidadMaxima,
+                                  @RequestParam Integer resistencia,
+                                  @RequestParam Integer maniobrabilidad,
                                   RedirectAttributes redirectAttributes) {
-        if (result.hasErrors()) {
-            return "modelos/form";
+        System.out.println("=== ACTUALIZANDO MODELO ===");
+        System.out.println("Parámetros recibidos para ID " + id + ":");
+        System.out.println("  - Nombre: '" + nombre + "'");
+        System.out.println("  - Color: '" + color + "'");
+        System.out.println("  - Descripción: '" + descripcion + "'");
+        System.out.println("  - Velocidad: " + velocidadMaxima);
+        System.out.println("  - Resistencia: " + resistencia);
+        System.out.println("  - Maniobrabilidad: " + maniobrabilidad);
+
+        try {
+            Modelo modelo = new Modelo();
+            modelo.setId(id); // Importante para que el servicio sepa que es una actualización
+            modelo.setNombre(nombre);
+            modelo.setColor(color);
+            modelo.setDescripcion(descripcion);
+            modelo.setVelocidadMaxima(velocidadMaxima);
+            modelo.setResistencia(resistencia);
+            modelo.setManiobrabilidad(maniobrabilidad);
+
+            Modelo updatedModelo = modeloService.update(id, modelo);
+            System.out.println("✅ Modelo actualizado exitosamente: " + updatedModelo);
+            redirectAttributes.addFlashAttribute("success", "Modelo actualizado exitosamente");
+            return "redirect:/modelos";
+        } catch (Exception e) {
+            System.out.println("❌ ERROR al actualizar modelo:");
+            System.out.println("  - Mensaje: " + e.getMessage());
+            System.out.println("  - Tipo: " + e.getClass().getSimpleName());
+            e.printStackTrace();
+            redirectAttributes.addFlashAttribute("error", "Error al actualizar modelo: " + e.getMessage());
+            return "redirect:/modelos/editar/" + id;
         }
-        
-        modeloService.update(id, modelo);
-        redirectAttributes.addFlashAttribute("success", "Modelo actualizado exitosamente");
-        return "redirect:/modelos";
     }
     
     @GetMapping("/eliminar/{id}")
@@ -95,10 +185,31 @@ public class ModeloController {
     
     @GetMapping("/buscar")
     public String buscarModelos(@RequestParam String nombre, Model model) {
-        List<Modelo> modelos = modeloService.findByNombreContaining(nombre);
-        model.addAttribute("modelos", modelos);
-        model.addAttribute("busqueda", nombre);
-        return "modelos/list";
+        System.out.println("=== BUSCAR MODELOS ===");
+        System.out.println("Término de búsqueda: '" + nombre + "'");
+        
+        try {
+            List<Modelo> modelos = modeloService.findByNombreContaining(nombre);
+            System.out.println("Modelos encontrados: " + modelos.size());
+            
+            model.addAttribute("modelos", modelos);
+            model.addAttribute("busqueda", nombre);
+            
+            if (modelos.isEmpty()) {
+                model.addAttribute("mensaje", "No se encontraron modelos con el nombre '" + nombre + "'");
+                System.out.println("❌ No se encontraron modelos");
+            } else {
+                System.out.println("✅ Modelos encontrados:");
+                modelos.forEach(m -> System.out.println("  - " + m.getNombre() + " (" + m.getColor() + ")"));
+            }
+            
+            return "modelos/list";
+        } catch (Exception e) {
+            System.out.println("❌ ERROR en búsqueda: " + e.getMessage());
+            e.printStackTrace();
+            model.addAttribute("error", "Error al buscar modelos: " + e.getMessage());
+            return "modelos/list";
+        }
     }
     
     @GetMapping("/filtrar")
