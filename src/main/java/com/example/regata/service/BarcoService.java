@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -23,94 +24,64 @@ public class BarcoService {
     }
     
     @Transactional(readOnly = true)
-    public Optional<Barco> findById(Long id) {
+    public Optional<Barco> findById(UUID id) {
         return barcoRepository.findById(id);
     }
     
     public Barco save(Barco barco) {
-        // Inicializar estadísticas basadas en el modelo si es un barco nuevo
-        if (barco.getId() == null && barco.getModelo() != null) {
-            barco.setVelocidadActual(barco.getModelo().getVelocidadMaxima());
-            barco.setResistenciaActual(barco.getModelo().getResistencia());
-            barco.setManiobrabilidadActual(barco.getModelo().getManiobrabilidad());
-        }
-        // Inicializar puntos ganados si es null
-        if (barco.getPuntosGanados() == null) {
-            barco.setPuntosGanados(0);
-        }
         return barcoRepository.save(barco);
     }
     
-    public void deleteById(Long id) {
+    public void deleteById(UUID id) {
         if (!barcoRepository.existsById(id)) {
             throw new GameException("No se encontró el barco con ID: " + id);
         }
         barcoRepository.deleteById(id);
     }
     
-    public Barco update(Long id, Barco barco) {
+    public Barco update(UUID id, Barco barco) {
         Barco existingBarco = barcoRepository.findById(id)
                 .orElseThrow(() -> new GameException("No se encontró el barco con ID: " + id));
         
-        existingBarco.setNombre(barco.getNombre());
-        existingBarco.setJugador(barco.getJugador());
+        existingBarco.setAlias(barco.getAlias());
+        existingBarco.setUsuario(barco.getUsuario());
         existingBarco.setModelo(barco.getModelo());
-        
-        // Actualizar estadísticas si cambió el modelo
-        if (barco.getModelo() != null && !barco.getModelo().equals(existingBarco.getModelo())) {
-            existingBarco.setResistenciaActual(barco.getModelo().getResistencia());
-            existingBarco.setManiobrabilidadActual(barco.getModelo().getManiobrabilidad());
-        }
         
         return barcoRepository.save(existingBarco);
     }
     
     @Transactional(readOnly = true)
-    public List<Barco> findByJugadorId(Long jugadorId) {
-        return barcoRepository.findByJugadorId(jugadorId);
+    public List<Barco> findByUsuarioId(UUID usuarioId) {
+        return barcoRepository.findByUsuarioId(usuarioId);
     }
     
     @Transactional(readOnly = true)
-    public List<Barco> findByModeloId(Long modeloId) {
+    public List<Barco> findByModeloId(UUID modeloId) {
         return barcoRepository.findByModeloId(modeloId);
     }
     
     @Transactional(readOnly = true)
-    public List<Barco> findByNombreContaining(String nombre) {
-        return barcoRepository.findByNombreContainingIgnoreCase(nombre);
+    public List<Barco> findByAliasContainingIgnoreCase(String alias) {
+        return barcoRepository.findByAliasContainingIgnoreCase(alias);
     }
     
     @Transactional(readOnly = true)
-    public List<Barco> findByJugadorIdOrderByPuntosGanadosDesc(Long jugadorId) {
-        return barcoRepository.findByJugadorIdOrderByPuntosGanadosDesc(jugadorId);
+    public List<Barco> findByUsuarioIdOrderByAliasAsc(UUID usuarioId) {
+        return barcoRepository.findByUsuarioIdOrderByAliasAsc(usuarioId);
     }
     
     @Transactional(readOnly = true)
-    public List<Barco> findAllOrderByPuntosGanadosDesc() {
-        return barcoRepository.findAllOrderByPuntosGanadosDesc();
+    public List<Barco> findBarcosConParticipaciones() {
+        return barcoRepository.findBarcosConParticipaciones();
     }
     
     @Transactional(readOnly = true)
-    public List<Barco> findBarcosEnMovimiento() {
-        return barcoRepository.findBarcosEnMovimiento();
+    public List<Barco> findByUsuarioAndModelo(UUID usuarioId, UUID modeloId) {
+        return barcoRepository.findByUsuarioAndModelo(usuarioId, modeloId);
     }
     
     @Transactional(readOnly = true)
-    public List<Barco> findByJugadorAndModelo(Long jugadorId, Long modeloId) {
-        return barcoRepository.findByJugadorAndModelo(jugadorId, modeloId);
-    }
-    
-    public void ganarPuntos(Long barcoId, Integer puntos) {
-        Barco barco = barcoRepository.findById(barcoId)
-                .orElseThrow(() -> new GameException("No se encontró el barco con ID: " + barcoId));
-        barco.ganarPuntos(puntos);
-        barcoRepository.save(barco);
-    }
-    
-    public void resetearEstadisticas(Long barcoId) {
-        Barco barco = barcoRepository.findById(barcoId)
-                .orElseThrow(() -> new GameException("No se encontró el barco con ID: " + barcoId));
-        barco.resetearEstadisticas();
-        barcoRepository.save(barco);
+    public Long countByUsuarioId(UUID usuarioId) {
+        return barcoRepository.countByUsuarioId(usuarioId);
     }
 }

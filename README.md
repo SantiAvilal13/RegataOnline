@@ -4,7 +4,7 @@ Sistema de gestión para carreras de barcos multijugador desarrollado con Spring
 
 ## Descripción
 
-Regata Online es una aplicación web que permite gestionar jugadores, modelos de barcos y flotas completas para regatas multijugador. La aplicación implementa operaciones CRUD completas para todas las entidades principales.
+Regata Online es una aplicación web que permite gestionar usuarios, modelos de barcos y flotas completas para regatas multijugador. La aplicación implementa operaciones CRUD completas para todas las entidades principales.
 
 ## Características
 
@@ -32,20 +32,20 @@ Regata Online es una aplicación web que permite gestionar jugadores, modelos de
 src/main/java/com/example/regata/
 ├── controller/          # Controladores REST
 │   ├── BarcoController.java
-│   ├── JugadorController.java
+│   ├── UsuarioRestController.java
 │   ├── ModeloController.java
 │   └── HomeController.java
 ├── model/              # Entidades JPA
 │   ├── Barco.java
-│   ├── Jugador.java
+│   ├── Usuario.java
 │   └── Modelo.java
 ├── repository/         # Repositorios JPA
 │   ├── BarcoRepository.java
-│   ├── JugadorRepository.java
+│   ├── UsuarioRepository.java
 │   └── ModeloRepository.java
 ├── service/           # Servicios de negocio
 │   ├── BarcoService.java
-│   ├── JugadorService.java
+│   ├── UsuarioService.java
 │   ├── ModeloService.java
 │   └── impl/          # Implementaciones
 ├── init/              # Inicialización de datos

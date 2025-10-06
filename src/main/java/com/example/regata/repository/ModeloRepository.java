@@ -7,21 +7,32 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
-public interface ModeloRepository extends JpaRepository<Modelo, Long> {
+public interface ModeloRepository extends JpaRepository<Modelo, UUID> {
     
-    List<Modelo> findByNombreContainingIgnoreCase(String nombre);
+    // Buscar modelos por nombre que contenga el texto (búsqueda parcial)
+    @Query("SELECT m FROM Modelo m WHERE LOWER(m.nombre) LIKE LOWER(CONCAT('%', :nombre, '%'))")
+    List<Modelo> findByNombreContainingIgnoreCase(@Param("nombre") String nombre);
     
-    @Query("SELECT m FROM Modelo m WHERE m.velocidadMaxima >= :velocidadMinima")
-    List<Modelo> findByVelocidadMaximaGreaterThanEqual(@Param("velocidadMinima") Integer velocidadMinima);
+    // Buscar modelos por color hexadecimal
+    @Query("SELECT m FROM Modelo m WHERE m.colorHex = :colorHex")
+    List<Modelo> findByColorHex(@Param("colorHex") String colorHex);
     
-    @Query("SELECT m FROM Modelo m WHERE m.resistencia >= :resistenciaMinima")
-    List<Modelo> findByResistenciaGreaterThanEqual(@Param("resistenciaMinima") Integer resistenciaMinima);
+    // Buscar modelos que contengan un color similar
+    @Query("SELECT m FROM Modelo m WHERE LOWER(m.colorHex) LIKE LOWER(CONCAT('%', :color, '%'))")
+    List<Modelo> findByColorHexContainingIgnoreCase(@Param("color") String color);
     
-    @Query("SELECT m FROM Modelo m WHERE m.maniobrabilidad >= :maniobrabilidadMinima")
-    List<Modelo> findByManiobrabilidadGreaterThanEqual(@Param("maniobrabilidadMinima") Integer maniobrabilidadMinima);
+    // Buscar modelos ordenados por nombre
+    @Query("SELECT m FROM Modelo m ORDER BY m.nombre ASC")
+    List<Modelo> findAllOrderByNombreAsc();
     
-    @Query("SELECT COUNT(b) FROM Barco b WHERE b.modelo.id = :modeloId")
-    Long countBarcosByModeloId(@Param("modeloId") Long modeloId);
+    // Contar barcos que usan este modelo
+    @Query("SELECT COUNT(b) FROM Barco b WHERE b.modelo.idModelo = :modeloId")
+    Long countBarcosByModeloId(@Param("modeloId") UUID modeloId);
+    
+    // Buscar modelos más populares (más usados)
+    @Query("SELECT m FROM Modelo m LEFT JOIN m.barcos b GROUP BY m.idModelo ORDER BY COUNT(b) DESC")
+    List<Modelo> findModelosMasPopulares();
 }

@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @Transactional
@@ -23,7 +24,7 @@ public class ModeloService {
     }
     
     @Transactional(readOnly = true)
-    public Optional<Modelo> findById(Long id) {
+    public Optional<Modelo> findById(UUID id) {
         return modeloRepository.findById(id);
     }
     
@@ -31,7 +32,7 @@ public class ModeloService {
         return modeloRepository.save(modelo);
     }
     
-    public void deleteById(Long id) {
+    public void deleteById(UUID id) {
         if (!modeloRepository.existsById(id)) {
             throw new GameException("No se encontró el modelo con ID: " + id);
         }
@@ -45,15 +46,12 @@ public class ModeloService {
         modeloRepository.deleteById(id);
     }
     
-    public Modelo update(Long id, Modelo modelo) {
+    public Modelo update(UUID id, Modelo modelo) {
         Modelo existingModelo = modeloRepository.findById(id)
                 .orElseThrow(() -> new GameException("No se encontró el modelo con ID: " + id));
         
         existingModelo.setNombre(modelo.getNombre());
-        existingModelo.setDescripcion(modelo.getDescripcion());
-        existingModelo.setVelocidadMaxima(modelo.getVelocidadMaxima());
-        existingModelo.setResistencia(modelo.getResistencia());
-        existingModelo.setManiobrabilidad(modelo.getManiobrabilidad());
+        existingModelo.setColorHex(modelo.getColorHex());
         
         return modeloRepository.save(existingModelo);
     }
@@ -64,22 +62,27 @@ public class ModeloService {
     }
     
     @Transactional(readOnly = true)
-    public List<Modelo> findByVelocidadMaximaGreaterThanEqual(Integer velocidadMinima) {
-        return modeloRepository.findByVelocidadMaximaGreaterThanEqual(velocidadMinima);
+    public List<Modelo> findByColorHex(String colorHex) {
+        return modeloRepository.findByColorHex(colorHex);
     }
     
     @Transactional(readOnly = true)
-    public List<Modelo> findByResistenciaGreaterThanEqual(Integer resistenciaMinima) {
-        return modeloRepository.findByResistenciaGreaterThanEqual(resistenciaMinima);
+    public List<Modelo> findByColorHexContainingIgnoreCase(String color) {
+        return modeloRepository.findByColorHexContainingIgnoreCase(color);
     }
     
     @Transactional(readOnly = true)
-    public List<Modelo> findByManiobrabilidadGreaterThanEqual(Integer maniobrabilidadMinima) {
-        return modeloRepository.findByManiobrabilidadGreaterThanEqual(maniobrabilidadMinima);
+    public List<Modelo> findAllOrderByNombreAsc() {
+        return modeloRepository.findAllOrderByNombreAsc();
     }
     
     @Transactional(readOnly = true)
-    public Long countBarcosByModeloId(Long modeloId) {
+    public List<Modelo> findModelosMasPopulares() {
+        return modeloRepository.findModelosMasPopulares();
+    }
+    
+    @Transactional(readOnly = true)
+    public Long countBarcosByModeloId(UUID modeloId) {
         return modeloRepository.countBarcosByModeloId(modeloId);
     }
 }

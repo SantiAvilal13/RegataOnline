@@ -98,61 +98,61 @@
                 </h5>
             </div>
             <div class="card-body">
-                <div th:if="${#lists.isEmpty(jugadores)}" class="text-center py-4">
+                <div th:if="${#lists.isEmpty(usuarios)}" class="text-center py-4">
                     <i class="fas fa-users fa-3x text-muted mb-3"></i>
                     <p th:if="${mensaje}" class="text-muted" th:text="${mensaje}">Mensaje de búsqueda</p>
-                    <p th:unless="${mensaje}" class="text-muted">No hay jugadores registrados</p>
+                    <p th:unless="${mensaje}" class="text-muted">No hay usuarios registrados</p>
                     <a th:href="@{/jugadores/nuevo}" class="btn btn-primary">
-                        <i class="fas fa-plus me-2"></i>Crear Nuevo Jugador
+                        <i class="fas fa-plus me-2"></i>Crear Nuevo Usuario
                     </a>
                     <a th:if="${busqueda}" th:href="@{/jugadores}" class="btn btn-outline-secondary ms-2">
                         <i class="fas fa-list me-2"></i>Ver Todos
                     </a>
                 </div>
                 
-                <div th:unless="${#lists.isEmpty(jugadores)}" class="table-responsive">
+                <div th:unless="${#lists.isEmpty(usuarios)}" class="table-responsive">
                     <table class="table table-hover">
                         <thead class="table-dark">
                             <tr>
                                 <th>ID</th>
                                 <th>Nombre</th>
                                 <th>Email</th>
-                                <th>Puntos Totales</th>
+                                <th>Rol</th>
                                 <th>Barcos</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr th:each="jugador : ${jugadores}">
-                                <td th:text="${jugador.id}">1</td>
+                            <tr th:each="usuario : ${usuarios}">
+                                <td th:text="${usuario.idUsuario}">1</td>
                                 <td>
-                                    <strong th:text="${jugador.nombre}">Nombre</strong>
+                                    <strong th:text="${usuario.nombre}">Nombre</strong>
                                 </td>
-                                <td th:text="${jugador.email}">email@example.com</td>
+                                <td th:text="${usuario.email}">email@example.com</td>
                                 <td>
-                                    <span class="badge bg-success" th:text="${jugador.puntosTotales} + ' pts'">100 pts</span>
+                                    <span class="badge bg-primary" th:text="${usuario.rol}">JUGADOR</span>
                                 </td>
                                 <td>
-                                    <span class="badge bg-info" th:text="${#lists.size(jugador.barcos)} + ' barcos'">5 barcos</span>
+                                    <span class="badge bg-info" th:text="${#lists.size(usuario.barcos)} + ' barcos'">5 barcos</span>
                                 </td>
                                 <td>
                                     <div class="btn-group" role="group">
-                                        <a th:href="@{/jugadores/detalle/{id}(id=${jugador.id})}" 
+                                        <a th:href="@{/jugadores/detalle/{id}(id=${usuario.idUsuario})}" 
                                            class="btn btn-sm btn-outline-info" title="Ver detalle">
                                             <i class="fas fa-eye"></i>
                                         </a>
-                                        <a th:href="@{/jugadores/editar/{id}(id=${jugador.id})}" 
+                                        <a th:href="@{/jugadores/editar/{id}(id=${usuario.idUsuario})}" 
                                            class="btn btn-sm btn-outline-warning" title="Editar">
                                             <i class="fas fa-edit"></i>
                                         </a>
-                                        <a th:href="@{/barcos/por-jugador/{id}(id=${jugador.id})}" 
+                                        <a th:href="@{/barcos/por-usuario/{id}(id=${usuario.idUsuario})}" 
                                            class="btn btn-sm btn-outline-primary" title="Ver barcos">
                                             <i class="fas fa-ship"></i>
                                         </a>
-                                        <a th:href="@{/jugadores/eliminar/{id}(id=${jugador.id})}" 
+                                        <a th:href="@{/jugadores/eliminar/{id}(id=${usuario.idUsuario})}" 
                                            class="btn btn-sm btn-outline-danger" 
                                            title="Eliminar"
-                                           onclick="return confirm('¿Estás seguro de que quieres eliminar este jugador?')">
+                                           onclick="return confirm('¿Estás seguro de que quieres eliminar este usuario?')">
                                             <i class="fas fa-trash"></i>
                                         </a>
                                     </div>

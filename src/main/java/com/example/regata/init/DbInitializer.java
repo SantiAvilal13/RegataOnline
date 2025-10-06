@@ -1,10 +1,10 @@
 package com.example.regata.init;
 
 import com.example.regata.model.Barco;
-import com.example.regata.model.Jugador;
+import com.example.regata.model.Usuario;
 import com.example.regata.model.Modelo;
 import com.example.regata.service.BarcoService;
-import com.example.regata.service.JugadorService;
+import com.example.regata.service.UsuarioService;
 import com.example.regata.service.ModeloService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 public class DbInitializer implements CommandLineRunner {
     
     @Autowired
-    private JugadorService jugadorService;
+    private UsuarioService usuarioService;
     
     @Autowired
     private ModeloService modeloService;
@@ -25,36 +25,36 @@ public class DbInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         // Verificar si ya hay datos
-        if (jugadorService.findAll().isEmpty()) {
+        if (usuarioService.findAll().isEmpty()) {
             inicializarDatos();
         }
     }
     
     private void inicializarDatos() {
-        // Crear 5 jugadores
-        Jugador jugador1 = new Jugador("María García", "maria.garcia@email.com");
-        Jugador jugador2 = new Jugador("Carlos López", "carlos.lopez@email.com");
-        Jugador jugador3 = new Jugador("Ana Martínez", "ana.martinez@email.com");
-        Jugador jugador4 = new Jugador("Pedro Rodríguez", "pedro.rodriguez@email.com");
-        Jugador jugador5 = new Jugador("Laura Sánchez", "laura.sanchez@email.com");
+        // Crear 5 usuarios
+        Usuario usuario1 = new Usuario("María García", "maria.garcia@email.com", "password123", Usuario.Rol.JUGADOR);
+        Usuario usuario2 = new Usuario("Carlos López", "carlos.lopez@email.com", "password123", Usuario.Rol.JUGADOR);
+        Usuario usuario3 = new Usuario("Ana Martínez", "ana.martinez@email.com", "password123", Usuario.Rol.JUGADOR);
+        Usuario usuario4 = new Usuario("Pedro Rodríguez", "pedro.rodriguez@email.com", "password123", Usuario.Rol.JUGADOR);
+        Usuario usuario5 = new Usuario("Laura Sánchez", "laura.sanchez@email.com", "password123", Usuario.Rol.JUGADOR);
         
-        jugador1 = jugadorService.save(jugador1);
-        jugador2 = jugadorService.save(jugador2);
-        jugador3 = jugadorService.save(jugador3);
-        jugador4 = jugadorService.save(jugador4);
-        jugador5 = jugadorService.save(jugador5);
+        usuario1 = usuarioService.save(usuario1);
+        usuario2 = usuarioService.save(usuario2);
+        usuario3 = usuarioService.save(usuario3);
+        usuario4 = usuarioService.save(usuario4);
+        usuario5 = usuarioService.save(usuario5);
         
         // Crear 10 modelos de barcos
-        Modelo modelo1 = new Modelo("Velero Clásico", "Azul", "Barco tradicional de vela con gran maniobrabilidad", 15, 80, 90);
-        Modelo modelo2 = new Modelo("Catamarán Rápido", "Blanco", "Embarcación de doble casco para alta velocidad", 25, 60, 70);
-        Modelo modelo3 = new Modelo("Yate de Lujo", "Dorado", "Barco elegante con excelente resistencia", 20, 95, 60);
-        Modelo modelo4 = new Modelo("Lancha Deportiva", "Rojo", "Embarcación ágil para carreras", 30, 50, 85);
-        Modelo modelo5 = new Modelo("Fragata de Guerra", "Gris", "Barco robusto con gran resistencia", 18, 100, 55);
-        Modelo modelo6 = new Modelo("Corbeta Ligera", "Verde", "Embarcación rápida y maniobrable", 28, 65, 80);
-        Modelo modelo7 = new Modelo("Galeón Comercial", "Marrón", "Barco resistente para largas travesías", 12, 90, 50);
-        Modelo modelo8 = new Modelo("Bote de Carreras", "Amarillo", "Embarcación ultraligera para velocidad", 35, 40, 95);
-        Modelo modelo9 = new Modelo("Crucero Familiar", "Celeste", "Barco cómodo y estable", 16, 75, 65);
-        Modelo modelo10 = new Modelo("Dragón de Mar", "Negro", "Embarcación mítica con poderes especiales", 22, 85, 75);
+        Modelo modelo1 = new Modelo("Velero Clásico", "#0000FF");
+        Modelo modelo2 = new Modelo("Catamarán Rápido", "#FFFFFF");
+        Modelo modelo3 = new Modelo("Yate de Lujo", "#FFD700");
+        Modelo modelo4 = new Modelo("Lancha Deportiva", "#FF0000");
+        Modelo modelo5 = new Modelo("Fragata de Guerra", "#808080");
+        Modelo modelo6 = new Modelo("Corbeta Ligera", "#008000");
+        Modelo modelo7 = new Modelo("Galeón Comercial", "#8B4513");
+        Modelo modelo8 = new Modelo("Bote de Carreras", "#FFFF00");
+        Modelo modelo9 = new Modelo("Crucero Familiar", "#87CEEB");
+        Modelo modelo10 = new Modelo("Dragón de Mar", "#000000");
         
         modelo1 = modeloService.save(modelo1);
         modelo2 = modeloService.save(modelo2);
@@ -67,22 +67,22 @@ public class DbInitializer implements CommandLineRunner {
         modelo9 = modeloService.save(modelo9);
         modelo10 = modeloService.save(modelo10);
         
-        // Crear 50 barcos (10 por jugador)
-        crearBarcosParaJugador(jugador1, new Modelo[]{modelo1, modelo2, modelo3, modelo4, modelo5, modelo6, modelo7, modelo8, modelo9, modelo10});
-        crearBarcosParaJugador(jugador2, new Modelo[]{modelo2, modelo3, modelo4, modelo5, modelo6, modelo7, modelo8, modelo9, modelo10, modelo1});
-        crearBarcosParaJugador(jugador3, new Modelo[]{modelo3, modelo4, modelo5, modelo6, modelo7, modelo8, modelo9, modelo10, modelo1, modelo2});
-        crearBarcosParaJugador(jugador4, new Modelo[]{modelo4, modelo5, modelo6, modelo7, modelo8, modelo9, modelo10, modelo1, modelo2, modelo3});
-        crearBarcosParaJugador(jugador5, new Modelo[]{modelo5, modelo6, modelo7, modelo8, modelo9, modelo10, modelo1, modelo2, modelo3, modelo4});
+        // Crear 50 barcos (10 por usuario)
+        crearBarcosParaUsuario(usuario1, new Modelo[]{modelo1, modelo2, modelo3, modelo4, modelo5, modelo6, modelo7, modelo8, modelo9, modelo10});
+        crearBarcosParaUsuario(usuario2, new Modelo[]{modelo2, modelo3, modelo4, modelo5, modelo6, modelo7, modelo8, modelo9, modelo10, modelo1});
+        crearBarcosParaUsuario(usuario3, new Modelo[]{modelo3, modelo4, modelo5, modelo6, modelo7, modelo8, modelo9, modelo10, modelo1, modelo2});
+        crearBarcosParaUsuario(usuario4, new Modelo[]{modelo4, modelo5, modelo6, modelo7, modelo8, modelo9, modelo10, modelo1, modelo2, modelo3});
+        crearBarcosParaUsuario(usuario5, new Modelo[]{modelo5, modelo6, modelo7, modelo8, modelo9, modelo10, modelo1, modelo2, modelo3, modelo4});
     }
     
-    private void crearBarcosParaJugador(Jugador jugador, Modelo[] modelos) {
+    private void crearBarcosParaUsuario(Usuario usuario, Modelo[] modelos) {
         String[] nombresBarcos = {
             "Océano Azul", "Mar Profundo", "Viento Libre", "Ola Salvaje", "Costa Dorada",
             "Bahía Serena", "Puerto Seguro", "Cabo Tormenta", "Isla Perdida", "Faro Brillante"
         };
         
         for (int i = 0; i < 10; i++) {
-            Barco barco = new Barco(nombresBarcos[i] + " " + (i + 1), jugador, modelos[i]);
+            Barco barco = new Barco(nombresBarcos[i] + " " + (i + 1), usuario, modelos[i]);
             barcoService.save(barco);
         }
     }

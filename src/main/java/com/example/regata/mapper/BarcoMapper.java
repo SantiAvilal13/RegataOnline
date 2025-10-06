@@ -13,21 +13,18 @@ public class BarcoMapper {
         }
         
         BarcoDTO dto = new BarcoDTO();
-        dto.setId(barco.getId());
-        dto.setNombre(barco.getNombre());
-        dto.setPuntosGanados(barco.getPuntosGanados());
-        dto.setVelocidadActual(barco.getVelocidadActual());
-        dto.setResistenciaActual(barco.getResistenciaActual());
-        dto.setManiobrabilidadActual(barco.getManiobrabilidadActual());
+        dto.setIdBarco(barco.getIdBarco());
+        dto.setAlias(barco.getAlias());
         
-        if (barco.getJugador() != null) {
-            dto.setJugadorId(barco.getJugador().getId());
-            dto.setJugadorNombre(barco.getJugador().getNombre());
+        if (barco.getUsuario() != null) {
+            dto.setUsuarioId(barco.getUsuario().getIdUsuario());
+            dto.setUsuarioNombre(barco.getUsuario().getNombre());
         }
         
         if (barco.getModelo() != null) {
-            dto.setModeloId(barco.getModelo().getId());
+            dto.setModeloId(barco.getModelo().getIdModelo());
             dto.setModeloNombre(barco.getModelo().getNombre());
+            dto.setModeloColorHex(barco.getModelo().getColorHex());
         }
         
         return dto;
@@ -39,12 +36,11 @@ public class BarcoMapper {
         }
         
         Barco barco = new Barco();
-        barco.setId(dto.getId());
-        barco.setNombre(dto.getNombre());
-        barco.setPuntosGanados(dto.getPuntosGanados());
-        barco.setVelocidadActual(dto.getVelocidadActual());
-        barco.setResistenciaActual(dto.getResistenciaActual());
-        barco.setManiobrabilidadActual(dto.getManiobrabilidadActual());
+        barco.setIdBarco(dto.getIdBarco());
+        barco.setAlias(dto.getAlias());
+        
+        // Nota: Los objetos Usuario y Modelo deben ser establecidos externamente
+        // ya que el mapper no tiene acceso a los servicios para cargarlos
         
         return barco;
     }

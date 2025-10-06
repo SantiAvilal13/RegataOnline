@@ -2,43 +2,25 @@ package com.example.regata.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "modelos")
 public class Modelo {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id_modelo")
+    private UUID idModelo;
     
     @NotBlank(message = "El nombre es obligatorio")
     @Column(nullable = false)
     private String nombre;
     
     @NotBlank(message = "El color es obligatorio")
-    @Column(nullable = false)
-    private String color;
-    
-    @Column(columnDefinition = "TEXT")
-    private String descripcion;
-    
-    @NotNull(message = "La velocidad máxima es obligatoria")
-    @Positive(message = "La velocidad máxima debe ser positiva")
-    @Column(name = "velocidad_maxima", nullable = false)
-    private Integer velocidadMaxima;
-    
-    @NotNull(message = "La resistencia es obligatoria")
-    @Positive(message = "La resistencia debe ser positiva")
-    @Column(nullable = false)
-    private Integer resistencia;
-    
-    @NotNull(message = "La maniobrabilidad es obligatoria")
-    @Positive(message = "La maniobrabilidad debe ser positiva")
-    @Column(nullable = false)
-    private Integer maniobrabilidad;
+    @Column(name = "color_hex", nullable = false)
+    private String colorHex;
     
     @OneToMany(mappedBy = "modelo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Barco> barcos;
@@ -46,23 +28,18 @@ public class Modelo {
     // Constructores
     public Modelo() {}
     
-    public Modelo(String nombre, String color, String descripcion, Integer velocidadMaxima, 
-                  Integer resistencia, Integer maniobrabilidad) {
+    public Modelo(String nombre, String colorHex) {
         this.nombre = nombre;
-        this.color = color;
-        this.descripcion = descripcion;
-        this.velocidadMaxima = velocidadMaxima;
-        this.resistencia = resistencia;
-        this.maniobrabilidad = maniobrabilidad;
+        this.colorHex = colorHex;
     }
     
     // Getters y Setters
-    public Long getId() {
-        return id;
+    public UUID getIdModelo() {
+        return idModelo;
     }
     
-    public void setId(Long id) {
-        this.id = id;
+    public void setIdModelo(UUID idModelo) {
+        this.idModelo = idModelo;
     }
     
     public String getNombre() {
@@ -73,44 +50,12 @@ public class Modelo {
         this.nombre = nombre;
     }
     
-    public String getColor() {
-        return color;
+    public String getColorHex() {
+        return colorHex;
     }
     
-    public void setColor(String color) {
-        this.color = color;
-    }
-    
-    public String getDescripcion() {
-        return descripcion;
-    }
-    
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
-    }
-    
-    public Integer getVelocidadMaxima() {
-        return velocidadMaxima;
-    }
-    
-    public void setVelocidadMaxima(Integer velocidadMaxima) {
-        this.velocidadMaxima = velocidadMaxima;
-    }
-    
-    public Integer getResistencia() {
-        return resistencia;
-    }
-    
-    public void setResistencia(Integer resistencia) {
-        this.resistencia = resistencia;
-    }
-    
-    public Integer getManiobrabilidad() {
-        return maniobrabilidad;
-    }
-    
-    public void setManiobrabilidad(Integer maniobrabilidad) {
-        this.maniobrabilidad = maniobrabilidad;
+    public void setColorHex(String colorHex) {
+        this.colorHex = colorHex;
     }
     
     public List<Barco> getBarcos() {
@@ -124,13 +69,9 @@ public class Modelo {
     @Override
     public String toString() {
         return "Modelo{" +
-                "id=" + id +
+                "idModelo=" + idModelo +
                 ", nombre='" + nombre + '\'' +
-                ", color='" + color + '\'' +
-                ", descripcion='" + descripcion + '\'' +
-                ", velocidadMaxima=" + velocidadMaxima +
-                ", resistencia=" + resistencia +
-                ", maniobrabilidad=" + maniobrabilidad +
+                ", colorHex='" + colorHex + '\'' +
                 '}';
     }
 }

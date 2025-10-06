@@ -78,11 +78,11 @@
                         <input type="text" name="nombre" class="form-control" placeholder="Buscar por nombre...">
                     </div>
                     <div class="col-md-3">
-                        <select name="jugadorId" class="form-select">
-                            <option value="">Todos los jugadores</option>
-                            <option th:each="jugador : ${jugadores}" 
-                                    th:value="${jugador.id}" 
-                                    th:text="${jugador.nombre}">Jugador</option>
+                        <select name="usuarioId" class="form-select">
+                            <option value="">Todos los usuarios</option>
+                                    <option th:each="usuario : ${usuarios}" 
+                                            th:value="${usuario.idUsuario}" 
+                                            th:text="${usuario.nombre}">Usuario</option>
                         </select>
                     </div>
                     <div class="col-md-3">
@@ -147,7 +147,7 @@
                                 <td>
                                     <strong th:text="${barco.nombre}">Nombre</strong>
                                 </td>
-                                <td th:text="${barco.jugador.nombre}">Jugador</td>
+                                <td th:text="${barco.usuario.nombre}">Usuario</td>
                                 <td th:text="${barco.modelo.nombre}">Modelo</td>
                                 <td>
                                     <span class="badge bg-success" th:text="${barco.puntosGanados} + ' pts'">50 pts</span>

@@ -70,14 +70,14 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="jugador" class="form-label">Jugador *</label>
-                                <select class="form-control" id="jugador" name="jugador.id" required>
-                                    <option value="">Selecciona un jugador</option>
-                                    <option th:each="jugador : ${jugadores}" 
-                                            th:value="${jugador.id}" 
-                                            th:text="${jugador.nombre + ' (' + jugador.email + ')'}"
-                                            th:selected="${barco.jugador != null and barco.jugador.id == jugador.id}">
-                                        Jugador
+                                <label for="usuario" class="form-label">Usuario *</label>
+                                <select class="form-control" id="usuario" name="usuario.id" required>
+                                    <option value="">Selecciona un usuario</option>
+                                    <option th:each="usuario : ${usuarios}" 
+                                            th:value="${usuario.idUsuario}" 
+                                            th:text="${usuario.nombre + ' (' + usuario.email + ')'}"
+                                            th:selected="${barco.usuario != null and barco.usuario.idUsuario == usuario.idUsuario}">
+                                        Usuario
                                     </option>
                                 </select>
                             </div>

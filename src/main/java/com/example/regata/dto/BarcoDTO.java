@@ -2,118 +2,81 @@ package com.example.regata.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
+import java.util.List;
+import java.util.UUID;
 
 public class BarcoDTO {
     
-    private Long id;
+    private UUID idBarco;
     
-    @NotBlank(message = "El nombre es obligatorio")
-    private String nombre;
+    @NotBlank(message = "El alias es obligatorio")
+    @Size(min = 2, max = 50, message = "El alias debe tener entre 2 y 50 caracteres")
+    private String alias;
     
-    @PositiveOrZero(message = "Los puntos ganados deben ser positivos o cero")
-    private Integer puntosGanados;
+    @NotNull(message = "El usuario propietario es obligatorio")
+    private UUID usuarioId;
     
-    @PositiveOrZero(message = "La velocidad actual debe ser positiva o cero")
-    private Integer velocidadActual;
-    
-    @PositiveOrZero(message = "La resistencia actual debe ser positiva o cero")
-    private Integer resistenciaActual;
-    
-    @PositiveOrZero(message = "La maniobrabilidad actual debe ser positiva o cero")
-    private Integer maniobrabilidadActual;
-    
-    @NotNull(message = "El jugador es obligatorio")
-    private Long jugadorId;
-    
-    private String jugadorNombre;
+    private String usuarioNombre;
     
     @NotNull(message = "El modelo es obligatorio")
-    private Long modeloId;
+    private UUID modeloId;
     
     private String modeloNombre;
+    private String modeloColorHex;
+    
+    // Campos adicionales para la vista
+    private List<ParticipacionDTO> participaciones;
+    private Long totalParticipaciones;
+    private Long partidasGanadas;
     
     // Constructores
     public BarcoDTO() {}
     
-    public BarcoDTO(String nombre, Long jugadorId, Long modeloId) {
-        this.nombre = nombre;
-        this.jugadorId = jugadorId;
+    public BarcoDTO(String alias, UUID usuarioId, UUID modeloId) {
+        this.alias = alias;
+        this.usuarioId = usuarioId;
         this.modeloId = modeloId;
-        this.puntosGanados = 0;
-        this.velocidadActual = 0;
     }
     
     // Getters y Setters
-    public Long getId() {
-        return id;
+    public UUID getIdBarco() {
+        return idBarco;
     }
     
-    public void setId(Long id) {
-        this.id = id;
+    public void setIdBarco(UUID idBarco) {
+        this.idBarco = idBarco;
     }
     
-    public String getNombre() {
-        return nombre;
+    public String getAlias() {
+        return alias;
     }
     
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setAlias(String alias) {
+        this.alias = alias;
     }
     
-    public Integer getPuntosGanados() {
-        return puntosGanados;
+    public UUID getUsuarioId() {
+        return usuarioId;
     }
     
-    public void setPuntosGanados(Integer puntosGanados) {
-        this.puntosGanados = puntosGanados;
+    public void setUsuarioId(UUID usuarioId) {
+        this.usuarioId = usuarioId;
     }
     
-    public Integer getVelocidadActual() {
-        return velocidadActual;
+    public String getUsuarioNombre() {
+        return usuarioNombre;
     }
     
-    public void setVelocidadActual(Integer velocidadActual) {
-        this.velocidadActual = velocidadActual;
+    public void setUsuarioNombre(String usuarioNombre) {
+        this.usuarioNombre = usuarioNombre;
     }
     
-    public Integer getResistenciaActual() {
-        return resistenciaActual;
-    }
-    
-    public void setResistenciaActual(Integer resistenciaActual) {
-        this.resistenciaActual = resistenciaActual;
-    }
-    
-    public Integer getManiobrabilidadActual() {
-        return maniobrabilidadActual;
-    }
-    
-    public void setManiobrabilidadActual(Integer maniobrabilidadActual) {
-        this.maniobrabilidadActual = maniobrabilidadActual;
-    }
-    
-    public Long getJugadorId() {
-        return jugadorId;
-    }
-    
-    public void setJugadorId(Long jugadorId) {
-        this.jugadorId = jugadorId;
-    }
-    
-    public String getJugadorNombre() {
-        return jugadorNombre;
-    }
-    
-    public void setJugadorNombre(String jugadorNombre) {
-        this.jugadorNombre = jugadorNombre;
-    }
-    
-    public Long getModeloId() {
+    public UUID getModeloId() {
         return modeloId;
     }
     
-    public void setModeloId(Long modeloId) {
+    public void setModeloId(UUID modeloId) {
         this.modeloId = modeloId;
     }
     
@@ -125,19 +88,48 @@ public class BarcoDTO {
         this.modeloNombre = modeloNombre;
     }
     
+    public String getModeloColorHex() {
+        return modeloColorHex;
+    }
+    
+    public void setModeloColorHex(String modeloColorHex) {
+        this.modeloColorHex = modeloColorHex;
+    }
+    
+    public List<ParticipacionDTO> getParticipaciones() {
+        return participaciones;
+    }
+    
+    public void setParticipaciones(List<ParticipacionDTO> participaciones) {
+        this.participaciones = participaciones;
+    }
+    
+    public Long getTotalParticipaciones() {
+        return totalParticipaciones;
+    }
+    
+    public void setTotalParticipaciones(Long totalParticipaciones) {
+        this.totalParticipaciones = totalParticipaciones;
+    }
+    
+    public Long getPartidasGanadas() {
+        return partidasGanadas;
+    }
+    
+    public void setPartidasGanadas(Long partidasGanadas) {
+        this.partidasGanadas = partidasGanadas;
+    }
+    
     @Override
     public String toString() {
         return "BarcoDTO{" +
-                "id=" + id +
-                ", nombre='" + nombre + '\'' +
-                ", puntosGanados=" + puntosGanados +
-                ", velocidadActual=" + velocidadActual +
-                ", resistenciaActual=" + resistenciaActual +
-                ", maniobrabilidadActual=" + maniobrabilidadActual +
-                ", jugadorId=" + jugadorId +
-                ", jugadorNombre='" + jugadorNombre + '\'' +
+                "idBarco=" + idBarco +
+                ", alias='" + alias + '\'' +
+                ", usuarioId=" + usuarioId +
+                ", usuarioNombre='" + usuarioNombre + '\'' +
                 ", modeloId=" + modeloId +
                 ", modeloNombre='" + modeloNombre + '\'' +
+                ", modeloColorHex='" + modeloColorHex + '\'' +
                 '}';
     }
 }

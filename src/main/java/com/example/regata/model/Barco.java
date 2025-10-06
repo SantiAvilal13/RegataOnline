@@ -3,153 +3,67 @@ package com.example.regata.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "barcos")
 public class Barco {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id_barco")
+    private UUID idBarco;
     
-    @NotBlank(message = "El nombre es obligatorio")
+    @NotBlank(message = "El alias es obligatorio")
     @Column(nullable = false)
-    private String nombre;
-    
-    @Column(name = "puntos_ganados")
-    private Integer puntosGanados = 0;
-    
-    @Column(name = "velocidad_actual")
-    private Integer velocidadActual = 0;
-    
-    @Column(name = "velocidad_x")
-    private Integer velocidadX = 0;
-    
-    @Column(name = "velocidad_y")
-    private Integer velocidadY = 0;
-    
-    @Column(name = "pos_x")
-    private Integer posX = 0;
-    
-    @Column(name = "pos_y")
-    private Integer posY = 0;
-    
-    @Column(name = "resistencia_actual")
-    private Integer resistenciaActual;
-    
-    @Column(name = "maniobrabilidad_actual")
-    private Integer maniobrabilidadActual;
+    private String alias;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "jugador_id", nullable = false)
-    @NotNull(message = "El jugador es obligatorio")
-    private Jugador jugador;
+    @JoinColumn(name = "id_usuario", nullable = false)
+    @NotNull(message = "El usuario propietario es obligatorio")
+    private Usuario usuario;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "modelo_id", nullable = false)
+    @JoinColumn(name = "id_modelo", nullable = false)
     @NotNull(message = "El modelo es obligatorio")
     private Modelo modelo;
+    
+    @OneToMany(mappedBy = "barco", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Participacion> participaciones;
     
     // Constructores
     public Barco() {}
     
-    public Barco(String nombre, Jugador jugador, Modelo modelo) {
-        this.nombre = nombre;
-        this.jugador = jugador;
+    public Barco(String alias, Usuario usuario, Modelo modelo) {
+        this.alias = alias;
+        this.usuario = usuario;
         this.modelo = modelo;
-        this.puntosGanados = 0;
-        this.velocidadActual = 0;
-        this.resistenciaActual = modelo.getResistencia();
-        this.maniobrabilidadActual = modelo.getManiobrabilidad();
     }
     
     // Getters y Setters
-    public Long getId() {
-        return id;
+    public UUID getIdBarco() {
+        return idBarco;
     }
     
-    public void setId(Long id) {
-        this.id = id;
+    public void setIdBarco(UUID idBarco) {
+        this.idBarco = idBarco;
     }
     
-    public String getNombre() {
-        return nombre;
+    public String getAlias() {
+        return alias;
     }
     
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setAlias(String alias) {
+        this.alias = alias;
     }
     
-    public Integer getPuntosGanados() {
-        return puntosGanados;
+    public Usuario getUsuario() {
+        return usuario;
     }
     
-    public void setPuntosGanados(Integer puntosGanados) {
-        this.puntosGanados = puntosGanados;
-    }
-    
-    public Integer getVelocidadActual() {
-        return velocidadActual;
-    }
-    
-    public void setVelocidadActual(Integer velocidadActual) {
-        this.velocidadActual = velocidadActual;
-    }
-    
-    public Integer getVelocidadX() {
-        return velocidadX;
-    }
-    
-    public void setVelocidadX(Integer velocidadX) {
-        this.velocidadX = velocidadX;
-    }
-    
-    public Integer getVelocidadY() {
-        return velocidadY;
-    }
-    
-    public void setVelocidadY(Integer velocidadY) {
-        this.velocidadY = velocidadY;
-    }
-    
-    public Integer getPosX() {
-        return posX;
-    }
-    
-    public void setPosX(Integer posX) {
-        this.posX = posX;
-    }
-    
-    public Integer getPosY() {
-        return posY;
-    }
-    
-    public void setPosY(Integer posY) {
-        this.posY = posY;
-    }
-    
-    public Integer getResistenciaActual() {
-        return resistenciaActual;
-    }
-    
-    public void setResistenciaActual(Integer resistenciaActual) {
-        this.resistenciaActual = resistenciaActual;
-    }
-    
-    public Integer getManiobrabilidadActual() {
-        return maniobrabilidadActual;
-    }
-    
-    public void setManiobrabilidadActual(Integer maniobrabilidadActual) {
-        this.maniobrabilidadActual = maniobrabilidadActual;
-    }
-    
-    public Jugador getJugador() {
-        return jugador;
-    }
-    
-    public void setJugador(Jugador jugador) {
-        this.jugador = jugador;
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
     }
     
     public Modelo getModelo() {
@@ -160,29 +74,21 @@ public class Barco {
         this.modelo = modelo;
     }
     
-    // Métodos de negocio
-    public void ganarPuntos(Integer puntos) {
-        this.puntosGanados += puntos;
-        if (this.jugador != null) {
-            this.jugador.setPuntosTotales(this.jugador.getPuntosTotales() + puntos);
-        }
+    public List<Participacion> getParticipaciones() {
+        return participaciones;
     }
     
-    public void resetearEstadisticas() {
-        this.velocidadActual = 0;
-        this.resistenciaActual = this.modelo.getResistencia();
-        this.maniobrabilidadActual = this.modelo.getManiobrabilidad();
+    public void setParticipaciones(List<Participacion> participaciones) {
+        this.participaciones = participaciones;
     }
     
     @Override
     public String toString() {
         return "Barco{" +
-                "id=" + id +
-                ", nombre='" + nombre + '\'' +
-                ", puntosGanados=" + puntosGanados +
-                ", velocidadActual=" + velocidadActual +
-                ", resistenciaActual=" + resistenciaActual +
-                ", maniobrabilidadActual=" + maniobrabilidadActual +
+                "idBarco=" + idBarco +
+                ", alias='" + alias + '\'' +
+                ", usuario=" + (usuario != null ? usuario.getNombre() : "null") +
+                ", modelo=" + (modelo != null ? modelo.getNombre() : "null") +
                 '}';
     }
 }

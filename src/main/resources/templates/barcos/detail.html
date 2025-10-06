@@ -100,8 +100,8 @@
                             <div class="col-md-6">
                                 <h6>Jugador:</h6>
                                 <p>
-                                    <a th:href="@{/jugadores/detalle/{id}(id=${barco.jugador.id})}" 
-                                       class="text-decoration-none" th:text="${barco.jugador.nombre}">Jugador</a>
+                                    <a th:href="@{/jugadores/detalle/{id}(id=${barco.usuario.idUsuario})}" 
+                                       class="text-decoration-none" th:text="${barco.usuario.nombre}">Usuario</a>
                                 </p>
                             </div>
                             <div class="col-md-6">
@@ -221,7 +221,7 @@
                                 </a>
                             </div>
                             <div class="col-md-2 mb-2">
-                                <a th:href="@{/jugadores/detalle/{id}(id=${barco.jugador.id})}" class="btn btn-info w-100">
+                                <a th:href="@{/jugadores/detalle/{id}(id=${barco.usuario.idUsuario})}" class="btn btn-info w-100">
                                     <i class="fas fa-user me-2"></i>Ver Jugador
                                 </a>
                             </div>

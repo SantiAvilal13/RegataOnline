@@ -1,31 +1,46 @@
 package com.example.regata.repository;
 
 import com.example.regata.model.Barco;
+import com.example.regata.model.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.UUID;
 
 @Repository
-public interface BarcoRepository extends JpaRepository<Barco, Long> {
+public interface BarcoRepository extends JpaRepository<Barco, UUID> {
     
-    List<Barco> findByJugadorId(Long jugadorId);
+    // Buscar barcos por usuario propietario
+    List<Barco> findByUsuario(Usuario usuario);
     
-    List<Barco> findByModeloId(Long modeloId);
+    // Buscar barcos por ID del usuario
+    @Query("SELECT b FROM Barco b WHERE b.usuario.idUsuario = :usuarioId")
+    List<Barco> findByUsuarioId(@Param("usuarioId") UUID usuarioId);
     
-    List<Barco> findByNombreContainingIgnoreCase(String nombre);
+    // Buscar barcos por modelo
+    @Query("SELECT b FROM Barco b WHERE b.modelo.idModelo = :modeloId")
+    List<Barco> findByModeloId(@Param("modeloId") UUID modeloId);
     
-    @Query("SELECT b FROM Barco b WHERE b.jugador.id = :jugadorId ORDER BY b.puntosGanados DESC")
-    List<Barco> findByJugadorIdOrderByPuntosGanadosDesc(@Param("jugadorId") Long jugadorId);
+    // Buscar barcos por alias que contenga el texto (búsqueda parcial)
+    @Query("SELECT b FROM Barco b WHERE LOWER(b.alias) LIKE LOWER(CONCAT('%', :alias, '%'))")
+    List<Barco> findByAliasContainingIgnoreCase(@Param("alias") String alias);
     
-    @Query("SELECT b FROM Barco b ORDER BY b.puntosGanados DESC")
-    List<Barco> findAllOrderByPuntosGanadosDesc();
+    // Buscar barcos de un usuario ordenados por alias
+    @Query("SELECT b FROM Barco b WHERE b.usuario.idUsuario = :usuarioId ORDER BY b.alias ASC")
+    List<Barco> findByUsuarioIdOrderByAliasAsc(@Param("usuarioId") UUID usuarioId);
     
-    @Query("SELECT b FROM Barco b WHERE b.velocidadActual > 0")
-    List<Barco> findBarcosEnMovimiento();
+    // Buscar barcos que participaron en partidas
+    @Query("SELECT DISTINCT b FROM Barco b JOIN b.participaciones p")
+    List<Barco> findBarcosConParticipaciones();
     
-    @Query("SELECT b FROM Barco b WHERE b.jugador.id = :jugadorId AND b.modelo.id = :modeloId")
-    List<Barco> findByJugadorAndModelo(@Param("jugadorId") Long jugadorId, @Param("modeloId") Long modeloId);
+    // Buscar barcos por usuario y modelo
+    @Query("SELECT b FROM Barco b WHERE b.usuario.idUsuario = :usuarioId AND b.modelo.idModelo = :modeloId")
+    List<Barco> findByUsuarioAndModelo(@Param("usuarioId") UUID usuarioId, @Param("modeloId") UUID modeloId);
+    
+    // Contar barcos por usuario
+    @Query("SELECT COUNT(b) FROM Barco b WHERE b.usuario.idUsuario = :usuarioId")
+    Long countByUsuarioId(@Param("usuarioId") UUID usuarioId);
 }

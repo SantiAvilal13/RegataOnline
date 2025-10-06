@@ -1,51 +1,43 @@
 package com.example.regata.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import java.util.List;
+import java.util.UUID;
 
 public class ModeloDTO {
     
-    private Long id;
+    private UUID idModelo;
     
     @NotBlank(message = "El nombre es obligatorio")
+    @Size(min = 2, max = 50, message = "El nombre debe tener entre 2 y 50 caracteres")
     private String nombre;
     
-    private String descripcion;
+    @NotBlank(message = "El color hexadecimal es obligatorio")
+    @Pattern(regexp = "^#[0-9A-Fa-f]{6}$", message = "El color debe ser un código hexadecimal válido (ej: #FF0000)")
+    private String colorHex;
     
-    @NotNull(message = "La velocidad máxima es obligatoria")
-    @Positive(message = "La velocidad máxima debe ser positiva")
-    private Integer velocidadMaxima;
-    
-    @NotNull(message = "La resistencia es obligatoria")
-    @Positive(message = "La resistencia debe ser positiva")
-    private Integer resistencia;
-    
-    @NotNull(message = "La maniobrabilidad es obligatoria")
-    @Positive(message = "La maniobrabilidad debe ser positiva")
-    private Integer maniobrabilidad;
-    
+    // Campos adicionales para la vista
+    private List<BarcoDTO> barcos;
     private Long cantidadBarcos;
+    private Long totalParticipaciones;
     
     // Constructores
     public ModeloDTO() {}
     
-    public ModeloDTO(String nombre, String descripcion, Integer velocidadMaxima, 
-                     Integer resistencia, Integer maniobrabilidad) {
+    public ModeloDTO(String nombre, String colorHex) {
         this.nombre = nombre;
-        this.descripcion = descripcion;
-        this.velocidadMaxima = velocidadMaxima;
-        this.resistencia = resistencia;
-        this.maniobrabilidad = maniobrabilidad;
+        this.colorHex = colorHex;
     }
     
     // Getters y Setters
-    public Long getId() {
-        return id;
+    public UUID getIdModelo() {
+        return idModelo;
     }
     
-    public void setId(Long id) {
-        this.id = id;
+    public void setIdModelo(UUID idModelo) {
+        this.idModelo = idModelo;
     }
     
     public String getNombre() {
@@ -56,36 +48,20 @@ public class ModeloDTO {
         this.nombre = nombre;
     }
     
-    public String getDescripcion() {
-        return descripcion;
+    public String getColorHex() {
+        return colorHex;
     }
     
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+    public void setColorHex(String colorHex) {
+        this.colorHex = colorHex;
     }
     
-    public Integer getVelocidadMaxima() {
-        return velocidadMaxima;
+    public List<BarcoDTO> getBarcos() {
+        return barcos;
     }
     
-    public void setVelocidadMaxima(Integer velocidadMaxima) {
-        this.velocidadMaxima = velocidadMaxima;
-    }
-    
-    public Integer getResistencia() {
-        return resistencia;
-    }
-    
-    public void setResistencia(Integer resistencia) {
-        this.resistencia = resistencia;
-    }
-    
-    public Integer getManiobrabilidad() {
-        return maniobrabilidad;
-    }
-    
-    public void setManiobrabilidad(Integer maniobrabilidad) {
-        this.maniobrabilidad = maniobrabilidad;
+    public void setBarcos(List<BarcoDTO> barcos) {
+        this.barcos = barcos;
     }
     
     public Long getCantidadBarcos() {
@@ -96,15 +72,20 @@ public class ModeloDTO {
         this.cantidadBarcos = cantidadBarcos;
     }
     
+    public Long getTotalParticipaciones() {
+        return totalParticipaciones;
+    }
+    
+    public void setTotalParticipaciones(Long totalParticipaciones) {
+        this.totalParticipaciones = totalParticipaciones;
+    }
+    
     @Override
     public String toString() {
         return "ModeloDTO{" +
-                "id=" + id +
+                "idModelo=" + idModelo +
                 ", nombre='" + nombre + '\'' +
-                ", descripcion='" + descripcion + '\'' +
-                ", velocidadMaxima=" + velocidadMaxima +
-                ", resistencia=" + resistencia +
-                ", maniobrabilidad=" + maniobrabilidad +
+                ", colorHex='" + colorHex + '\'' +
                 ", cantidadBarcos=" + cantidadBarcos +
                 '}';
     }
