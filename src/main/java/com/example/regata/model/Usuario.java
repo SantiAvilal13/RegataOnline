@@ -3,11 +3,18 @@ package com.example.regata.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Email;
+import lombok.*;
 import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Table(name = "usuarios")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(exclude = {"barcos", "participaciones", "partidasGanadas"})
+@ToString(exclude = {"barcos", "participaciones", "partidasGanadas"})
 public class Usuario {
     
     @Id
@@ -44,91 +51,6 @@ public class Usuario {
     // Enum para los roles
     public enum Rol {
         ADMIN, JUGADOR
-    }
-    
-    // Constructores
-    public Usuario() {}
-    
-    public Usuario(String nombre, String email, String passwordHash, Rol rol) {
-        this.nombre = nombre;
-        this.email = email;
-        this.passwordHash = passwordHash;
-        this.rol = rol;
-    }
-    
-    // Getters y Setters
-    public UUID getIdUsuario() {
-        return idUsuario;
-    }
-    
-    public void setIdUsuario(UUID idUsuario) {
-        this.idUsuario = idUsuario;
-    }
-    
-    public String getNombre() {
-        return nombre;
-    }
-    
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-    
-    public String getEmail() {
-        return email;
-    }
-    
-    public void setEmail(String email) {
-        this.email = email;
-    }
-    
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-    
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
-    }
-    
-    public Rol getRol() {
-        return rol;
-    }
-    
-    public void setRol(Rol rol) {
-        this.rol = rol;
-    }
-    
-    public List<Barco> getBarcos() {
-        return barcos;
-    }
-    
-    public void setBarcos(List<Barco> barcos) {
-        this.barcos = barcos;
-    }
-    
-    public List<Participacion> getParticipaciones() {
-        return participaciones;
-    }
-    
-    public void setParticipaciones(List<Participacion> participaciones) {
-        this.participaciones = participaciones;
-    }
-    
-    public List<Partida> getPartidasGanadas() {
-        return partidasGanadas;
-    }
-    
-    public void setPartidasGanadas(List<Partida> partidasGanadas) {
-        this.partidasGanadas = partidasGanadas;
-    }
-    
-    @Override
-    public String toString() {
-        return "Usuario{" +
-                "idUsuario=" + idUsuario +
-                ", nombre='" + nombre + '\'' +
-                ", email='" + email + '\'' +
-                ", rol=" + rol +
-                '}';
     }
 }
 

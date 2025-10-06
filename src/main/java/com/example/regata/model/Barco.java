@@ -3,11 +3,18 @@ package com.example.regata.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.*;
 import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Table(name = "barcos")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(exclude = {"usuario", "modelo", "participaciones"})
+@ToString(exclude = {"participaciones"})
 public class Barco {
     
     @Id
@@ -31,64 +38,4 @@ public class Barco {
     
     @OneToMany(mappedBy = "barco", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Participacion> participaciones;
-    
-    // Constructores
-    public Barco() {}
-    
-    public Barco(String alias, Usuario usuario, Modelo modelo) {
-        this.alias = alias;
-        this.usuario = usuario;
-        this.modelo = modelo;
-    }
-    
-    // Getters y Setters
-    public UUID getIdBarco() {
-        return idBarco;
-    }
-    
-    public void setIdBarco(UUID idBarco) {
-        this.idBarco = idBarco;
-    }
-    
-    public String getAlias() {
-        return alias;
-    }
-    
-    public void setAlias(String alias) {
-        this.alias = alias;
-    }
-    
-    public Usuario getUsuario() {
-        return usuario;
-    }
-    
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
-    
-    public Modelo getModelo() {
-        return modelo;
-    }
-    
-    public void setModelo(Modelo modelo) {
-        this.modelo = modelo;
-    }
-    
-    public List<Participacion> getParticipaciones() {
-        return participaciones;
-    }
-    
-    public void setParticipaciones(List<Participacion> participaciones) {
-        this.participaciones = participaciones;
-    }
-    
-    @Override
-    public String toString() {
-        return "Barco{" +
-                "idBarco=" + idBarco +
-                ", alias='" + alias + '\'' +
-                ", usuario=" + (usuario != null ? usuario.getNombre() : "null") +
-                ", modelo=" + (modelo != null ? modelo.getNombre() : "null") +
-                '}';
-    }
 }

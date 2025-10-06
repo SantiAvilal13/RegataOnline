@@ -92,9 +92,12 @@ public class HomeRestController {
     @PostMapping("/test-db")
     public ResponseEntity<Map<String, String>> testDatabase() {
         try {
-            Usuario testUsuario = new Usuario("Test Usuario " + System.currentTimeMillis(), 
-                                             "test" + System.currentTimeMillis() + "@test.com", 
-                                             "password123", Usuario.Rol.JUGADOR);
+            Usuario testUsuario = Usuario.builder()
+                    .nombre("Test Usuario " + System.currentTimeMillis())
+                    .email("test" + System.currentTimeMillis() + "@test.com")
+                    .passwordHash("password123")
+                    .rol(Usuario.Rol.JUGADOR)
+                    .build();
             Usuario saved = usuarioService.save(testUsuario);
             
             Map<String, String> response = new HashMap<>();

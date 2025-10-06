@@ -32,11 +32,36 @@ public class DbInitializer implements CommandLineRunner {
     
     private void inicializarDatos() {
         // Crear 5 usuarios
-        Usuario usuario1 = new Usuario("María García", "maria.garcia@email.com", "password123", Usuario.Rol.JUGADOR);
-        Usuario usuario2 = new Usuario("Carlos López", "carlos.lopez@email.com", "password123", Usuario.Rol.JUGADOR);
-        Usuario usuario3 = new Usuario("Ana Martínez", "ana.martinez@email.com", "password123", Usuario.Rol.JUGADOR);
-        Usuario usuario4 = new Usuario("Pedro Rodríguez", "pedro.rodriguez@email.com", "password123", Usuario.Rol.JUGADOR);
-        Usuario usuario5 = new Usuario("Laura Sánchez", "laura.sanchez@email.com", "password123", Usuario.Rol.JUGADOR);
+        Usuario usuario1 = Usuario.builder()
+                .nombre("María García")
+                .email("maria.garcia@email.com")
+                .passwordHash("password123")
+                .rol(Usuario.Rol.JUGADOR)
+                .build();
+        Usuario usuario2 = Usuario.builder()
+                .nombre("Carlos López")
+                .email("carlos.lopez@email.com")
+                .passwordHash("password123")
+                .rol(Usuario.Rol.JUGADOR)
+                .build();
+        Usuario usuario3 = Usuario.builder()
+                .nombre("Ana Martínez")
+                .email("ana.martinez@email.com")
+                .passwordHash("password123")
+                .rol(Usuario.Rol.JUGADOR)
+                .build();
+        Usuario usuario4 = Usuario.builder()
+                .nombre("Pedro Rodríguez")
+                .email("pedro.rodriguez@email.com")
+                .passwordHash("password123")
+                .rol(Usuario.Rol.JUGADOR)
+                .build();
+        Usuario usuario5 = Usuario.builder()
+                .nombre("Laura Sánchez")
+                .email("laura.sanchez@email.com")
+                .passwordHash("password123")
+                .rol(Usuario.Rol.JUGADOR)
+                .build();
         
         usuario1 = usuarioService.save(usuario1);
         usuario2 = usuarioService.save(usuario2);
@@ -45,16 +70,46 @@ public class DbInitializer implements CommandLineRunner {
         usuario5 = usuarioService.save(usuario5);
         
         // Crear 10 modelos de barcos
-        Modelo modelo1 = new Modelo("Velero Clásico", "#0000FF");
-        Modelo modelo2 = new Modelo("Catamarán Rápido", "#FFFFFF");
-        Modelo modelo3 = new Modelo("Yate de Lujo", "#FFD700");
-        Modelo modelo4 = new Modelo("Lancha Deportiva", "#FF0000");
-        Modelo modelo5 = new Modelo("Fragata de Guerra", "#808080");
-        Modelo modelo6 = new Modelo("Corbeta Ligera", "#008000");
-        Modelo modelo7 = new Modelo("Galeón Comercial", "#8B4513");
-        Modelo modelo8 = new Modelo("Bote de Carreras", "#FFFF00");
-        Modelo modelo9 = new Modelo("Crucero Familiar", "#87CEEB");
-        Modelo modelo10 = new Modelo("Dragón de Mar", "#000000");
+        Modelo modelo1 = Modelo.builder()
+                .nombre("Velero Clásico")
+                .colorHex("#0000FF")
+                .build();
+        Modelo modelo2 = Modelo.builder()
+                .nombre("Catamarán Rápido")
+                .colorHex("#FFFFFF")
+                .build();
+        Modelo modelo3 = Modelo.builder()
+                .nombre("Yate de Lujo")
+                .colorHex("#FFD700")
+                .build();
+        Modelo modelo4 = Modelo.builder()
+                .nombre("Lancha Deportiva")
+                .colorHex("#FF0000")
+                .build();
+        Modelo modelo5 = Modelo.builder()
+                .nombre("Fragata de Guerra")
+                .colorHex("#808080")
+                .build();
+        Modelo modelo6 = Modelo.builder()
+                .nombre("Corbeta Ligera")
+                .colorHex("#008000")
+                .build();
+        Modelo modelo7 = Modelo.builder()
+                .nombre("Galeón Comercial")
+                .colorHex("#8B4513")
+                .build();
+        Modelo modelo8 = Modelo.builder()
+                .nombre("Bote de Carreras")
+                .colorHex("#FFFF00")
+                .build();
+        Modelo modelo9 = Modelo.builder()
+                .nombre("Crucero Familiar")
+                .colorHex("#87CEEB")
+                .build();
+        Modelo modelo10 = Modelo.builder()
+                .nombre("Dragón de Mar")
+                .colorHex("#000000")
+                .build();
         
         modelo1 = modeloService.save(modelo1);
         modelo2 = modeloService.save(modelo2);
@@ -82,7 +137,11 @@ public class DbInitializer implements CommandLineRunner {
         };
         
         for (int i = 0; i < 10; i++) {
-            Barco barco = new Barco(nombresBarcos[i] + " " + (i + 1), usuario, modelos[i]);
+            Barco barco = Barco.builder()
+                    .alias(nombresBarcos[i] + " " + (i + 1))
+                    .usuario(usuario)
+                    .modelo(modelos[i])
+                    .build();
             barcoService.save(barco);
         }
     }

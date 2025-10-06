@@ -2,12 +2,19 @@ package com.example.regata.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import lombok.*;
 import java.util.List;
 import java.util.UUID;
 
 @Entity
 @Table(name = "celdas", 
        uniqueConstraints = @UniqueConstraint(columnNames = {"id_mapa", "coord_x", "coord_y"}))
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@EqualsAndHashCode(exclude = {"mapa", "movimientos"})
+@ToString(exclude = {"movimientos"})
 public class Celda {
     
     @Id
@@ -36,76 +43,6 @@ public class Celda {
     // Enum para los tipos de celda
     public enum Tipo {
         AGUA, PARED, PARTIDA, META
-    }
-    
-    // Constructores
-    public Celda() {}
-    
-    public Celda(Integer coordX, Integer coordY, Tipo tipo, Mapa mapa) {
-        this.coordX = coordX;
-        this.coordY = coordY;
-        this.tipo = tipo;
-        this.mapa = mapa;
-    }
-    
-    // Getters y Setters
-    public UUID getIdCelda() {
-        return idCelda;
-    }
-    
-    public void setIdCelda(UUID idCelda) {
-        this.idCelda = idCelda;
-    }
-    
-    public Integer getCoordX() {
-        return coordX;
-    }
-    
-    public void setCoordX(Integer coordX) {
-        this.coordX = coordX;
-    }
-    
-    public Integer getCoordY() {
-        return coordY;
-    }
-    
-    public void setCoordY(Integer coordY) {
-        this.coordY = coordY;
-    }
-    
-    public Tipo getTipo() {
-        return tipo;
-    }
-    
-    public void setTipo(Tipo tipo) {
-        this.tipo = tipo;
-    }
-    
-    public Mapa getMapa() {
-        return mapa;
-    }
-    
-    public void setMapa(Mapa mapa) {
-        this.mapa = mapa;
-    }
-    
-    public List<Movimiento> getMovimientos() {
-        return movimientos;
-    }
-    
-    public void setMovimientos(List<Movimiento> movimientos) {
-        this.movimientos = movimientos;
-    }
-    
-    @Override
-    public String toString() {
-        return "Celda{" +
-                "idCelda=" + idCelda +
-                ", coordX=" + coordX +
-                ", coordY=" + coordY +
-                ", tipo=" + tipo +
-                ", mapa=" + (mapa != null ? mapa.getNombre() : "null") +
-                '}';
     }
 }
 
