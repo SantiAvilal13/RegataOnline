@@ -3,15 +3,25 @@ package com.example.regata.init;
 import com.example.regata.model.Barco;
 import com.example.regata.model.Usuario;
 import com.example.regata.model.Modelo;
+import com.example.regata.model.Mapa;
+import com.example.regata.model.Celda;
 import com.example.regata.service.BarcoService;
 import com.example.regata.service.UsuarioService;
 import com.example.regata.service.ModeloService;
+import com.example.regata.service.MapaService;
+import com.example.regata.service.CeldaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Optional;
 
 @Component
 public class DbInitializer implements CommandLineRunner {
+    
+    private static final Logger logger = LoggerFactory.getLogger(DbInitializer.class);
     
     @Autowired
     private UsuarioService usuarioService;
@@ -22,12 +32,20 @@ public class DbInitializer implements CommandLineRunner {
     @Autowired
     private BarcoService barcoService;
     
+    @Autowired
+    private MapaService mapaService;
+    
+    @Autowired
+    private CeldaService celdaService;
+    
     @Override
     public void run(String... args) throws Exception {
+        logger.info("Inicializando datos de la base de datos...");
         // Verificar si ya hay datos
         if (usuarioService.findAll().isEmpty()) {
             inicializarDatos();
         }
+        logger.info("Datos de la base de datos inicializados correctamente.");
     }
     
     private void inicializarDatos() {
@@ -128,6 +146,9 @@ public class DbInitializer implements CommandLineRunner {
         crearBarcosParaUsuario(usuario3, new Modelo[]{modelo3, modelo4, modelo5, modelo6, modelo7, modelo8, modelo9, modelo10, modelo1, modelo2});
         crearBarcosParaUsuario(usuario4, new Modelo[]{modelo4, modelo5, modelo6, modelo7, modelo8, modelo9, modelo10, modelo1, modelo2, modelo3});
         crearBarcosParaUsuario(usuario5, new Modelo[]{modelo5, modelo6, modelo7, modelo8, modelo9, modelo10, modelo1, modelo2, modelo3, modelo4});
+        
+        // Crear mapas jugables
+        crearMapasJugables();
     }
     
     private void crearBarcosParaUsuario(Usuario usuario, Modelo[] modelos) {
@@ -144,5 +165,99 @@ public class DbInitializer implements CommandLineRunner {
                     .build();
             barcoService.save(barco);
         }
+    }
+    
+    private void crearMapasJugables() {
+        logger.info("Creando mapa específico...");
+        
+        // Crear el mapa específico de la imagen: 30x20 con obstáculos
+        crearMapaEspecifico();
+        
+        logger.info("Total de mapas creados: {}", mapaService.findAll().size());
+    }
+    
+    private void crearMapaEspecifico() {
+        String nombreMapa = "Mapa de Regata Específico";
+        
+        // Matriz exacta del mapa
+        char[][] mapaInicial = {
+            {'x','x','x','x','x','x','x','x','x','x','x','x','x','x','x','x','x','x'},
+            {'x','x','x','x','x','x','x','x','x','x','x','x','x','x','x','x','x','x'},
+            {'x','x',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','x','x'},
+            {'x','x',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','x','x'},
+            {'x','x',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','x','x'},
+            {'x','x',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','x','x'},
+            {'x','x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ','x','x'},
+            {'x','x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ','x','x'},
+            {'x','x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ','x','x'},
+            {'x','x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ','x','x'},
+            {'x','x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ','x','x'},
+            {'x','x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ','x','x'},
+            {'x','x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ','x','x'},
+            {'x','x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ','x','x'},
+            {'x','x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ','x','x'},
+            {'x','x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ','x','x'},
+            {'x','x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ','x','x'},
+            {'x','x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ','x','x'},
+            {'x','x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ','x','x'},
+            {'x','x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ','x','x'},
+            {'x','x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ','x','x'},
+            {'x','x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ','x','x'},
+            {'x','x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ','x','x'},
+            {'x','x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ','x','x'},
+            {'x','x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ','x','x'},
+            {'x','x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ','x','x'},
+            {'x','x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ','x','x'},
+            {'x','x','P','P','P','P','x','x','x','x','x','x','M','M','M','M','x','x'},
+            {'x','x','x','x','x','x','x','x','x','x','x','x','x','x','x','x','x','x'},
+            {'x','x','x','x','x','x','x','x','x','x','x','x','x','x','x','x','x','x'} 
+        };
+        
+        int tamFilas = mapaInicial.length;
+        int tamColumnas = mapaInicial[0].length;
+        
+        // Crear el mapa
+        Mapa mapaEspecifico = Mapa.builder()
+                .nombre(nombreMapa)
+                .tamFilas(tamFilas)
+                .tamColumnas(tamColumnas)
+                .build();
+        
+        mapaEspecifico = mapaService.save(mapaEspecifico);
+        
+        // Crear celdas directamente desde la matriz
+        for (int x = 0; x < tamFilas; x++) {
+            for (int y = 0; y < tamColumnas; y++) {
+                Celda.Tipo tipo;
+                char celdaChar = mapaInicial[x][y];
+                
+                switch (celdaChar) {
+                    case 'x':
+                        tipo = Celda.Tipo.PARED;
+                        break;
+                    case 'P':
+                        tipo = Celda.Tipo.PARTIDA;
+                        break;
+                    case 'M':
+                        tipo = Celda.Tipo.META;
+                        break;
+                    case ' ':
+                    default:
+                        tipo = Celda.Tipo.AGUA;
+                        break;
+                }
+                
+                Celda celda = Celda.builder()
+                        .mapa(mapaEspecifico)
+                        .coordX(x)
+                        .coordY(y)
+                        .tipo(tipo)
+                        .build();
+                
+                celdaService.save(celda);
+            }
+        }
+        
+        logger.info("Mapa específico creado: {} ({}x{})", nombreMapa, tamFilas, tamColumnas);
     }
 }
