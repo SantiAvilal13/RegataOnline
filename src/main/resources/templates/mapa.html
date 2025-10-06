@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Mapa de Regata - Regata Online</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+            background: #e3f2fd; 
+            text-align: center;
+        }
+        h1 { color: #1565c0; margin-bottom: 20px; }
+        .mapa-container { 
+            display: inline-block; 
+            background: white; 
+            padding: 20px; 
+            border-radius: 10px; 
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .mapa-grid { 
+            display: grid; 
+            grid-template-columns: repeat(18, 25px); 
+            grid-template-rows: repeat(18, 25px); 
+            gap: 1px; 
+            background: #ccc;
+            border: 2px solid #333;
+        }
+        .celda { 
+            width: 25px; 
+            height: 25px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 12px; 
+            font-weight: bold;
+        }
+        .agua { background: #81d4fa; color: #0277bd; }
+        .pared { background: #424242; color: white; }
+        .meta { background: #4caf50; color: white; }
+        .puerto { background: #ff9800; color: white; }
+        .leyenda { 
+            margin-top: 20px; 
+            text-align: left; 
+            max-width: 500px; 
+            margin-left: auto; 
+            margin-right: auto;
+        }
+        .leyenda-item { 
+            display: flex; 
+            align-items: center; 
+            margin: 5px 0; 
+        }
+        .leyenda-color { 
+            width: 20px; 
+            height: 20px; 
+            margin-right: 10px; 
+            border: 1px solid #333;
+        }
+        .nav-link { 
+            display: inline-block; 
+            margin: 10px; 
+            padding: 8px 16px; 
+            background: #007bff; 
+            color: white; 
+            text-decoration: none; 
+            border-radius: 4px;
+        }
+        .nav-link:hover { background: #0056b3; }
+    </style>
+</head>
+<body>
+    <h1>🗺️ Mapa de la Regata</h1>
+    
+    <div class="mapa-container">
+        <div class="mapa-grid" id="mapaGrid">
+            <!-- El mapa se genera con JavaScript -->
+        </div>
+    </div>
+    
+    <div class="leyenda">
+        <h3>Leyenda:</h3>
+        <div class="leyenda-item">
+            <div class="leyenda-color agua"></div>
+            <span><strong>Agua (vacías):</strong> En esta celda los barcos pueden navegar sin restricciones.</span>
+        </div>
+        <div class="leyenda-item">
+            <div class="leyenda-color pared"></div>
+            <span><strong>Pared (x):</strong> Si un barco llega a una celda de este tipo, es destruido y pierde el juego.</span>
+        </div>
+        <div class="leyenda-item">
+            <div class="leyenda-color meta"></div>
+            <span><strong>Meta (M):</strong> Si un barco llega a esta celda, termina el trayecto. Si llegó primero, gana la carrera igual a que si fuera agua.</span>
+        </div>
+        <div class="leyenda-item">
+            <div class="leyenda-color puerto"></div>
+            <span><strong>Puerto (P):</strong> Si un barco llega a esta celda, puede ocupar este espacio. Después de iniciado el juego, se trata igual a que si fuera agua.</span>
+        </div>
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <a href="/" class="nav-link">🏠 Inicio</a>
+        <a href="/jugadores" class="nav-link">👥 Jugadores</a>
+        <a href="/modelos" class="nav-link">⚙️ Modelos</a>
+        <a href="/barcos" class="nav-link">⛵ Barcos</a>
+    </div>
+    
+    <script>
+        // Mapa basado en la imagen proporcionada
+        const mapaData = [
+            ['x','x','x','x','x','x','x','x','x','x','x','x','x','x','x','x','x','x'],
+            ['x',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','x'],
+            ['x',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','x'],
+            ['x',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','x'],
+            ['x',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','x'],
+            ['x',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','x'],
+            ['x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ',' ',' ','x'],
+            ['x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ',' ',' ','x'],
+            ['x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ',' ',' ','x'],
+            ['x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ',' ',' ','x'],
+            ['x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ',' ',' ','x'],
+            ['x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ',' ',' ','x'],
+            ['x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ',' ',' ','x'],
+            ['x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ',' ',' ','x'],
+            ['x',' ',' ',' ',' ','x','x','x','x','x','x',' ',' ',' ',' ',' ',' ','x'],
+            ['x',' ',' ','P','P','P','x','x','x','x','x','M','M','M','M',' ',' ','x'],
+            ['x',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ',' ','x'],
+            ['x','x','x','x','x','x','x','x','x','x','x','x','x','x','x','x','x','x']
+        ];
+        
+        function generarMapa() {
+            const grid = document.getElementById('mapaGrid');
+            
+            for (let fila = 0; fila < mapaData.length; fila++) {
+                for (let col = 0; col < mapaData[fila].length; col++) {
+                    const celda = document.createElement('div');
+                    celda.className = 'celda';
+                    
+                    const valor = mapaData[fila][col];
+                    
+                    switch(valor) {
+                        case 'x':
+                            celda.classList.add('pared');
+                            celda.textContent = 'X';
+                            break;
+                        case 'M':
+                            celda.classList.add('meta');
+                            celda.textContent = 'M';
+                            break;
+                        case 'P':
+                            celda.classList.add('puerto');
+                            celda.textContent = 'P';
+                            break;
+                        default:
+                            celda.classList.add('agua');
+                            celda.textContent = '';
+                    }
+                    
+                    grid.appendChild(celda);
+                }
+            }
+        }
+        
+        // Generar el mapa al cargar la página
+        document.addEventListener('DOMContentLoaded', generarMapa);
+        
+        console.log('🗺️ Mapa de regata cargado correctamente');
+    </script>
+</body>
+</html>

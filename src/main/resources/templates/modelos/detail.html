@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title th:text="'Detalle del Modelo: ' + ${modelo.nombre} + ' - Regata Online'">Detalle del Modelo - Regata Online</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link th:href="@{/css/style.css}" rel="stylesheet">
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" th:href="@{/}">
+                <i class="fas fa-ship me-2"></i>Regata Online
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/}">
+                            <i class="fas fa-home me-1"></i>Inicio
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/jugadores}">
+                            <i class="fas fa-users me-1"></i>Jugadores
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" th:href="@{/modelos}">
+                            <i class="fas fa-cog me-1"></i>Modelos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" th:href="@{/barcos}">
+                            <i class="fas fa-ship me-1"></i>Barcos
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="container mt-4">
+        <!-- Flash Messages -->
+        <div th:if="${success}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle me-2"></i>
+            <span th:text="${success}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+        
+        <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-triangle me-2"></i>
+            <span th:text="${error}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2>
+                <i class="fas fa-cog me-2"></i>Detalle del Modelo
+            </h2>
+            <div>
+                <a th:href="@{/modelos/editar/{id}(id=${modelo.id})}" class="btn btn-warning me-2">
+                    <i class="fas fa-edit me-2"></i>Editar
+                </a>
+                <a th:href="@{/modelos}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Volver a Modelos
+                </a>
+            </div>
+        </div>
+
+        <!-- Model Details -->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-info-circle me-2"></i>Información del Modelo
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Nombre:</h6>
+                                <p class="text-primary fs-5" th:text="${modelo.nombre}">Nombre del Modelo</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>ID:</h6>
+                                <p class="text-muted" th:text="${modelo.id}">1</p>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h6>Descripción:</h6>
+                            <p th:text="${modelo.descripcion} ?: 'Sin descripción'">Descripción del modelo</p>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="text-center p-3 bg-success text-white rounded">
+                                    <h4 th:text="${modelo.velocidadMaxima} + ' km/h'">100 km/h</h4>
+                                    <p class="mb-0">Velocidad Máxima</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center p-3 bg-warning text-white rounded">
+                                    <h4 th:text="${modelo.resistencia} + ' pts'">80 pts</h4>
+                                    <p class="mb-0">Resistencia</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="text-center p-3 bg-info text-white rounded">
+                                    <h4 th:text="${modelo.maniobrabilidad} + ' pts'">90 pts</h4>
+                                    <p class="mb-0">Maniobrabilidad</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-ship me-2"></i>Barcos de este Modelo
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div th:if="${#lists.isEmpty(modelo.barcos)}" class="text-center text-muted">
+                            <i class="fas fa-ship fa-2x mb-2"></i>
+                            <p>No hay barcos de este modelo</p>
+                        </div>
+                        <div th:unless="${#lists.isEmpty(modelo.barcos)}">
+                            <div th:each="barco : ${modelo.barcos}" class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded">
+                                <div>
+                                    <strong th:text="${barco.nombre}">Barco</strong>
+                                    <br>
+                                    <small class="text-muted" th:text="${barco.jugador.nombre}">Jugador</small>
+                                </div>
+                                <div class="text-end">
+                                    <span class="badge bg-success" th:text="${barco.puntosGanados} + ' pts'">50 pts</span>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <a th:href="@{/barcos/por-modelo/{id}(id=${modelo.id})}" class="btn btn-outline-primary btn-sm w-100">
+                                    <i class="fas fa-eye me-1"></i>Ver todos los barcos
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-tools me-2"></i>Acciones
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3 mb-2">
+                                <a th:href="@{/modelos/editar/{id}(id=${modelo.id})}" class="btn btn-warning w-100">
+                                    <i class="fas fa-edit me-2"></i>Editar Modelo
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <a th:href="@{/barcos/nuevo?modeloId={id}(id=${modelo.id})}" class="btn btn-primary w-100">
+                                    <i class="fas fa-plus me-2"></i>Crear Barco
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <a th:href="@{/barcos/por-modelo/{id}(id=${modelo.id})}" class="btn btn-info w-100">
+                                    <i class="fas fa-ship me-2"></i>Ver Barcos
+                                </a>
+                            </div>
+                            <div class="col-md-3 mb-2">
+                                <a th:href="@{/modelos/eliminar/{id}(id=${modelo.id})}" 
+                                   class="btn btn-danger w-100"
+                                   onclick="return confirm('¿Estás seguro de que quieres eliminar este modelo?')">
+                                    <i class="fas fa-trash me-2"></i>Eliminar
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-light mt-5 py-4">
+        <div class="container text-center">
+            <p class="mb-0">&copy; 2024 Regata Online - Sistema de Gestión de Carreras de Barcos</p>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script th:src="@{/js/main.js}"></script>
+</body>
+</html>
