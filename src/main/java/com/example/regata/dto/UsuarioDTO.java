@@ -28,9 +28,7 @@ public class UsuarioDTO {
     @NotNull(message = "El rol es obligatorio")
     private Usuario.Rol rol;
     
-    // Campos adicionales para la vista
-    private List<BarcoDTO> barcos;
-    private List<ParticipacionDTO> participaciones;
+    // Campos adicionales para la vista (sin relaciones para evitar referencias circulares)
     private Long totalPartidasGanadas;
     private Long totalBarcos;
     
@@ -92,21 +90,7 @@ public class UsuarioDTO {
         this.rol = rol;
     }
     
-    public List<BarcoDTO> getBarcos() {
-        return barcos;
-    }
-    
-    public void setBarcos(List<BarcoDTO> barcos) {
-        this.barcos = barcos;
-    }
-    
-    public List<ParticipacionDTO> getParticipaciones() {
-        return participaciones;
-    }
-    
-    public void setParticipaciones(List<ParticipacionDTO> participaciones) {
-        this.participaciones = participaciones;
-    }
+    // Métodos de relaciones removidos para evitar referencias circulares
     
     public Long getTotalPartidasGanadas() {
         return totalPartidasGanadas;

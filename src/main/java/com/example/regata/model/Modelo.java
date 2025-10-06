@@ -1,5 +1,6 @@
 package com.example.regata.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.*;
@@ -30,5 +31,6 @@ public class Modelo {
     private String colorHex;
     
     @OneToMany(mappedBy = "modelo", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Barco> barcos;
 }

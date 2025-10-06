@@ -18,8 +18,7 @@ public class ModeloDTO {
     @Pattern(regexp = "^#[0-9A-Fa-f]{6}$", message = "El color debe ser un código hexadecimal válido (ej: #FF0000)")
     private String colorHex;
     
-    // Campos adicionales para la vista
-    private List<BarcoDTO> barcos;
+    // Campos adicionales para la vista (sin relaciones para evitar referencias circulares)
     private Long cantidadBarcos;
     private Long totalParticipaciones;
     
@@ -56,13 +55,7 @@ public class ModeloDTO {
         this.colorHex = colorHex;
     }
     
-    public List<BarcoDTO> getBarcos() {
-        return barcos;
-    }
-    
-    public void setBarcos(List<BarcoDTO> barcos) {
-        this.barcos = barcos;
-    }
+    // Métodos de relaciones removidos para evitar referencias circulares
     
     public Long getCantidadBarcos() {
         return cantidadBarcos;

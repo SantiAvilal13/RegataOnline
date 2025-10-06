@@ -1,5 +1,6 @@
 package com.example.regata.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Email;
@@ -40,12 +41,15 @@ public class Usuario {
     private Rol rol;
     
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Barco> barcos;
     
     @OneToMany(mappedBy = "jugador", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Participacion> participaciones;
     
     @OneToMany(mappedBy = "ganadorUsuario", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Partida> partidasGanadas;
     
     // Enum para los roles

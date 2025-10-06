@@ -1,5 +1,7 @@
 package com.example.regata.restcontroller;
 
+import com.example.regata.dto.ModeloDTO;
+import com.example.regata.mapper.ModeloMapper;
 import com.example.regata.model.Modelo;
 import com.example.regata.service.ModeloService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/modelos")
@@ -18,21 +21,28 @@ public class ModeloRestController {
     @Autowired
     private ModeloService modeloService;
     
+    @Autowired
+    private ModeloMapper modeloMapper;
+    
     @GetMapping
-    public ResponseEntity<List<Modelo>> listarModelos() {
+    public ResponseEntity<List<ModeloDTO>> listarModelos() {
         try {
             List<Modelo> modelos = modeloService.findAll();
-            return ResponseEntity.ok(modelos);
+            List<ModeloDTO> modelosDTO = modelos.stream()
+                .map(modeloMapper::toDTO)
+                .collect(Collectors.toList());
+            return ResponseEntity.ok(modelosDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<Modelo> obtenerModelo(@PathVariable UUID id) {
+    public ResponseEntity<ModeloDTO> obtenerModelo(@PathVariable UUID id) {
         try {
             Optional<Modelo> modelo = modeloService.findById(id);
-            return modelo.map(ResponseEntity::ok)
+            return modelo.map(modeloMapper::toDTO)
+                        .map(ResponseEntity::ok)
                         .orElse(ResponseEntity.notFound().build());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -40,20 +50,24 @@ public class ModeloRestController {
     }
     
     @PostMapping
-    public ResponseEntity<Modelo> crearModelo(@RequestBody Modelo modelo) {
+    public ResponseEntity<ModeloDTO> crearModelo(@RequestBody ModeloDTO modeloDTO) {
         try {
+            Modelo modelo = modeloMapper.toEntity(modeloDTO);
             Modelo savedModelo = modeloService.save(modelo);
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedModelo);
+            ModeloDTO savedModeloDTO = modeloMapper.toDTO(savedModelo);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedModeloDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<Modelo> actualizarModelo(@PathVariable UUID id, @RequestBody Modelo modelo) {
+    public ResponseEntity<ModeloDTO> actualizarModelo(@PathVariable UUID id, @RequestBody ModeloDTO modeloDTO) {
         try {
+            Modelo modelo = modeloMapper.toEntity(modeloDTO);
             Modelo updatedModelo = modeloService.update(id, modelo);
-            return ResponseEntity.ok(updatedModelo);
+            ModeloDTO updatedModeloDTO = modeloMapper.toDTO(updatedModelo);
+            return ResponseEntity.ok(updatedModeloDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -70,50 +84,65 @@ public class ModeloRestController {
     }
     
     @GetMapping("/buscar")
-    public ResponseEntity<List<Modelo>> buscarModelos(@RequestParam String nombre) {
+    public ResponseEntity<List<ModeloDTO>> buscarModelos(@RequestParam String nombre) {
         try {
             List<Modelo> modelos = modeloService.findByNombreContaining(nombre);
-            return ResponseEntity.ok(modelos);
+            List<ModeloDTO> modelosDTO = modelos.stream()
+                .map(modeloMapper::toDTO)
+                .collect(Collectors.toList());
+            return ResponseEntity.ok(modelosDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
     
     @GetMapping("/color/{colorHex}")
-    public ResponseEntity<List<Modelo>> obtenerModelosPorColor(@PathVariable String colorHex) {
+    public ResponseEntity<List<ModeloDTO>> obtenerModelosPorColor(@PathVariable String colorHex) {
         try {
             List<Modelo> modelos = modeloService.findByColorHex(colorHex);
-            return ResponseEntity.ok(modelos);
+            List<ModeloDTO> modelosDTO = modelos.stream()
+                .map(modeloMapper::toDTO)
+                .collect(Collectors.toList());
+            return ResponseEntity.ok(modelosDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
     
     @GetMapping("/color-buscar")
-    public ResponseEntity<List<Modelo>> buscarModelosPorColor(@RequestParam String color) {
+    public ResponseEntity<List<ModeloDTO>> buscarModelosPorColor(@RequestParam String color) {
         try {
             List<Modelo> modelos = modeloService.findByColorHexContainingIgnoreCase(color);
-            return ResponseEntity.ok(modelos);
+            List<ModeloDTO> modelosDTO = modelos.stream()
+                .map(modeloMapper::toDTO)
+                .collect(Collectors.toList());
+            return ResponseEntity.ok(modelosDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
     
     @GetMapping("/ordenados")
-    public ResponseEntity<List<Modelo>> obtenerModelosOrdenados() {
+    public ResponseEntity<List<ModeloDTO>> obtenerModelosOrdenados() {
         try {
             List<Modelo> modelos = modeloService.findAllOrderByNombreAsc();
-            return ResponseEntity.ok(modelos);
+            List<ModeloDTO> modelosDTO = modelos.stream()
+                .map(modeloMapper::toDTO)
+                .collect(Collectors.toList());
+            return ResponseEntity.ok(modelosDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
     
     @GetMapping("/populares")
-    public ResponseEntity<List<Modelo>> obtenerModelosPopulares() {
+    public ResponseEntity<List<ModeloDTO>> obtenerModelosPopulares() {
         try {
             List<Modelo> modelos = modeloService.findModelosMasPopulares();
-            return ResponseEntity.ok(modelos);
+            List<ModeloDTO> modelosDTO = modelos.stream()
+                .map(modeloMapper::toDTO)
+                .collect(Collectors.toList());
+            return ResponseEntity.ok(modelosDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

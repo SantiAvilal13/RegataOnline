@@ -25,8 +25,7 @@ public class BarcoDTO {
     private String modeloNombre;
     private String modeloColorHex;
     
-    // Campos adicionales para la vista
-    private List<ParticipacionDTO> participaciones;
+    // Campos adicionales para la vista (sin relaciones para evitar referencias circulares)
     private Long totalParticipaciones;
     private Long partidasGanadas;
     
@@ -96,13 +95,7 @@ public class BarcoDTO {
         this.modeloColorHex = modeloColorHex;
     }
     
-    public List<ParticipacionDTO> getParticipaciones() {
-        return participaciones;
-    }
-    
-    public void setParticipaciones(List<ParticipacionDTO> participaciones) {
-        this.participaciones = participaciones;
-    }
+    // Métodos de relaciones removidos para evitar referencias circulares
     
     public Long getTotalParticipaciones() {
         return totalParticipaciones;

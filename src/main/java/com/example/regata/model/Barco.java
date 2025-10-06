@@ -1,5 +1,6 @@
 package com.example.regata.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -29,13 +30,16 @@ public class Barco {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_usuario", nullable = false)
     @NotNull(message = "El usuario propietario es obligatorio")
+    @JsonIgnore
     private Usuario usuario;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_modelo", nullable = false)
     @NotNull(message = "El modelo es obligatorio")
+    @JsonIgnore
     private Modelo modelo;
     
     @OneToMany(mappedBy = "barco", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonIgnore
     private List<Participacion> participaciones;
 }

@@ -1,7 +1,11 @@
 package com.example.regata.restcontroller;
 
+import com.example.regata.dto.BarcoDTO;
+import com.example.regata.mapper.BarcoMapper;
 import com.example.regata.model.Barco;
 import com.example.regata.service.BarcoService;
+import com.example.regata.service.UsuarioService;
+import com.example.regata.service.ModeloService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/barcos")
@@ -18,21 +23,34 @@ public class BarcoRestController {
     @Autowired
     private BarcoService barcoService;
     
+    @Autowired
+    private BarcoMapper barcoMapper;
+    
+    @Autowired
+    private UsuarioService usuarioService;
+    
+    @Autowired
+    private ModeloService modeloService;
+    
     @GetMapping
-    public ResponseEntity<List<Barco>> listarBarcos() {
+    public ResponseEntity<List<BarcoDTO>> listarBarcos() {
         try {
             List<Barco> barcos = barcoService.findAll();
-            return ResponseEntity.ok(barcos);
+            List<BarcoDTO> barcosDTO = barcos.stream()
+                .map(barcoMapper::toDTO)
+                .collect(Collectors.toList());
+            return ResponseEntity.ok(barcosDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<Barco> obtenerBarco(@PathVariable UUID id) {
+    public ResponseEntity<BarcoDTO> obtenerBarco(@PathVariable UUID id) {
         try {
             Optional<Barco> barco = barcoService.findById(id);
-            return barco.map(ResponseEntity::ok)
+            return barco.map(barcoMapper::toDTO)
+                       .map(ResponseEntity::ok)
                        .orElse(ResponseEntity.notFound().build());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
@@ -40,20 +58,45 @@ public class BarcoRestController {
     }
     
     @PostMapping
-    public ResponseEntity<Barco> crearBarco(@RequestBody Barco barco) {
+    public ResponseEntity<BarcoDTO> crearBarco(@RequestBody BarcoDTO barcoDTO) {
         try {
+            Barco barco = new Barco();
+            barco.setAlias(barcoDTO.getAlias());
+            
+            // Cargar usuario y modelo desde los IDs
+            if (barcoDTO.getUsuarioId() != null) {
+                barco.setUsuario(usuarioService.findById(barcoDTO.getUsuarioId()).orElse(null));
+            }
+            if (barcoDTO.getModeloId() != null) {
+                barco.setModelo(modeloService.findById(barcoDTO.getModeloId()).orElse(null));
+            }
+            
             Barco savedBarco = barcoService.save(barco);
-            return ResponseEntity.status(HttpStatus.CREATED).body(savedBarco);
+            BarcoDTO savedBarcoDTO = barcoMapper.toDTO(savedBarco);
+            return ResponseEntity.status(HttpStatus.CREATED).body(savedBarcoDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<Barco> actualizarBarco(@PathVariable UUID id, @RequestBody Barco barco) {
+    public ResponseEntity<BarcoDTO> actualizarBarco(@PathVariable UUID id, @RequestBody BarcoDTO barcoDTO) {
         try {
+            Barco barco = new Barco();
+            barco.setIdBarco(id);
+            barco.setAlias(barcoDTO.getAlias());
+            
+            // Cargar usuario y modelo desde los IDs
+            if (barcoDTO.getUsuarioId() != null) {
+                barco.setUsuario(usuarioService.findById(barcoDTO.getUsuarioId()).orElse(null));
+            }
+            if (barcoDTO.getModeloId() != null) {
+                barco.setModelo(modeloService.findById(barcoDTO.getModeloId()).orElse(null));
+            }
+            
             Barco updatedBarco = barcoService.update(id, barco);
-            return ResponseEntity.ok(updatedBarco);
+            BarcoDTO updatedBarcoDTO = barcoMapper.toDTO(updatedBarco);
+            return ResponseEntity.ok(updatedBarcoDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
@@ -70,61 +113,79 @@ public class BarcoRestController {
     }
     
     @GetMapping("/buscar")
-    public ResponseEntity<List<Barco>> buscarBarcos(@RequestParam String alias) {
+    public ResponseEntity<List<BarcoDTO>> buscarBarcos(@RequestParam String alias) {
         try {
             List<Barco> barcos = barcoService.findByAliasContainingIgnoreCase(alias);
-            return ResponseEntity.ok(barcos);
+            List<BarcoDTO> barcosDTO = barcos.stream()
+                .map(barcoMapper::toDTO)
+                .collect(Collectors.toList());
+            return ResponseEntity.ok(barcosDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
     
     @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<List<Barco>> obtenerBarcosPorUsuario(@PathVariable UUID usuarioId) {
+    public ResponseEntity<List<BarcoDTO>> obtenerBarcosPorUsuario(@PathVariable UUID usuarioId) {
         try {
             List<Barco> barcos = barcoService.findByUsuarioId(usuarioId);
-            return ResponseEntity.ok(barcos);
+            List<BarcoDTO> barcosDTO = barcos.stream()
+                .map(barcoMapper::toDTO)
+                .collect(Collectors.toList());
+            return ResponseEntity.ok(barcosDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
     
     @GetMapping("/modelo/{modeloId}")
-    public ResponseEntity<List<Barco>> obtenerBarcosPorModelo(@PathVariable UUID modeloId) {
+    public ResponseEntity<List<BarcoDTO>> obtenerBarcosPorModelo(@PathVariable UUID modeloId) {
         try {
             List<Barco> barcos = barcoService.findByModeloId(modeloId);
-            return ResponseEntity.ok(barcos);
+            List<BarcoDTO> barcosDTO = barcos.stream()
+                .map(barcoMapper::toDTO)
+                .collect(Collectors.toList());
+            return ResponseEntity.ok(barcosDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
     
     @GetMapping("/usuario/{usuarioId}/ordenados")
-    public ResponseEntity<List<Barco>> obtenerBarcosPorUsuarioOrdenados(@PathVariable UUID usuarioId) {
+    public ResponseEntity<List<BarcoDTO>> obtenerBarcosPorUsuarioOrdenados(@PathVariable UUID usuarioId) {
         try {
             List<Barco> barcos = barcoService.findByUsuarioIdOrderByAliasAsc(usuarioId);
-            return ResponseEntity.ok(barcos);
+            List<BarcoDTO> barcosDTO = barcos.stream()
+                .map(barcoMapper::toDTO)
+                .collect(Collectors.toList());
+            return ResponseEntity.ok(barcosDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
     
     @GetMapping("/con-participaciones")
-    public ResponseEntity<List<Barco>> obtenerBarcosConParticipaciones() {
+    public ResponseEntity<List<BarcoDTO>> obtenerBarcosConParticipaciones() {
         try {
             List<Barco> barcos = barcoService.findBarcosConParticipaciones();
-            return ResponseEntity.ok(barcos);
+            List<BarcoDTO> barcosDTO = barcos.stream()
+                .map(barcoMapper::toDTO)
+                .collect(Collectors.toList());
+            return ResponseEntity.ok(barcosDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
     
     @GetMapping("/usuario/{usuarioId}/modelo/{modeloId}")
-    public ResponseEntity<List<Barco>> obtenerBarcosPorUsuarioYModelo(@PathVariable UUID usuarioId, 
+    public ResponseEntity<List<BarcoDTO>> obtenerBarcosPorUsuarioYModelo(@PathVariable UUID usuarioId, 
                                                                       @PathVariable UUID modeloId) {
         try {
             List<Barco> barcos = barcoService.findByUsuarioAndModelo(usuarioId, modeloId);
-            return ResponseEntity.ok(barcos);
+            List<BarcoDTO> barcosDTO = barcos.stream()
+                .map(barcoMapper::toDTO)
+                .collect(Collectors.toList());
+            return ResponseEntity.ok(barcosDTO);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
