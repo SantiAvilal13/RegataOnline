@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import java.lang.Long;
 
 @Service
 @Transactional
@@ -25,7 +25,7 @@ public class CeldaService {
     }
     
     @Transactional(readOnly = true)
-    public Optional<Celda> findById(UUID id) {
+    public Optional<Celda> findById(Long id) {
         return celdaRepository.findById(id);
     }
     
@@ -74,14 +74,14 @@ public class CeldaService {
         return celdaRepository.save(celda);
     }
     
-    public void deleteById(UUID id) {
+    public void deleteById(Long id) {
         if (!celdaRepository.existsById(id)) {
             throw new GameException("No se encontró la celda con ID: " + id);
         }
         celdaRepository.deleteById(id);
     }
     
-    public Celda update(UUID id, Celda celda) {
+    public Celda update(Long id, Celda celda) {
         Celda existingCelda = celdaRepository.findById(id)
                 .orElseThrow(() -> new GameException("No se encontró la celda con ID: " + id));
         

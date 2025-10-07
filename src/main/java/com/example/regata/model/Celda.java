@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "celdas", 
@@ -18,9 +17,9 @@ import java.util.UUID;
 public class Celda {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_celda")
-    private UUID idCelda;
+    private Long idCelda;
     
     @Column(name = "coord_x", nullable = false)
     private Integer coordX;

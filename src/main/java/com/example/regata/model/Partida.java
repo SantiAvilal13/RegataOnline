@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "partidas")
@@ -18,9 +17,9 @@ import java.util.UUID;
 public class Partida {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_partida")
-    private UUID idPartida;
+    private Long idPartida;
     
     @Column(name = "fecha_inicio")
     private LocalDateTime fechaInicio;

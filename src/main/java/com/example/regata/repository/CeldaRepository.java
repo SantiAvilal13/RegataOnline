@@ -9,10 +9,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
-public interface CeldaRepository extends JpaRepository<Celda, UUID> {
+public interface CeldaRepository extends JpaRepository<Celda, Long> {
     
     /**
      * Buscar celdas por mapa

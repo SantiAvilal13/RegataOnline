@@ -4,7 +4,6 @@ import com.example.regata.model.Celda;
 import lombok.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -12,7 +11,7 @@ import java.util.UUID;
 @Builder
 public class MapaDTO {
     
-    private UUID idMapa;
+    private Long idMapa;
     private String nombre;
     private Integer tamFilas;
     private Integer tamColumnas;
@@ -23,7 +22,7 @@ public class MapaDTO {
     @AllArgsConstructor
     @Builder
     public static class CeldaDTO {
-        private UUID idCelda;
+        private Long idCelda;
         private Integer coordX;
         private Integer coordY;
         private Celda.Tipo tipo;

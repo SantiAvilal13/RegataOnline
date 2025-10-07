@@ -7,11 +7,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.util.List;
-import java.util.UUID;
 
 public class UsuarioDTO {
     
-    private UUID idUsuario;
+    private Long idUsuario;
     
     @NotBlank(message = "El nombre es obligatorio")
     @Size(min = 2, max = 50, message = "El nombre debe tener entre 2 y 50 caracteres")
@@ -42,7 +41,7 @@ public class UsuarioDTO {
         this.rol = rol;
     }
     
-    public UsuarioDTO(UUID idUsuario, String nombre, String email, Usuario.Rol rol) {
+    public UsuarioDTO(Long idUsuario, String nombre, String email, Usuario.Rol rol) {
         this.idUsuario = idUsuario;
         this.nombre = nombre;
         this.email = email;
@@ -50,11 +49,11 @@ public class UsuarioDTO {
     }
     
     // Getters y Setters
-    public UUID getIdUsuario() {
+    public Long getIdUsuario() {
         return idUsuario;
     }
-    
-    public void setIdUsuario(UUID idUsuario) {
+
+    public void setIdUsuario(Long idUsuario) {
         this.idUsuario = idUsuario;
     }
     

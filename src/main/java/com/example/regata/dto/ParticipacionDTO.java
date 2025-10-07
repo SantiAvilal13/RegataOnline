@@ -3,11 +3,10 @@ package com.example.regata.dto;
 import com.example.regata.model.Participacion;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
-import java.util.UUID;
 
 public class ParticipacionDTO {
     
-    private UUID idParticipacion;
+    private Long idParticipacion;
     
     private Integer turnoActual;
     
@@ -25,17 +24,17 @@ public class ParticipacionDTO {
     private Participacion.Estado estado;
     
     @NotNull(message = "La partida es obligatoria")
-    private UUID partidaId;
+    private Long partidaId;
     
     private String partidaNombre;
     
     @NotNull(message = "El barco es obligatorio")
-    private UUID barcoId;
+    private Long barcoId;
     
     private String barcoAlias;
     
     @NotNull(message = "El jugador es obligatorio")
-    private UUID jugadorId;
+    private Long jugadorId;
     
     private String jugadorNombre;
     
@@ -48,7 +47,7 @@ public class ParticipacionDTO {
     // Constructores
     public ParticipacionDTO() {}
     
-    public ParticipacionDTO(UUID partidaId, UUID barcoId, UUID jugadorId, Integer posX, Integer posY) {
+    public ParticipacionDTO(Long partidaId, Long barcoId, Long jugadorId, Integer posX, Integer posY) {
         this.partidaId = partidaId;
         this.barcoId = barcoId;
         this.jugadorId = jugadorId;
@@ -61,11 +60,11 @@ public class ParticipacionDTO {
     }
     
     // Getters y Setters
-    public UUID getIdParticipacion() {
+    public Long getIdParticipacion() {
         return idParticipacion;
     }
-    
-    public void setIdParticipacion(UUID idParticipacion) {
+
+    public void setIdParticipacion(Long idParticipacion) {
         this.idParticipacion = idParticipacion;
     }
     
@@ -117,11 +116,11 @@ public class ParticipacionDTO {
         this.estado = estado;
     }
     
-    public UUID getPartidaId() {
+    public Long getPartidaId() {
         return partidaId;
     }
-    
-    public void setPartidaId(UUID partidaId) {
+
+    public void setPartidaId(Long partidaId) {
         this.partidaId = partidaId;
     }
     
@@ -133,11 +132,11 @@ public class ParticipacionDTO {
         this.partidaNombre = partidaNombre;
     }
     
-    public UUID getBarcoId() {
+    public Long getBarcoId() {
         return barcoId;
     }
-    
-    public void setBarcoId(UUID barcoId) {
+
+    public void setBarcoId(Long barcoId) {
         this.barcoId = barcoId;
     }
     
@@ -149,11 +148,11 @@ public class ParticipacionDTO {
         this.barcoAlias = barcoAlias;
     }
     
-    public UUID getJugadorId() {
+    public Long getJugadorId() {
         return jugadorId;
     }
-    
-    public void setJugadorId(UUID jugadorId) {
+
+    public void setJugadorId(Long jugadorId) {
         this.jugadorId = jugadorId;
     }
     

@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -26,11 +25,11 @@ public class UsuarioService {
         return usuarioRepository.findAll();
     }
     
-    public Optional<Usuario> findById(UUID id) {
+    public Optional<Usuario> findById(Long id) {
         return usuarioRepository.findById(id);
     }
     
-    public Usuario update(UUID id, Usuario usuario) {
+    public Usuario update(Long id, Usuario usuario) {
         Usuario existingUsuario = usuarioRepository.findById(id)
             .orElseThrow(() -> new GameException("Usuario no encontrado con ID: " + id));
         
@@ -42,7 +41,7 @@ public class UsuarioService {
         return usuarioRepository.save(existingUsuario);
     }
     
-    public void deleteById(UUID id) {
+    public void deleteById(Long id) {
         if (!usuarioRepository.existsById(id)) {
             throw new GameException("Usuario no encontrado con ID: " + id);
         }
@@ -61,7 +60,7 @@ public class UsuarioService {
         return usuarioRepository.findAllOrderByNombreAsc();
     }
     
-    public Long countBarcosByUsuarioId(UUID usuarioId) {
+    public Long countBarcosByUsuarioId(Long usuarioId) {
         return usuarioRepository.countBarcosByUsuarioId(usuarioId);
     }
     

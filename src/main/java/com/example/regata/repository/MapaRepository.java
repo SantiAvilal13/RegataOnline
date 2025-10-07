@@ -7,10 +7,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
-public interface MapaRepository extends JpaRepository<Mapa, UUID> {
+public interface MapaRepository extends JpaRepository<Mapa, Long> {
     
     /**
      * Buscar mapas por nombre (búsqueda parcial, case-insensitive)

@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "participaciones",
@@ -21,9 +20,9 @@ import java.util.UUID;
 public class Participacion {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_participacion")
-    private UUID idParticipacion;
+    private Long idParticipacion;
     
     @Column(name = "turno_actual", nullable = false)
     @Builder.Default

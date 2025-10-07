@@ -4,11 +4,10 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import java.util.List;
-import java.util.UUID;
 
 public class ModeloDTO {
     
-    private UUID idModelo;
+    private Long idModelo;
     
     @NotBlank(message = "El nombre es obligatorio")
     @Size(min = 2, max = 50, message = "El nombre debe tener entre 2 y 50 caracteres")
@@ -31,11 +30,11 @@ public class ModeloDTO {
     }
     
     // Getters y Setters
-    public UUID getIdModelo() {
+    public Long getIdModelo() {
         return idModelo;
     }
-    
-    public void setIdModelo(UUID idModelo) {
+
+    public void setIdModelo(Long idModelo) {
         this.idModelo = idModelo;
     }
     

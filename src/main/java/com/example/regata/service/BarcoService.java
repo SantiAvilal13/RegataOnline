@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import java.lang.Long;
 
 @Service
 @Transactional
@@ -24,7 +24,7 @@ public class BarcoService {
     }
     
     @Transactional(readOnly = true)
-    public Optional<Barco> findById(UUID id) {
+    public Optional<Barco> findById(Long id) {
         return barcoRepository.findById(id);
     }
     
@@ -32,14 +32,14 @@ public class BarcoService {
         return barcoRepository.save(barco);
     }
     
-    public void deleteById(UUID id) {
+    public void deleteById(Long id) {
         if (!barcoRepository.existsById(id)) {
             throw new GameException("No se encontró el barco con ID: " + id);
         }
         barcoRepository.deleteById(id);
     }
     
-    public Barco update(UUID id, Barco barco) {
+    public Barco update(Long id, Barco barco) {
         Barco existingBarco = barcoRepository.findById(id)
                 .orElseThrow(() -> new GameException("No se encontró el barco con ID: " + id));
         
@@ -51,12 +51,12 @@ public class BarcoService {
     }
     
     @Transactional(readOnly = true)
-    public List<Barco> findByUsuarioId(UUID usuarioId) {
+    public List<Barco> findByUsuarioId(Long usuarioId) {
         return barcoRepository.findByUsuarioId(usuarioId);
     }
     
     @Transactional(readOnly = true)
-    public List<Barco> findByModeloId(UUID modeloId) {
+    public List<Barco> findByModeloId(Long modeloId) {
         return barcoRepository.findByModeloId(modeloId);
     }
     
@@ -66,7 +66,7 @@ public class BarcoService {
     }
     
     @Transactional(readOnly = true)
-    public List<Barco> findByUsuarioIdOrderByAliasAsc(UUID usuarioId) {
+    public List<Barco> findByUsuarioIdOrderByAliasAsc(Long usuarioId) {
         return barcoRepository.findByUsuarioIdOrderByAliasAsc(usuarioId);
     }
     
@@ -76,12 +76,12 @@ public class BarcoService {
     }
     
     @Transactional(readOnly = true)
-    public List<Barco> findByUsuarioAndModelo(UUID usuarioId, UUID modeloId) {
+    public List<Barco> findByUsuarioAndModelo(Long usuarioId, Long modeloId) {
         return barcoRepository.findByUsuarioAndModelo(usuarioId, modeloId);
     }
     
     @Transactional(readOnly = true)
-    public Long countByUsuarioId(UUID usuarioId) {
+    public Long countByUsuarioId(Long usuarioId) {
         return barcoRepository.countByUsuarioId(usuarioId);
     }
 }

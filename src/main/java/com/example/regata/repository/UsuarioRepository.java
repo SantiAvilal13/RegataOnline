@@ -8,10 +8,9 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Repository
-public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
+public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     
     Optional<Usuario> findByEmail(String email);
     
@@ -21,7 +20,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
     List<Usuario> findAllOrderByNombreAsc();
     
     @Query("SELECT COUNT(b) FROM Barco b WHERE b.usuario.idUsuario = :usuarioId")
-    Long countBarcosByUsuarioId(@Param("usuarioId") UUID usuarioId);
+    Long countBarcosByUsuarioId(@Param("usuarioId") Long usuarioId);
     
     boolean existsByEmail(String email);
     

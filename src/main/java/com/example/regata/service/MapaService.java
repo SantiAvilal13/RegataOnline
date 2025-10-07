@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import java.lang.Long;
 
 @Service
 @Transactional
@@ -24,7 +24,7 @@ public class MapaService {
     }
     
     @Transactional(readOnly = true)
-    public Optional<Mapa> findById(UUID id) {
+    public Optional<Mapa> findById(Long id) {
         return mapaRepository.findById(id);
     }
     
@@ -47,7 +47,7 @@ public class MapaService {
         return mapaRepository.save(mapa);
     }
     
-    public void deleteById(UUID id) {
+    public void deleteById(Long id) {
         if (!mapaRepository.existsById(id)) {
             throw new GameException("No se encontró el mapa con ID: " + id);
         }
@@ -61,7 +61,7 @@ public class MapaService {
         mapaRepository.deleteById(id);
     }
     
-    public Mapa update(UUID id, Mapa mapa) {
+    public Mapa update(Long id, Mapa mapa) {
         Mapa existingMapa = mapaRepository.findById(id)
                 .orElseThrow(() -> new GameException("No se encontró el mapa con ID: " + id));
         
@@ -150,7 +150,7 @@ public class MapaService {
      * Validar que un mapa es jugable (tiene al menos una celda de partida y una de meta)
      */
     @Transactional(readOnly = true)
-    public boolean esMapaJugable(UUID mapaId) {
+    public boolean esMapaJugable(Long mapaId) {
         Optional<Mapa> mapaOpt = findById(mapaId);
         if (!mapaOpt.isPresent()) {
             return false;

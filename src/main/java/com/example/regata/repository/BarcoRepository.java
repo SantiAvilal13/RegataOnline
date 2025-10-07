@@ -8,21 +8,22 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.UUID;
+import java.lang.Long;
+import java.lang.Long;
 
 @Repository
-public interface BarcoRepository extends JpaRepository<Barco, UUID> {
+public interface BarcoRepository extends JpaRepository<Barco, Long> {
     
     // Buscar barcos por usuario propietario
     List<Barco> findByUsuario(Usuario usuario);
     
     // Buscar barcos por ID del usuario
     @Query("SELECT b FROM Barco b WHERE b.usuario.idUsuario = :usuarioId")
-    List<Barco> findByUsuarioId(@Param("usuarioId") UUID usuarioId);
+    List<Barco> findByUsuarioId(@Param("usuarioId") Long usuarioId);
     
     // Buscar barcos por modelo
     @Query("SELECT b FROM Barco b WHERE b.modelo.idModelo = :modeloId")
-    List<Barco> findByModeloId(@Param("modeloId") UUID modeloId);
+    List<Barco> findByModeloId(@Param("modeloId") Long modeloId);
     
     // Buscar barcos por alias que contenga el texto (búsqueda parcial)
     @Query("SELECT b FROM Barco b WHERE LOWER(b.alias) LIKE LOWER(CONCAT('%', :alias, '%'))")
@@ -30,7 +31,7 @@ public interface BarcoRepository extends JpaRepository<Barco, UUID> {
     
     // Buscar barcos de un usuario ordenados por alias
     @Query("SELECT b FROM Barco b WHERE b.usuario.idUsuario = :usuarioId ORDER BY b.alias ASC")
-    List<Barco> findByUsuarioIdOrderByAliasAsc(@Param("usuarioId") UUID usuarioId);
+    List<Barco> findByUsuarioIdOrderByAliasAsc(@Param("usuarioId") Long usuarioId);
     
     // Buscar barcos que participaron en partidas
     @Query("SELECT DISTINCT b FROM Barco b JOIN b.participaciones p")
@@ -38,9 +39,9 @@ public interface BarcoRepository extends JpaRepository<Barco, UUID> {
     
     // Buscar barcos por usuario y modelo
     @Query("SELECT b FROM Barco b WHERE b.usuario.idUsuario = :usuarioId AND b.modelo.idModelo = :modeloId")
-    List<Barco> findByUsuarioAndModelo(@Param("usuarioId") UUID usuarioId, @Param("modeloId") UUID modeloId);
+    List<Barco> findByUsuarioAndModelo(@Param("usuarioId") Long usuarioId, @Param("modeloId") Long modeloId);
     
     // Contar barcos por usuario
     @Query("SELECT COUNT(b) FROM Barco b WHERE b.usuario.idUsuario = :usuarioId")
-    Long countByUsuarioId(@Param("usuarioId") UUID usuarioId);
+    Long countByUsuarioId(@Param("usuarioId") Long usuarioId);
 }

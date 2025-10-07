@@ -9,7 +9,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 @Transactional
@@ -24,7 +23,7 @@ public class ModeloService {
     }
     
     @Transactional(readOnly = true)
-    public Optional<Modelo> findById(UUID id) {
+    public Optional<Modelo> findById(Long id) {
         return modeloRepository.findById(id);
     }
     
@@ -32,7 +31,7 @@ public class ModeloService {
         return modeloRepository.save(modelo);
     }
     
-    public void deleteById(UUID id) {
+    public void deleteById(Long id) {
         if (!modeloRepository.existsById(id)) {
             throw new GameException("No se encontró el modelo con ID: " + id);
         }
@@ -46,7 +45,7 @@ public class ModeloService {
         modeloRepository.deleteById(id);
     }
     
-    public Modelo update(UUID id, Modelo modelo) {
+    public Modelo update(Long id, Modelo modelo) {
         Modelo existingModelo = modeloRepository.findById(id)
                 .orElseThrow(() -> new GameException("No se encontró el modelo con ID: " + id));
         
@@ -82,7 +81,7 @@ public class ModeloService {
     }
     
     @Transactional(readOnly = true)
-    public Long countBarcosByModeloId(UUID modeloId) {
+    public Long countBarcosByModeloId(Long modeloId) {
         return modeloRepository.countBarcosByModeloId(modeloId);
     }
 }

@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Email;
 import lombok.*;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "usuarios")
@@ -19,9 +18,9 @@ import java.util.UUID;
 public class Usuario {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_usuario")
-    private UUID idUsuario;
+    private Long idUsuario;
     
     @NotBlank(message = "El nombre es obligatorio")
     @Column(nullable = false)

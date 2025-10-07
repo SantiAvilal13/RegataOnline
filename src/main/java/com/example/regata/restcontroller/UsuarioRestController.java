@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -38,7 +37,7 @@ public class UsuarioRestController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<UsuarioDTO> obtenerUsuario(@PathVariable UUID id) {
+    public ResponseEntity<UsuarioDTO> obtenerUsuario(@PathVariable Long id) {
         try {
             Optional<Usuario> usuario = usuarioService.findById(id);
             return usuario.map(usuarioMapper::toDTO)
@@ -62,7 +61,7 @@ public class UsuarioRestController {
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<UsuarioDTO> actualizarUsuario(@PathVariable UUID id, @RequestBody UsuarioDTO usuarioDTO) {
+    public ResponseEntity<UsuarioDTO> actualizarUsuario(@PathVariable Long id, @RequestBody UsuarioDTO usuarioDTO) {
         try {
             Usuario usuario = usuarioMapper.toEntity(usuarioDTO);
             Usuario updatedUsuario = usuarioService.update(id, usuario);
@@ -74,7 +73,7 @@ public class UsuarioRestController {
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarUsuario(@PathVariable UUID id) {
+    public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
         try {
             usuarioService.deleteById(id);
             return ResponseEntity.noContent().build();

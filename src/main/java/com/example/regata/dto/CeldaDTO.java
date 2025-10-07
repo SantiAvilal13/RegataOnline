@@ -3,11 +3,10 @@ package com.example.regata.dto;
 import com.example.regata.model.Celda;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
-import java.util.UUID;
 
 public class CeldaDTO {
     
-    private UUID idCelda;
+    private Long idCelda;
     
     @NotNull(message = "La coordenada X es obligatoria")
     private Integer coordX;
@@ -19,7 +18,7 @@ public class CeldaDTO {
     private Celda.Tipo tipo;
     
     @NotNull(message = "El mapa es obligatorio")
-    private UUID mapaId;
+    private Long mapaId;
     
     private String mapaNombre;
     
@@ -31,7 +30,7 @@ public class CeldaDTO {
     // Constructores
     public CeldaDTO() {}
     
-    public CeldaDTO(Integer coordX, Integer coordY, Celda.Tipo tipo, UUID mapaId) {
+    public CeldaDTO(Integer coordX, Integer coordY, Celda.Tipo tipo, Long mapaId) {
         this.coordX = coordX;
         this.coordY = coordY;
         this.tipo = tipo;
@@ -39,11 +38,11 @@ public class CeldaDTO {
     }
     
     // Getters y Setters
-    public UUID getIdCelda() {
+    public Long getIdCelda() {
         return idCelda;
     }
-    
-    public void setIdCelda(UUID idCelda) {
+
+    public void setIdCelda(Long idCelda) {
         this.idCelda = idCelda;
     }
     
@@ -71,11 +70,11 @@ public class CeldaDTO {
         this.tipo = tipo;
     }
     
-    public UUID getMapaId() {
+    public Long getMapaId() {
         return mapaId;
     }
-    
-    public void setMapaId(UUID mapaId) {
+
+    public void setMapaId(Long mapaId) {
         this.mapaId = mapaId;
     }
     

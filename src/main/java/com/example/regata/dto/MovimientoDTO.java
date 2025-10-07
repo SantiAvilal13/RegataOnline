@@ -2,11 +2,10 @@ package com.example.regata.dto;
 
 import com.example.regata.model.Movimiento;
 import jakarta.validation.constraints.NotNull;
-import java.util.UUID;
 
 public class MovimientoDTO {
     
-    private UUID idMov;
+    private Long idMov;
     
     @NotNull(message = "El turno es obligatorio")
     private Integer turno;
@@ -32,11 +31,11 @@ public class MovimientoDTO {
     private Boolean colision;
     
     @NotNull(message = "La participación es obligatoria")
-    private UUID participacionId;
+    private Long participacionId;
     
     private String participacionInfo;
     
-    private UUID celdaId;
+    private Long celdaId;
     
     private String celdaInfo;
     
@@ -45,7 +44,7 @@ public class MovimientoDTO {
     
     public MovimientoDTO(Integer turno, Integer posX, Integer posY, Integer velX, Integer velY, 
                         Movimiento.DeltaVelocidad deltaVx, Movimiento.DeltaVelocidad deltaVy, 
-                        UUID participacionId) {
+                        Long participacionId) {
         this.turno = turno;
         this.posX = posX;
         this.posY = posY;
@@ -58,11 +57,11 @@ public class MovimientoDTO {
     }
     
     // Getters y Setters
-    public UUID getIdMov() {
+    public Long getIdMov() {
         return idMov;
     }
-    
-    public void setIdMov(UUID idMov) {
+
+    public void setIdMov(Long idMov) {
         this.idMov = idMov;
     }
     
@@ -130,11 +129,11 @@ public class MovimientoDTO {
         this.colision = colision;
     }
     
-    public UUID getParticipacionId() {
+    public Long getParticipacionId() {
         return participacionId;
     }
-    
-    public void setParticipacionId(UUID participacionId) {
+
+    public void setParticipacionId(Long participacionId) {
         this.participacionId = participacionId;
     }
     
@@ -146,11 +145,11 @@ public class MovimientoDTO {
         this.participacionInfo = participacionInfo;
     }
     
-    public UUID getCeldaId() {
+    public Long getCeldaId() {
         return celdaId;
     }
-    
-    public void setCeldaId(UUID celdaId) {
+
+    public void setCeldaId(Long celdaId) {
         this.celdaId = celdaId;
     }
     

@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -46,7 +45,7 @@ public class BarcoRestController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<BarcoDTO> obtenerBarco(@PathVariable UUID id) {
+    public ResponseEntity<BarcoDTO> obtenerBarco(@PathVariable Long id) {
         try {
             Optional<Barco> barco = barcoService.findById(id);
             return barco.map(barcoMapper::toDTO)
@@ -80,7 +79,7 @@ public class BarcoRestController {
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<BarcoDTO> actualizarBarco(@PathVariable UUID id, @RequestBody BarcoDTO barcoDTO) {
+    public ResponseEntity<BarcoDTO> actualizarBarco(@PathVariable Long id, @RequestBody BarcoDTO barcoDTO) {
         try {
             Barco barco = new Barco();
             barco.setIdBarco(id);
@@ -103,7 +102,7 @@ public class BarcoRestController {
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarBarco(@PathVariable UUID id) {
+    public ResponseEntity<Void> eliminarBarco(@PathVariable Long id) {
         try {
             barcoService.deleteById(id);
             return ResponseEntity.noContent().build();
@@ -126,7 +125,7 @@ public class BarcoRestController {
     }
     
     @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<List<BarcoDTO>> obtenerBarcosPorUsuario(@PathVariable UUID usuarioId) {
+    public ResponseEntity<List<BarcoDTO>> obtenerBarcosPorUsuario(@PathVariable Long usuarioId) {
         try {
             List<Barco> barcos = barcoService.findByUsuarioId(usuarioId);
             List<BarcoDTO> barcosDTO = barcos.stream()
@@ -139,7 +138,7 @@ public class BarcoRestController {
     }
     
     @GetMapping("/modelo/{modeloId}")
-    public ResponseEntity<List<BarcoDTO>> obtenerBarcosPorModelo(@PathVariable UUID modeloId) {
+    public ResponseEntity<List<BarcoDTO>> obtenerBarcosPorModelo(@PathVariable Long modeloId) {
         try {
             List<Barco> barcos = barcoService.findByModeloId(modeloId);
             List<BarcoDTO> barcosDTO = barcos.stream()
@@ -152,7 +151,7 @@ public class BarcoRestController {
     }
     
     @GetMapping("/usuario/{usuarioId}/ordenados")
-    public ResponseEntity<List<BarcoDTO>> obtenerBarcosPorUsuarioOrdenados(@PathVariable UUID usuarioId) {
+    public ResponseEntity<List<BarcoDTO>> obtenerBarcosPorUsuarioOrdenados(@PathVariable Long usuarioId) {
         try {
             List<Barco> barcos = barcoService.findByUsuarioIdOrderByAliasAsc(usuarioId);
             List<BarcoDTO> barcosDTO = barcos.stream()
@@ -178,8 +177,8 @@ public class BarcoRestController {
     }
     
     @GetMapping("/usuario/{usuarioId}/modelo/{modeloId}")
-    public ResponseEntity<List<BarcoDTO>> obtenerBarcosPorUsuarioYModelo(@PathVariable UUID usuarioId, 
-                                                                      @PathVariable UUID modeloId) {
+    public ResponseEntity<List<BarcoDTO>> obtenerBarcosPorUsuarioYModelo(@PathVariable Long usuarioId, 
+                                                                     @PathVariable Long modeloId) {
         try {
             List<Barco> barcos = barcoService.findByUsuarioAndModelo(usuarioId, modeloId);
             List<BarcoDTO> barcosDTO = barcos.stream()
@@ -192,7 +191,7 @@ public class BarcoRestController {
     }
     
     @GetMapping("/usuario/{usuarioId}/contar")
-    public ResponseEntity<Long> contarBarcosPorUsuario(@PathVariable UUID usuarioId) {
+    public ResponseEntity<Long> contarBarcosPorUsuario(@PathVariable Long usuarioId) {
         try {
             Long count = barcoService.countByUsuarioId(usuarioId);
             return ResponseEntity.ok(count);

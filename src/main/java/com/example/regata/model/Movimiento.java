@@ -3,7 +3,7 @@ package com.example.regata.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import java.util.UUID;
+ 
 
 @Entity
 @Table(name = "movimientos",
@@ -16,9 +16,9 @@ import java.util.UUID;
 public class Movimiento {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_mov")
-    private UUID idMov;
+    private Long idMov;
     
     @Column(nullable = false)
     private Integer turno;

@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
 import lombok.*;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "mapas")
@@ -18,9 +17,9 @@ import java.util.UUID;
 public class Mapa {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_mapa")
-    private UUID idMapa;
+    private Long idMapa;
     
     @NotBlank(message = "El nombre es obligatorio")
     @Column(nullable = false)

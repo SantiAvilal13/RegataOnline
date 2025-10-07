@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import java.util.List;
-import java.util.UUID;
 
 @Entity
 @Table(name = "barcos")
@@ -19,9 +18,9 @@ import java.util.UUID;
 public class Barco {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id_barco")
-    private UUID idBarco;
+    private Long idBarco;
     
     @NotBlank(message = "El alias es obligatorio")
     @Column(nullable = false)

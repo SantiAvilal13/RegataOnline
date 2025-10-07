@@ -38,9 +38,9 @@ public class MapaRestController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<MapaDTO> obtenerMapa(@PathVariable String id) {
+    public ResponseEntity<MapaDTO> obtenerMapa(@PathVariable Long id) {
         try {
-            return mapaService.findById(java.util.UUID.fromString(id))
+            return mapaService.findById(id)
                 .map(this::convertirAMapaDTO)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -50,9 +50,9 @@ public class MapaRestController {
     }
     
     @GetMapping("/{id}/celdas")
-    public ResponseEntity<List<MapaDTO.CeldaDTO>> obtenerCeldas(@PathVariable String id) {
+    public ResponseEntity<List<MapaDTO.CeldaDTO>> obtenerCeldas(@PathVariable Long id) {
         try {
-            return mapaService.findById(java.util.UUID.fromString(id))
+            return mapaService.findById(id)
                     .map(mapa -> {
                         List<MapaDTO.CeldaDTO> celdasDTO = mapa.getCeldas().stream()
                             .map(this::convertirACeldaDTO)
@@ -66,9 +66,9 @@ public class MapaRestController {
     }
     
     @GetMapping("/{id}/matriz")
-    public ResponseEntity<Map<String, Object>> obtenerMatriz(@PathVariable String id) {
+    public ResponseEntity<Map<String, Object>> obtenerMatriz(@PathVariable Long id) {
         try {
-            return mapaService.findById(java.util.UUID.fromString(id))
+            return mapaService.findById(id)
                     .map(mapa -> {
                         List<Celda> celdas = celdaService.findByMapa(mapa);
                         

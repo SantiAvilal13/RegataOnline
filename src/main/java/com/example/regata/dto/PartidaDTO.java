@@ -4,11 +4,10 @@ import com.example.regata.model.Partida;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 public class PartidaDTO {
     
-    private UUID idPartida;
+    private Long idPartida;
     
     private LocalDateTime fechaInicio;
     
@@ -18,15 +17,15 @@ public class PartidaDTO {
     private Partida.Estado estado;
     
     @NotNull(message = "El mapa es obligatorio")
-    private UUID mapaId;
+    private Long mapaId;
     
     private String mapaNombre;
     
-    private UUID ganadorUsuarioId;
+    private Long ganadorUsuarioId;
     
     private String ganadorUsuarioNombre;
     
-    private UUID ganadorBarcoId;
+    private Long ganadorBarcoId;
     
     private String ganadorBarcoAlias;
     
@@ -38,18 +37,18 @@ public class PartidaDTO {
     // Constructores
     public PartidaDTO() {}
     
-    public PartidaDTO(UUID mapaId, Partida.Estado estado) {
+    public PartidaDTO(Long mapaId, Partida.Estado estado) {
         this.mapaId = mapaId;
         this.estado = estado;
         this.fechaInicio = LocalDateTime.now();
     }
     
     // Getters y Setters
-    public UUID getIdPartida() {
+    public Long getIdPartida() {
         return idPartida;
     }
-    
-    public void setIdPartida(UUID idPartida) {
+
+    public void setIdPartida(Long idPartida) {
         this.idPartida = idPartida;
     }
     
@@ -77,11 +76,11 @@ public class PartidaDTO {
         this.estado = estado;
     }
     
-    public UUID getMapaId() {
+    public Long getMapaId() {
         return mapaId;
     }
-    
-    public void setMapaId(UUID mapaId) {
+
+    public void setMapaId(Long mapaId) {
         this.mapaId = mapaId;
     }
     
@@ -93,11 +92,11 @@ public class PartidaDTO {
         this.mapaNombre = mapaNombre;
     }
     
-    public UUID getGanadorUsuarioId() {
+    public Long getGanadorUsuarioId() {
         return ganadorUsuarioId;
     }
-    
-    public void setGanadorUsuarioId(UUID ganadorUsuarioId) {
+
+    public void setGanadorUsuarioId(Long ganadorUsuarioId) {
         this.ganadorUsuarioId = ganadorUsuarioId;
     }
     
@@ -109,11 +108,11 @@ public class PartidaDTO {
         this.ganadorUsuarioNombre = ganadorUsuarioNombre;
     }
     
-    public UUID getGanadorBarcoId() {
+    public Long getGanadorBarcoId() {
         return ganadorBarcoId;
     }
-    
-    public void setGanadorBarcoId(UUID ganadorBarcoId) {
+
+    public void setGanadorBarcoId(Long ganadorBarcoId) {
         this.ganadorBarcoId = ganadorBarcoId;
     }
     

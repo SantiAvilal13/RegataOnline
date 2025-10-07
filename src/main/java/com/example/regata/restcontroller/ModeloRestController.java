@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -38,7 +37,7 @@ public class ModeloRestController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<ModeloDTO> obtenerModelo(@PathVariable UUID id) {
+    public ResponseEntity<ModeloDTO> obtenerModelo(@PathVariable Long id) {
         try {
             Optional<Modelo> modelo = modeloService.findById(id);
             return modelo.map(modeloMapper::toDTO)
@@ -62,7 +61,7 @@ public class ModeloRestController {
     }
     
     @PutMapping("/{id}")
-    public ResponseEntity<ModeloDTO> actualizarModelo(@PathVariable UUID id, @RequestBody ModeloDTO modeloDTO) {
+    public ResponseEntity<ModeloDTO> actualizarModelo(@PathVariable Long id, @RequestBody ModeloDTO modeloDTO) {
         try {
             Modelo modelo = modeloMapper.toEntity(modeloDTO);
             Modelo updatedModelo = modeloService.update(id, modelo);
@@ -74,7 +73,7 @@ public class ModeloRestController {
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarModelo(@PathVariable UUID id) {
+    public ResponseEntity<Void> eliminarModelo(@PathVariable Long id) {
         try {
             modeloService.deleteById(id);
             return ResponseEntity.noContent().build();
@@ -149,7 +148,7 @@ public class ModeloRestController {
     }
     
     @GetMapping("/{id}/barcos")
-    public ResponseEntity<Long> contarBarcosPorModelo(@PathVariable UUID id) {
+    public ResponseEntity<Long> contarBarcosPorModelo(@PathVariable Long id) {
         try {
             Long count = modeloService.countBarcosByModeloId(id);
             return ResponseEntity.ok(count);

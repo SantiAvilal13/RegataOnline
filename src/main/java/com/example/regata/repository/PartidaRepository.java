@@ -10,10 +10,9 @@ import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 
 @Repository
-public interface PartidaRepository extends JpaRepository<Partida, UUID> {
+public interface PartidaRepository extends JpaRepository<Partida, Long> {
     
     // Buscar partidas por estado
     List<Partida> findByEstado(Partida.Estado estado);
@@ -23,14 +22,14 @@ public interface PartidaRepository extends JpaRepository<Partida, UUID> {
     
     // Buscar partidas por ID del mapa
     @Query("SELECT p FROM Partida p WHERE p.mapa.idMapa = :mapaId")
-    List<Partida> findByMapaId(@Param("mapaId") UUID mapaId);
+    List<Partida> findByMapaId(@Param("mapaId") Long mapaId);
     
     // Buscar partidas por ganador
     List<Partida> findByGanadorUsuario(Usuario ganadorUsuario);
     
     // Buscar partidas por ID del ganador
     @Query("SELECT p FROM Partida p WHERE p.ganadorUsuario.idUsuario = :usuarioId")
-    List<Partida> findByGanadorUsuarioId(@Param("usuarioId") UUID usuarioId);
+    List<Partida> findByGanadorUsuarioId(@Param("usuarioId") Long usuarioId);
     
     // Buscar partidas por rango de fechas
     @Query("SELECT p FROM Partida p WHERE p.fechaInicio BETWEEN :fechaInicio AND :fechaFin")
@@ -51,7 +50,7 @@ public interface PartidaRepository extends JpaRepository<Partida, UUID> {
     
     // Buscar partidas donde participó un usuario específico
     @Query("SELECT DISTINCT p FROM Partida p JOIN p.participaciones part WHERE part.jugador.idUsuario = :usuarioId")
-    List<Partida> findPartidasByParticipacionUsuario(@Param("usuarioId") UUID usuarioId);
+    List<Partida> findPartidasByParticipacionUsuario(@Param("usuarioId") Long usuarioId);
     
     // Buscar partidas recientes (últimas N partidas)
     @Query("SELECT p FROM Partida p WHERE p.estado = 'TERMINADA' ORDER BY p.fechaFin DESC")

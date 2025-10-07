@@ -4,23 +4,22 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.util.List;
-import java.util.UUID;
 
 public class BarcoDTO {
     
-    private UUID idBarco;
+    private Long idBarco;
     
     @NotBlank(message = "El alias es obligatorio")
     @Size(min = 2, max = 50, message = "El alias debe tener entre 2 y 50 caracteres")
     private String alias;
     
     @NotNull(message = "El usuario propietario es obligatorio")
-    private UUID usuarioId;
+    private Long usuarioId;
     
     private String usuarioNombre;
     
     @NotNull(message = "El modelo es obligatorio")
-    private UUID modeloId;
+    private Long modeloId;
     
     private String modeloNombre;
     private String modeloColorHex;
@@ -32,18 +31,18 @@ public class BarcoDTO {
     // Constructores
     public BarcoDTO() {}
     
-    public BarcoDTO(String alias, UUID usuarioId, UUID modeloId) {
+    public BarcoDTO(String alias, Long usuarioId, Long modeloId) {
         this.alias = alias;
         this.usuarioId = usuarioId;
         this.modeloId = modeloId;
     }
     
     // Getters y Setters
-    public UUID getIdBarco() {
+    public Long getIdBarco() {
         return idBarco;
     }
-    
-    public void setIdBarco(UUID idBarco) {
+
+    public void setIdBarco(Long idBarco) {
         this.idBarco = idBarco;
     }
     
@@ -55,11 +54,11 @@ public class BarcoDTO {
         this.alias = alias;
     }
     
-    public UUID getUsuarioId() {
+    public Long getUsuarioId() {
         return usuarioId;
     }
-    
-    public void setUsuarioId(UUID usuarioId) {
+
+    public void setUsuarioId(Long usuarioId) {
         this.usuarioId = usuarioId;
     }
     
@@ -71,11 +70,11 @@ public class BarcoDTO {
         this.usuarioNombre = usuarioNombre;
     }
     
-    public UUID getModeloId() {
+    public Long getModeloId() {
         return modeloId;
     }
-    
-    public void setModeloId(UUID modeloId) {
+
+    public void setModeloId(Long modeloId) {
         this.modeloId = modeloId;
     }
     
