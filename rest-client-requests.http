@@ -1,0 +1,285 @@
+### Variables
+@baseUrl = http://localhost:8080
+@apiUrl = {{baseUrl}}/api
+
+### ========================================
+### CONFIGURACIÓN Y DOCUMENTACIÓN
+### ========================================
+
+### Obtener documentación Swagger
+GET {{baseUrl}}/swagger-ui.html
+
+### Obtener JSON de la API
+GET {{baseUrl}}/api-docs
+
+### Acceder a la consola H2
+GET {{baseUrl}}/h2-console
+
+### ========================================
+### ESTADÍSTICAS GENERALES
+### ========================================
+
+### Obtener estadísticas generales
+GET {{apiUrl}}/estadisticas
+
+### ========================================
+### GESTIÓN DE USUARIOS
+### ========================================
+
+### Listar todos los usuarios
+GET {{apiUrl}}/usuarios
+
+### Obtener usuario por ID
+GET {{apiUrl}}/usuarios/1
+
+### Crear nuevo usuario
+POST {{apiUrl}}/usuarios
+Content-Type: application/json
+
+{
+    "nombre": "Juan Pérez",
+    "email": "juan.perez@email.com",
+    "password": "password123",
+    "rol": "JUGADOR"
+}
+
+### Actualizar usuario
+PUT {{apiUrl}}/usuarios/1
+Content-Type: application/json
+
+{
+    "nombre": "Juan Pérez Actualizado",
+    "email": "juan.perez@email.com",
+    "password": "nuevopassword123",
+    "rol": "JUGADOR"
+}
+
+### Buscar usuarios por nombre
+GET {{apiUrl}}/usuarios/buscar?nombre=Juan
+
+### Obtener usuarios por rol
+GET {{apiUrl}}/usuarios/rol/JUGADOR
+
+### Obtener solo jugadores
+GET {{apiUrl}}/usuarios/jugadores
+
+### Obtener solo administradores
+GET {{apiUrl}}/usuarios/administradores
+
+### Obtener usuario por email
+GET {{apiUrl}}/usuarios/email/maria.garcia@email.com
+
+### Verificar si existe email
+GET {{apiUrl}}/usuarios/existe-email/maria.garcia@email.com
+
+### Contar usuarios por rol
+GET {{apiUrl}}/usuarios/contar-por-rol/JUGADOR
+
+### Eliminar usuario
+DELETE {{apiUrl}}/usuarios/1
+
+### ========================================
+### GESTIÓN DE MODELOS
+### ========================================
+
+### Listar todos los modelos
+GET {{apiUrl}}/modelos
+
+### Obtener modelo por ID
+GET {{apiUrl}}/modelos/1
+
+### Crear nuevo modelo
+POST {{apiUrl}}/modelos
+Content-Type: application/json
+
+{
+    "nombre": "Nave Espacial",
+    "colorHex": "#FF00FF"
+}
+
+### Actualizar modelo
+PUT {{apiUrl}}/modelos/1
+Content-Type: application/json
+
+{
+    "nombre": "Nave Espacial Mejorada",
+    "colorHex": "#00FFFF"
+}
+
+### Buscar modelos por nombre
+GET {{apiUrl}}/modelos/buscar?nombre=Velero
+
+### Obtener modelos por color exacto
+GET {{apiUrl}}/modelos/color/%230000FF
+
+### Buscar modelos por color
+GET {{apiUrl}}/modelos/color-buscar?color=FF
+
+### Obtener modelos ordenados alfabéticamente
+GET {{apiUrl}}/modelos/ordenados
+
+### Obtener modelos más populares
+GET {{apiUrl}}/modelos/populares
+
+### Contar barcos por modelo
+GET {{apiUrl}}/modelos/1/barcos
+
+### Eliminar modelo
+DELETE {{apiUrl}}/modelos/1
+
+### ========================================
+### GESTIÓN DE BARCOS
+### ========================================
+
+### Listar todos los barcos
+GET {{apiUrl}}/barcos
+
+### Obtener barco por ID
+GET {{apiUrl}}/barcos/1
+
+### Crear nuevo barco
+POST {{apiUrl}}/barcos
+Content-Type: application/json
+
+{
+    "alias": "Mi Barco Favorito",
+    "usuarioId": 1,
+    "modeloId": 1
+}
+
+### Actualizar barco
+PUT {{apiUrl}}/barcos/1
+Content-Type: application/json
+
+{
+    "alias": "Mi Barco Favorito Actualizado",
+    "usuarioId": 1,
+    "modeloId": 2
+}
+
+### Buscar barcos por alias
+GET {{apiUrl}}/barcos/buscar?alias=Océano
+
+### Obtener barcos por usuario
+GET {{apiUrl}}/barcos/usuario/1
+
+### Obtener barcos por modelo
+GET {{apiUrl}}/barcos/modelo/1
+
+### Obtener barcos de usuario ordenados
+GET {{apiUrl}}/barcos/usuario/1/ordenados
+
+### Obtener barcos con participaciones
+GET {{apiUrl}}/barcos/con-participaciones
+
+### Obtener barcos por usuario y modelo
+GET {{apiUrl}}/barcos/usuario/1/modelo/1
+
+### Contar barcos por usuario
+GET {{apiUrl}}/barcos/usuario/1/contar
+
+### Eliminar barco
+DELETE {{apiUrl}}/barcos/1
+
+### ========================================
+### GESTIÓN DE MAPAS
+### ========================================
+
+### Listar todos los mapas
+GET {{apiUrl}}/mapas
+
+### Obtener mapa por ID
+GET {{apiUrl}}/mapas/1
+
+### Obtener celdas de un mapa
+GET {{apiUrl}}/mapas/1/celdas
+
+### Obtener matriz del mapa
+GET {{apiUrl}}/mapas/1/matriz
+
+### ========================================
+### ENDPOINTS DE PRUEBA
+### ========================================
+
+### Test de base de datos
+POST {{apiUrl}}/test-db
+
+### Test simple
+POST {{apiUrl}}/test-simple
+
+### Test CRUD completo
+POST {{apiUrl}}/test-crud
+
+### ========================================
+### EJEMPLOS DE PRUEBA COMPLETOS
+### ========================================
+
+### Crear usuario y barco completo
+# 1. Crear usuario
+POST {{apiUrl}}/usuarios
+Content-Type: application/json
+
+{
+    "nombre": "Test User",
+    "email": "test@example.com",
+    "password": "password123",
+    "rol": "JUGADOR"
+}
+
+###
+
+# 2. Crear modelo
+POST {{apiUrl}}/modelos
+Content-Type: application/json
+
+{
+    "nombre": "Test Model",
+    "colorHex": "#FF0000"
+}
+
+###
+
+# 3. Crear barco (usar IDs de los pasos anteriores)
+POST {{apiUrl}}/barcos
+Content-Type: application/json
+
+{
+    "alias": "Test Boat",
+    "usuarioId": 6,
+    "modeloId": 11
+}
+
+###
+
+### Verificar datos creados
+GET {{apiUrl}}/usuarios
+###
+
+GET {{apiUrl}}/modelos
+###
+
+GET {{apiUrl}}/barcos
+###
+
+### ========================================
+### CONSULTAS DE ANÁLISIS
+### ========================================
+
+### Análisis de usuarios
+GET {{apiUrl}}/usuarios/contar-por-rol/JUGADOR
+###
+
+GET {{apiUrl}}/usuarios/contar-por-rol/ADMIN
+###
+
+### Análisis de modelos
+GET {{apiUrl}}/modelos/populares
+###
+
+### Análisis de barcos
+GET {{apiUrl}}/barcos/con-participaciones
+###
+
+### Estadísticas generales
+GET {{apiUrl}}/estadisticas
+###

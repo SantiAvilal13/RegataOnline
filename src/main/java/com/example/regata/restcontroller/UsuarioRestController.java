@@ -4,6 +4,11 @@ import com.example.regata.dto.UsuarioDTO;
 import com.example.regata.mapper.UsuarioMapper;
 import com.example.regata.model.Usuario;
 import com.example.regata.service.UsuarioService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +20,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/usuarios")
+@Tag(name = "Gestión de Usuarios", description = "API para gestionar usuarios del juego")
 public class UsuarioRestController {
     
     @Autowired
@@ -24,6 +30,11 @@ public class UsuarioRestController {
     private UsuarioMapper usuarioMapper;
     
     @GetMapping
+    @Operation(summary = "Listar todos los usuarios", description = "Obtiene una lista de todos los usuarios registrados")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lista de usuarios obtenida exitosamente"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     public ResponseEntity<List<UsuarioDTO>> listarUsuarios() {
         try {
             List<Usuario> usuarios = usuarioService.findAll();

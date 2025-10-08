@@ -4,6 +4,11 @@ import com.example.regata.dto.ModeloDTO;
 import com.example.regata.mapper.ModeloMapper;
 import com.example.regata.model.Modelo;
 import com.example.regata.service.ModeloService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +20,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/modelos")
+@Tag(name = "Gestión de Modelos", description = "API para gestionar modelos de barcos")
 public class ModeloRestController {
     
     @Autowired
@@ -24,6 +30,11 @@ public class ModeloRestController {
     private ModeloMapper modeloMapper;
     
     @GetMapping
+    @Operation(summary = "Listar todos los modelos", description = "Obtiene una lista de todos los modelos de barcos disponibles")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lista de modelos obtenida exitosamente"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     public ResponseEntity<List<ModeloDTO>> listarModelos() {
         try {
             List<Modelo> modelos = modeloService.findAll();

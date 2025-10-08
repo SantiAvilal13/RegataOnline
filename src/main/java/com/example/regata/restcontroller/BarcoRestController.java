@@ -6,6 +6,11 @@ import com.example.regata.model.Barco;
 import com.example.regata.service.BarcoService;
 import com.example.regata.service.UsuarioService;
 import com.example.regata.service.ModeloService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +22,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/barcos")
+@Tag(name = "Gestión de Barcos", description = "API para gestionar barcos del juego")
 public class BarcoRestController {
     
     @Autowired
@@ -32,6 +38,11 @@ public class BarcoRestController {
     private ModeloService modeloService;
     
     @GetMapping
+    @Operation(summary = "Listar todos los barcos", description = "Obtiene una lista de todos los barcos registrados")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lista de barcos obtenida exitosamente"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
     public ResponseEntity<List<BarcoDTO>> listarBarcos() {
         try {
             List<Barco> barcos = barcoService.findAll();
@@ -45,7 +56,14 @@ public class BarcoRestController {
     }
     
     @GetMapping("/{id}")
-    public ResponseEntity<BarcoDTO> obtenerBarco(@PathVariable Long id) {
+    @Operation(summary = "Obtener barco por ID", description = "Obtiene un barco específico por su identificador único")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Barco encontrado exitosamente"),
+        @ApiResponse(responseCode = "404", description = "Barco no encontrado"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    public ResponseEntity<BarcoDTO> obtenerBarco(
+            @Parameter(description = "ID único del barco", required = true) @PathVariable Long id) {
         try {
             Optional<Barco> barco = barcoService.findById(id);
             return barco.map(barcoMapper::toDTO)
@@ -57,7 +75,14 @@ public class BarcoRestController {
     }
     
     @PostMapping
-    public ResponseEntity<BarcoDTO> crearBarco(@RequestBody BarcoDTO barcoDTO) {
+    @Operation(summary = "Crear nuevo barco", description = "Crea un nuevo barco en el sistema")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Barco creado exitosamente"),
+        @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    public ResponseEntity<BarcoDTO> crearBarco(
+            @Parameter(description = "Datos del barco a crear", required = true) @RequestBody BarcoDTO barcoDTO) {
         try {
             Barco barco = new Barco();
             barco.setAlias(barcoDTO.getAlias());
@@ -102,7 +127,14 @@ public class BarcoRestController {
     }
     
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarBarco(@PathVariable Long id) {
+    @Operation(summary = "Eliminar barco", description = "Elimina un barco del sistema por su ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Barco eliminado exitosamente"),
+        @ApiResponse(responseCode = "404", description = "Barco no encontrado"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    public ResponseEntity<Void> eliminarBarco(
+            @Parameter(description = "ID único del barco a eliminar", required = true) @PathVariable Long id) {
         try {
             barcoService.deleteById(id);
             return ResponseEntity.noContent().build();
