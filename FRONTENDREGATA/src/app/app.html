@@ -1,0 +1,92 @@
+<div class="spa-container">
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="nav-brand">
+      <h1>🏁 Regata Online</h1>
+    </div>
+    <div class="nav-links">
+      <button class="nav-link" (click)="showSection('home')" [class.active]="currentSection() === 'home'">Inicio</button>
+      <button class="nav-link" (click)="showSection('usuarios')" [class.active]="currentSection() === 'usuarios'">Usuarios</button>
+      <button class="nav-link" (click)="showSection('barcos')" [class.active]="currentSection() === 'barcos'">Barcos</button>
+      <button class="nav-link" (click)="showSection('modelos')" [class.active]="currentSection() === 'modelos'">Modelos</button>
+      <button class="nav-link" (click)="showSection('partidas')" [class.active]="currentSection() === 'partidas'">Partidas</button>
+    </div>
+  </nav>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+    <!-- Home Section -->
+    <div *ngIf="currentSection() === 'home'" class="section active">
+      <app-home (sectionChange)="onSectionChange($event)"></app-home>
+    </div>
+
+    <!-- Usuarios Section -->
+    <div *ngIf="currentSection() === 'usuarios'" class="section active">
+      <div class="section-header">
+        <h2>Gestión de Usuarios</h2>
+        <button class="btn btn-primary" (click)="showSubSection('usuarios', 'list')">Lista</button>
+        <button class="btn btn-success" (click)="showSubSection('usuarios', 'form')">Nuevo</button>
+      </div>
+      
+      <div *ngIf="currentSubSection() === 'list'">
+        <app-usuarios-list></app-usuarios-list>
+      </div>
+      <div *ngIf="currentSubSection() === 'form'">
+        <app-usuario-form></app-usuario-form>
+      </div>
+    </div>
+
+    <!-- Barcos Section -->
+    <div *ngIf="currentSection() === 'barcos'" class="section active">
+      <div class="section-header">
+        <h2>Gestión de Barcos</h2>
+        <button class="btn btn-primary" (click)="showSubSection('barcos', 'list')">Lista</button>
+        <button class="btn btn-success" (click)="showSubSection('barcos', 'form')">Nuevo</button>
+      </div>
+      
+      <div *ngIf="currentSubSection() === 'list'">
+        <app-barcos-list></app-barcos-list>
+      </div>
+      <div *ngIf="currentSubSection() === 'form'">
+        <app-barco-form></app-barco-form>
+      </div>
+    </div>
+
+    <!-- Modelos Section -->
+    <div *ngIf="currentSection() === 'modelos'" class="section active">
+      <div class="section-header">
+        <h2>Gestión de Modelos</h2>
+        <button class="btn btn-primary" (click)="showSubSection('modelos', 'list')">Lista</button>
+        <button class="btn btn-success" (click)="showSubSection('modelos', 'form')">Nuevo</button>
+      </div>
+      
+      <div *ngIf="currentSubSection() === 'list'">
+        <app-modelos-list></app-modelos-list>
+      </div>
+      <div *ngIf="currentSubSection() === 'form'">
+        <app-modelo-form></app-modelo-form>
+      </div>
+    </div>
+
+    <!-- Partidas Section -->
+    <div *ngIf="currentSection() === 'partidas'" class="section active">
+      <div class="section-header">
+        <h2>Gestión de Partidas</h2>
+        <button class="btn btn-primary" (click)="showSubSection('partidas', 'list')">Lista</button>
+        <button class="btn btn-success" (click)="showSubSection('partidas', 'form')">Nueva</button>
+      </div>
+      
+      <div *ngIf="currentSubSection() === 'list'">
+        <app-partidas-list></app-partidas-list>
+      </div>
+      <div *ngIf="currentSubSection() === 'form'">
+        <app-partida-form></app-partida-form>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2024 Regata Online - Sistema de Gestión de Regatas</p>
+  </footer>
+</div>

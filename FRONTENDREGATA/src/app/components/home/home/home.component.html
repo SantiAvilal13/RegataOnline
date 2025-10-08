@@ -1,0 +1,60 @@
+<div class="home-container">
+  <div class="hero-section">
+    <h1>🏁 Bienvenido a Regata Online</h1>
+    <p>Sistema de gestión completo para regatas náuticas</p>
+  </div>
+
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">👥</div>
+      <h3>Gestión de Usuarios</h3>
+      <p>Administra jugadores y administradores del sistema</p>
+      <button class="btn btn-primary" (click)="navigateToSection('usuarios')">Ver Usuarios</button>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">🚤</div>
+      <h3>Gestión de Barcos</h3>
+      <p>Registra y administra los barcos de los jugadores</p>
+      <button class="btn btn-primary" (click)="navigateToSection('barcos')">Ver Barcos</button>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">🎨</div>
+      <h3>Modelos de Barcos</h3>
+      <p>Define diferentes tipos y colores de barcos</p>
+      <button class="btn btn-primary" (click)="navigateToSection('modelos')">Ver Modelos</button>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">🏆</div>
+      <h3>Partidas</h3>
+      <p>Crea y gestiona partidas de regata</p>
+      <button class="btn btn-primary" (click)="navigateToSection('partidas')">Ver Partidas</button>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">🎮</div>
+      <h3>Juego</h3>
+      <p>Participa en regatas en tiempo real</p>
+      <button class="btn btn-success">Jugar Ahora</button>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <h3>Estadísticas</h3>
+      <p>Consulta estadísticas y resultados</p>
+      <button class="btn btn-info">Ver Estadísticas</button>
+    </div>
+  </div>
+
+  <div class="quick-actions">
+    <h2>Acciones Rápidas</h2>
+    <div class="action-buttons">
+      <button class="btn btn-outline-primary" (click)="navigateToForm('usuarios')">Crear Usuario</button>
+      <button class="btn btn-outline-primary" (click)="navigateToForm('barcos')">Crear Barco</button>
+      <button class="btn btn-outline-primary" (click)="navigateToForm('modelos')">Crear Modelo</button>
+      <button class="btn btn-outline-success" (click)="navigateToForm('partidas')">Nueva Partida</button>
+    </div>
+  </div>
+</div>

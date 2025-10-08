@@ -1,0 +1,83 @@
+<div class="barco-form">
+  <div class="header">
+    <h2>{{ barcoId ? 'Editar Barco' : 'Crear Nuevo Barco' }}</h2>
+  </div>
+
+  @if (loading()) {
+    <div class="loading">Cargando datos...</div>
+  }
+
+  @if (error()) {
+    <div class="error">{{ error() }}</div>
+  }
+
+  @if (!loading()) {
+    <form (ngSubmit)="saveBarco()" #barcoForm="ngForm">
+      <div class="form-group">
+        <label for="alias">Alias del Barco *</label>
+        <input 
+          type="text" 
+          id="alias"
+          name="alias"
+          [(ngModel)]="barco().alias"
+          required
+          minlength="2"
+          maxlength="50"
+          class="form-control"
+          placeholder="Ingresa el alias del barco">
+        @if (barcoForm.submitted && !barco().hasValidAlias()) {
+          <div class="field-error">El alias debe tener entre 2 y 50 caracteres</div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="usuarioId">Usuario *</label>
+        <select 
+          id="usuarioId"
+          name="usuarioId"
+          [(ngModel)]="barco().usuarioId"
+          required
+          class="form-control">
+          <option value="">Selecciona un usuario</option>
+          @for (usuario of usuarios(); track usuario.idUsuario) {
+            <option [value]="usuario.idUsuario">{{ usuario.nombre }} ({{ usuario.email }})</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="modeloId">Modelo *</label>
+        <select 
+          id="modeloId"
+          name="modeloId"
+          [(ngModel)]="barco().modeloId"
+          required
+          class="form-control">
+          <option value="">Selecciona un modelo</option>
+          @for (modelo of modelos(); track modelo.idModelo) {
+            <option [value]="modelo.idModelo">{{ modelo.nombre }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="form-actions">
+        <button 
+          type="button" 
+          class="btn btn-secondary"
+          (click)="barcoForm.resetForm()">
+          Limpiar
+        </button>
+        <button 
+          type="submit" 
+          class="btn btn-primary"
+          [disabled]="saving() || !barco().isValid()">
+          @if (saving()) {
+            Guardando...
+          } @else {
+            {{ barcoId ? 'Actualizar' : 'Crear' }} Barco
+          }
+        </button>
+      </div>
+    </form>
+  }
+</div>

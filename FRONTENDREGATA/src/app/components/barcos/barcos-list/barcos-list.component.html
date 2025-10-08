@@ -1,0 +1,59 @@
+<div class="barcos-list">
+  <div class="header">
+    <h2>Lista de Barcos</h2>
+    <button class="btn btn-primary" (click)="loadBarcos()">Actualizar</button>
+  </div>
+
+  @if (loading()) {
+    <div class="loading">Cargando barcos...</div>
+  }
+
+  @if (error()) {
+    <div class="error">{{ error() }}</div>
+  }
+
+  @if (barcos().length === 0 && !loading()) {
+    <div class="no-data">No hay barcos registrados</div>
+  }
+
+  @if (barcos().length > 0) {
+    <div class="table-container">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Alias</th>
+            <th>Usuario</th>
+            <th>Modelo</th>
+            <th>Participaciones</th>
+            <th>Partidas Ganadas</th>
+            <th>% Victorias</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (barco of barcos(); track barco.idBarco) {
+            <tr>
+              <td>{{ barco.idBarco }}</td>
+              <td>{{ barco.getDisplayName() }}</td>
+              <td>{{ barco.getUsuarioNombre() }}</td>
+              <td>{{ barco.getModeloNombre() }}</td>
+              <td>{{ barco.getTotalParticipaciones() }}</td>
+              <td>{{ barco.getPartidasGanadas() }}</td>
+              <td>
+                <span class="badge" [class]="barco.getStatusBadgeClass()">
+                  {{ barco.getWinRateDisplay() }}
+                </span>
+              </td>
+              <td>
+                <button class="btn btn-sm btn-info">Ver</button>
+                <button class="btn btn-sm btn-warning">Editar</button>
+                <button class="btn btn-sm btn-danger" (click)="deleteBarco(barco.idBarco!)">Eliminar</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

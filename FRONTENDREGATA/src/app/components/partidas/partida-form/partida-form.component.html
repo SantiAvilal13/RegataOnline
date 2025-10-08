@@ -1,0 +1,57 @@
+<div class="partida-form">
+  <div class="header">
+    <h2>Crear Nueva Partida</h2>
+  </div>
+
+  @if (error()) {
+    <div class="error">{{ error() }}</div>
+  }
+
+  <form (ngSubmit)="savePartida()" #partidaForm="ngForm">
+    <div class="form-group">
+      <label for="estado">Estado *</label>
+      <select 
+        id="estado"
+        name="estado"
+        [(ngModel)]="partida().estado"
+        required
+        class="form-control">
+        <option value="">Selecciona un estado</option>
+        <option value="ESPERANDO">Esperando</option>
+        <option value="EN_JUEGO">En Juego</option>
+        <option value="TERMINADA">Terminada</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="mapaId">ID del Mapa *</label>
+      <input 
+        type="number" 
+        id="mapaId"
+        name="mapaId"
+        [(ngModel)]="partida().mapaId"
+        required
+        class="form-control"
+        placeholder="Ingresa el ID del mapa">
+    </div>
+
+    <div class="form-actions">
+      <button 
+        type="button" 
+        class="btn btn-secondary"
+        (click)="partidaForm.resetForm()">
+        Limpiar
+      </button>
+      <button 
+        type="submit" 
+        class="btn btn-primary"
+        [disabled]="saving() || !partida().isValid()">
+        @if (saving()) {
+          Guardando...
+        } @else {
+          Crear Partida
+        }
+      </button>
+    </div>
+  </form>
+</div>

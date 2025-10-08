@@ -1,0 +1,56 @@
+<div class="modelo-form">
+  <div class="header">
+    <h2>{{ modeloId ? 'Editar Modelo' : 'Crear Nuevo Modelo' }}</h2>
+  </div>
+
+  @if (error()) {
+    <div class="error">{{ error() }}</div>
+  }
+
+  <form (ngSubmit)="saveModelo()" #modeloForm="ngForm">
+    <div class="form-group">
+      <label for="nombre">Nombre del Modelo *</label>
+      <input 
+        type="text" 
+        id="nombre"
+        name="nombre"
+        [(ngModel)]="modelo().nombre"
+        required
+        minlength="2"
+        maxlength="50"
+        class="form-control"
+        placeholder="Ingresa el nombre del modelo">
+    </div>
+
+    <div class="form-group">
+      <label for="colorHex">Color (Hex) *</label>
+      <input 
+        type="color" 
+        id="colorHex"
+        name="colorHex"
+        [(ngModel)]="modelo().colorHex"
+        required
+        class="form-control color-input">
+      <small class="form-text">Color: {{ modelo().colorHex }}</small>
+    </div>
+
+    <div class="form-actions">
+      <button 
+        type="button" 
+        class="btn btn-secondary"
+        (click)="modeloForm.resetForm()">
+        Limpiar
+      </button>
+      <button 
+        type="submit" 
+        class="btn btn-primary"
+        [disabled]="saving() || !modelo().isValid()">
+        @if (saving()) {
+          Guardando...
+        } @else {
+          {{ modeloId ? 'Actualizar' : 'Crear' }} Modelo
+        }
+      </button>
+    </div>
+  </form>
+</div>
