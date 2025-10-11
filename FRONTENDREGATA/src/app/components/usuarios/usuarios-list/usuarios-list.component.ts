@@ -1,16 +1,17 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { Usuario } from '../../../models';
 import { UsuarioService } from '../../../shared/services/usuarios/usuario.service';
 
 @Component({
   selector: 'app-usuarios-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './usuarios-list.component.html',
   styleUrl: './usuarios-list.component.css'
 })
-export class UsuariosListComponent implements OnInit {
+export class UsuariosListComponent {
   usuarios = signal<Usuario[]>([]);
   loading = signal(false);
   error = signal<string | null>(null);

@@ -1,6 +1,6 @@
 <div class="barco-form">
   <div class="header">
-    <h2>{{ barcoId ? 'Editar Barco' : 'Crear Nuevo Barco' }}</h2>
+    <h2>{{ isEditMode() ? 'Editar Barco' : 'Crear Nuevo Barco' }}</h2>
   </div>
 
   @if (loading()) {
@@ -74,7 +74,7 @@
           @if (saving()) {
             Guardando...
           } @else {
-            {{ barcoId ? 'Actualizar' : 'Crear' }} Barco
+            {{ isEditMode() ? 'Actualizar' : 'Crear' }} Barco
           }
         </button>
       </div>

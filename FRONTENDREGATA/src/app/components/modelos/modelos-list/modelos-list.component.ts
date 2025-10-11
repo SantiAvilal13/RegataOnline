@@ -1,16 +1,17 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { Modelo } from '../../../models';
 import { ModeloService } from '../../../shared/services/modelos/modelo.service';
 
 @Component({
   selector: 'app-modelos-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './modelos-list.component.html',
   styleUrl: './modelos-list.component.css'
 })
-export class ModelosListComponent implements OnInit {
+export class ModelosListComponent {
   modelos = signal<Modelo[]>([]);
   loading = signal(false);
   error = signal<string | null>(null);

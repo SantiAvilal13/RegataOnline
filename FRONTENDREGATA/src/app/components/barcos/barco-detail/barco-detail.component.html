@@ -75,12 +75,10 @@
       </div>
 
       <div class="actions">
-        <button class="btn btn-info">Ver Usuario</button>
-        <button class="btn btn-info">Ver Modelo</button>
-        <button class="btn btn-warning">Editar Barco</button>
-        @if (barco()!.canBeDeleted()) {
-          <button class="btn btn-danger">Eliminar Barco</button>
-        }
+        <button class="btn btn-secondary" [routerLink]="['/barcos']">Volver</button>
+        <button class="btn btn-info" [routerLink]="['/usuarios', barco()!.usuarioId]">Ver Usuario</button>
+        <button class="btn btn-info" [routerLink]="['/modelos', barco()!.modeloId]">Ver Modelo</button>
+        <button class="btn btn-warning" [routerLink]="['/barcos', barco()!.idBarco, 'edit']">Editar Barco</button>
       </div>
     </div>
   }

@@ -1,7 +1,10 @@
 <div class="usuarios-list">
   <div class="header">
     <h2>Lista de Usuarios</h2>
-    <button class="btn btn-primary" (click)="loadUsuarios()">Actualizar</button>
+    <div>
+      <button class="btn btn-success" [routerLink]="['/usuarios/new']">Nuevo Usuario</button>
+      <button class="btn btn-primary" (click)="loadUsuarios()">Actualizar</button>
+    </div>
   </div>
 
   @if (loading()) {
@@ -44,8 +47,8 @@
               <td>{{ usuario.getTotalPartidasGanadas() }}</td>
               <td>{{ usuario.getTotalBarcos() }}</td>
               <td>
-                <button class="btn btn-sm btn-info">Ver</button>
-                <button class="btn btn-sm btn-warning">Editar</button>
+                <button class="btn btn-sm btn-info" [routerLink]="['/usuarios', usuario.idUsuario]">Ver</button>
+                <button class="btn btn-sm btn-warning" [routerLink]="['/usuarios', usuario.idUsuario, 'edit']">Editar</button>
                 <button class="btn btn-sm btn-danger" (click)="deleteUsuario(usuario.idUsuario!)">Eliminar</button>
               </td>
             </tr>

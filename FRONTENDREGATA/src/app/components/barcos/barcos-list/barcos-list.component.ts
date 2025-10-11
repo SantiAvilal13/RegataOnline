@@ -1,16 +1,17 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { Barco } from '../../../models';
 import { BarcoService } from '../../../shared/services/barcos/barco.service';
 
 @Component({
   selector: 'app-barcos-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './barcos-list.component.html',
   styleUrl: './barcos-list.component.css'
 })
-export class BarcosListComponent implements OnInit {
+export class BarcosListComponent {
   barcos = signal<Barco[]>([]);
   loading = signal(false);
   error = signal<string | null>(null);

@@ -1,7 +1,11 @@
 <div class="partida-form">
   <div class="header">
-    <h2>Crear Nueva Partida</h2>
+    <h2>{{ isEditMode() ? 'Editar Partida' : 'Crear Nueva Partida' }}</h2>
   </div>
+
+  @if (loading()) {
+    <div class="loading">Cargando datos...</div>
+  }
 
   @if (error()) {
     <div class="error">{{ error() }}</div>
@@ -49,7 +53,7 @@
         @if (saving()) {
           Guardando...
         } @else {
-          Crear Partida
+          {{ isEditMode() ? 'Actualizar' : 'Crear' }} Partida
         }
       </button>
     </div>

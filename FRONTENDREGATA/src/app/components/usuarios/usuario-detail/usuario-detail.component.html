@@ -1,1 +1,71 @@
-<p>usuario-detail works!</p>
+<div class="usuario-detail">
+  @if (loading()) {
+    <div class="loading">Cargando usuario...</div>
+  }
+
+  @if (error()) {
+    <div class="error">{{ error() }}</div>
+  }
+
+  @if (usuario() && !loading()) {
+    <div class="detail-container">
+      <div class="header">
+        <h2>{{ usuario()!.nombre }}</h2>
+        <span class="badge" [class.badge-admin]="usuario()!.esAdmin()" [class.badge-jugador]="usuario()!.esJugador()">
+          {{ usuario()!.getRolDisplayName() }}
+        </span>
+      </div>
+
+      <div class="detail-grid">
+        <div class="detail-card">
+          <h3>Información Básica</h3>
+          <div class="detail-item">
+            <label>ID:</label>
+            <span>{{ usuario()!.idUsuario }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Nombre:</label>
+            <span>{{ usuario()!.nombre }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Email:</label>
+            <span>{{ usuario()!.email }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Rol:</label>
+            <span>{{ usuario()!.getRolDisplayName() }}</span>
+          </div>
+        </div>
+
+        <div class="detail-card">
+          <h3>Estadísticas</h3>
+          <div class="detail-item">
+            <label>Total de Barcos:</label>
+            <span>{{ usuario()!.getTotalBarcos() }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Partidas Ganadas:</label>
+            <span>{{ usuario()!.getTotalPartidasGanadas() }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Es Administrador:</label>
+            <span class="status" [class.status-yes]="usuario()!.esAdmin()" [class.status-no]="!usuario()!.esAdmin()">
+              {{ usuario()!.esAdmin() ? 'Sí' : 'No' }}
+            </span>
+          </div>
+          <div class="detail-item">
+            <label>Es Jugador:</label>
+            <span class="status" [class.status-yes]="usuario()!.esJugador()" [class.status-no]="!usuario()!.esJugador()">
+              {{ usuario()!.esJugador() ? 'Sí' : 'No' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-secondary" [routerLink]="['/usuarios']">Volver</button>
+        <button class="btn btn-warning" [routerLink]="['/usuarios', usuario()!.idUsuario, 'edit']">Editar Usuario</button>
+      </div>
+    </div>
+  }
+</div>

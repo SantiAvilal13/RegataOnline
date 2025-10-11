@@ -1,16 +1,17 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { Partida } from '../../../models';
 import { PartidaService } from '../../../shared/services/partidas/partida.service';
 
 @Component({
   selector: 'app-partidas-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './partidas-list.component.html',
   styleUrl: './partidas-list.component.css'
 })
-export class PartidasListComponent implements OnInit {
+export class PartidasListComponent {
   partidas = signal<Partida[]>([]);
   loading = signal(false);
   error = signal<string | null>(null);

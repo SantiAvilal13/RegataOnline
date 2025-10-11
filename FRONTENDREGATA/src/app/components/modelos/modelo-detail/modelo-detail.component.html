@@ -1,1 +1,77 @@
-<p>modelo-detail works!</p>
+<div class="modelo-detail">
+  @if (loading()) {
+    <div class="loading">Cargando modelo...</div>
+  }
+
+  @if (error()) {
+    <div class="error">{{ error() }}</div>
+  }
+
+  @if (modelo() && !loading()) {
+    <div class="detail-container">
+      <div class="header">
+        <h2>{{ modelo()!.nombre }}</h2>
+        <div class="color-badge" [style.background-color]="modelo()!.colorHex">
+          {{ modelo()!.colorHex }}
+        </div>
+      </div>
+
+      <div class="detail-grid">
+        <div class="detail-card">
+          <h3>Información Básica</h3>
+          <div class="detail-item">
+            <label>ID:</label>
+            <span>{{ modelo()!.idModelo }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Nombre:</label>
+            <span>{{ modelo()!.nombre }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Color Hexadecimal:</label>
+            <span>{{ modelo()!.colorHex }}</span>
+          </div>
+        </div>
+
+        <div class="detail-card">
+          <h3>Estadísticas</h3>
+          <div class="detail-item">
+            <label>Cantidad de Barcos:</label>
+            <span>{{ modelo()!.getCantidadBarcos() }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Total Participaciones:</label>
+            <span>{{ modelo()!.getTotalParticipaciones() }}</span>
+          </div>
+        </div>
+
+        <div class="detail-card">
+          <h3>Validación</h3>
+          <div class="detail-item">
+            <label>Nombre válido:</label>
+            <span class="status" [class.status-yes]="modelo()!.hasValidNombre()" [class.status-no]="!modelo()!.hasValidNombre()">
+              {{ modelo()!.hasValidNombre() ? 'Sí' : 'No' }}
+            </span>
+          </div>
+          <div class="detail-item">
+            <label>Color válido:</label>
+            <span class="status" [class.status-yes]="modelo()!.hasValidColorHex()" [class.status-no]="!modelo()!.hasValidColorHex()">
+              {{ modelo()!.hasValidColorHex() ? 'Sí' : 'No' }}
+            </span>
+          </div>
+          <div class="detail-item">
+            <label>Modelo válido:</label>
+            <span class="status" [class.status-yes]="modelo()!.isValid()" [class.status-no]="!modelo()!.isValid()">
+              {{ modelo()!.isValid() ? 'Sí' : 'No' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-secondary" [routerLink]="['/modelos']">Volver</button>
+        <button class="btn btn-warning" [routerLink]="['/modelos', modelo()!.idModelo, 'edit']">Editar Modelo</button>
+      </div>
+    </div>
+  }
+</div>

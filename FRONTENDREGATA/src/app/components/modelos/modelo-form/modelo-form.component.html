@@ -1,7 +1,11 @@
 <div class="modelo-form">
   <div class="header">
-    <h2>{{ modeloId ? 'Editar Modelo' : 'Crear Nuevo Modelo' }}</h2>
+    <h2>{{ isEditMode() ? 'Editar Modelo' : 'Crear Nuevo Modelo' }}</h2>
   </div>
+
+  @if (loading()) {
+    <div class="loading">Cargando datos...</div>
+  }
 
   @if (error()) {
     <div class="error">{{ error() }}</div>
@@ -48,7 +52,7 @@
         @if (saving()) {
           Guardando...
         } @else {
-          {{ modeloId ? 'Actualizar' : 'Crear' }} Modelo
+          {{ isEditMode() ? 'Actualizar' : 'Crear' }} Modelo
         }
       </button>
     </div>

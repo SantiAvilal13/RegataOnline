@@ -1,7 +1,10 @@
 <div class="barcos-list">
   <div class="header">
     <h2>Lista de Barcos</h2>
-    <button class="btn btn-primary" (click)="loadBarcos()">Actualizar</button>
+    <div>
+      <button class="btn btn-success" [routerLink]="['/barcos/new']">Nuevo Barco</button>
+      <button class="btn btn-primary" (click)="loadBarcos()">Actualizar</button>
+    </div>
   </div>
 
   @if (loading()) {
@@ -46,8 +49,8 @@
                 </span>
               </td>
               <td>
-                <button class="btn btn-sm btn-info">Ver</button>
-                <button class="btn btn-sm btn-warning">Editar</button>
+                <button class="btn btn-sm btn-info" [routerLink]="['/barcos', barco.idBarco]">Ver</button>
+                <button class="btn btn-sm btn-warning" [routerLink]="['/barcos', barco.idBarco, 'edit']">Editar</button>
                 <button class="btn btn-sm btn-danger" (click)="deleteBarco(barco.idBarco!)">Eliminar</button>
               </td>
             </tr>

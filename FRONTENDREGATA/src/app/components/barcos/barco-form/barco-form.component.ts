@@ -1,6 +1,8 @@
-import { Component, inject, signal, OnInit, Input } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { switchMap, Observable } from 'rxjs';
 import { Barco, Usuario, Modelo } from '../../../models';
 import { BarcoService } from '../../../shared/services/barcos/barco.service';
 import { UsuarioService } from '../../../shared/services/usuarios/usuario.service';
@@ -13,31 +15,50 @@ import { ModeloService } from '../../../shared/services/modelos/modelo.service';
   templateUrl: './barco-form.component.html',
   styleUrl: './barco-form.component.css'
 })
-export class BarcoFormComponent implements OnInit {
-  @Input() barcoId?: number;
-  
+export class BarcoFormComponent {
   barco = signal<Barco>(new Barco());
   usuarios = signal<Usuario[]>([]);
   modelos = signal<Modelo[]>([]);
   loading = signal(false);
   saving = signal(false);
   error = signal<string | null>(null);
+  isEditMode = signal(false);
   
   barcoService = inject(BarcoService);
   usuarioService = inject(UsuarioService);
   modeloService = inject(ModeloService);
+  route = inject(ActivatedRoute);
+  router = inject(Router);
 
   ngOnInit() {
     this.loadData();
-    if (this.barcoId) {
-      this.loadBarco();
-    }
+    
+    this.route.params.pipe(
+      switchMap(params => {
+        const id = params['id'];
+        if (id) {
+          this.isEditMode.set(true);
+          return this.barcoService.getBarco(id);
+        } else {
+          // Modo creación - retornamos un observable vacío
+          return new Observable<Barco>(subscriber => {
+            subscriber.complete();
+          });
+        }
+      })
+    ).subscribe({
+      next: (barco) => {
+        this.barco.set(barco);
+      },
+      error: (err) => {
+        this.error.set('Error al cargar el barco: ' + err.message);
+      }
+    });
   }
 
   loadData() {
     this.loading.set(true);
     
-    // Cargar usuarios y modelos en paralelo
     this.usuarioService.getUsuarios().subscribe({
       next: (usuarios) => {
         this.usuarios.set(usuarios);
@@ -59,19 +80,6 @@ export class BarcoFormComponent implements OnInit {
     });
   }
 
-  loadBarco() {
-    if (this.barcoId) {
-      this.barcoService.getBarco(this.barcoId).subscribe({
-        next: (barco) => {
-          this.barco.set(barco);
-        },
-        error: (error) => {
-          this.error.set('Error al cargar barco: ' + error.message);
-        }
-      });
-    }
-  }
-
   saveBarco() {
     if (!this.barco().isValid()) {
       this.error.set('Por favor completa todos los campos requeridos');
@@ -82,32 +90,20 @@ export class BarcoFormComponent implements OnInit {
     this.error.set(null);
 
     const barco = this.barco();
+    const operation = this.isEditMode()
+      ? this.barcoService.updateBarco(barco.idBarco!, barco)
+      : this.barcoService.createBarco(barco);
     
-    if (this.barcoId) {
-      // Actualizar
-      this.barcoService.updateBarco(this.barcoId, barco).subscribe({
-        next: () => {
-          this.saving.set(false);
-          alert('Barco actualizado exitosamente');
-        },
-        error: (error) => {
-          this.error.set('Error al actualizar barco: ' + error.message);
-          this.saving.set(false);
-        }
-      });
-    } else {
-      // Crear
-      this.barcoService.createBarco(barco).subscribe({
-        next: () => {
-          this.saving.set(false);
-          this.barco.set(new Barco()); // Reset form
-          alert('Barco creado exitosamente');
-        },
-        error: (error) => {
-          this.error.set('Error al crear barco: ' + error.message);
-          this.saving.set(false);
-        }
-      });
-    }
+    operation.subscribe({
+      next: () => {
+        this.saving.set(false);
+        alert(this.isEditMode() ? 'Barco actualizado exitosamente' : 'Barco creado exitosamente');
+        this.router.navigate(['/barcos']);
+      },
+      error: (error) => {
+        this.error.set('Error al guardar barco: ' + error.message);
+        this.saving.set(false);
+      }
+    });
   }
 }
