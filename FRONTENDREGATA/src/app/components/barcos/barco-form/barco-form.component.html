@@ -19,14 +19,15 @@
           type="text" 
           id="alias"
           name="alias"
+          #alias="ngModel"
           [(ngModel)]="barco().alias"
           required
           minlength="2"
           maxlength="50"
           class="form-control"
           placeholder="Ingresa el alias del barco">
-        @if (barcoForm.submitted && !barco().hasValidAlias()) {
-          <div class="field-error">El alias debe tener entre 2 y 50 caracteres</div>
+        @if (alias.invalid && alias.touched) {
+          <div class="field-error">El alias debe tener entre 2 y 50 caracteres y no puede estar vacío</div>
         }
       </div>
 
@@ -35,6 +36,7 @@
         <select 
           id="usuarioId"
           name="usuarioId"
+          #usuarioId="ngModel"
           [(ngModel)]="barco().usuarioId"
           required
           class="form-control">
@@ -43,6 +45,9 @@
             <option [value]="usuario.idUsuario">{{ usuario.nombre }} ({{ usuario.email }})</option>
           }
         </select>
+        @if (usuarioId.invalid && usuarioId.touched) {
+          <div class="field-error">Debe seleccionar un usuario</div>
+        }
       </div>
 
       <div class="form-group">
@@ -50,6 +55,7 @@
         <select 
           id="modeloId"
           name="modeloId"
+          #modeloId="ngModel"
           [(ngModel)]="barco().modeloId"
           required
           class="form-control">
@@ -58,6 +64,9 @@
             <option [value]="modelo.idModelo">{{ modelo.nombre }}</option>
           }
         </select>
+        @if (modeloId.invalid && modeloId.touched) {
+          <div class="field-error">Debe seleccionar un modelo</div>
+        }
       </div>
 
       <div class="form-actions">
@@ -70,7 +79,7 @@
         <button 
           type="submit" 
           class="btn btn-primary"
-          [disabled]="saving() || !barco().isValid()">
+          [disabled]="saving() || barcoForm.invalid">
           @if (saving()) {
             Guardando...
           } @else {

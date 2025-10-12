@@ -17,6 +17,7 @@
       <select 
         id="estado"
         name="estado"
+        #estado="ngModel"
         [(ngModel)]="partida().estado"
         required
         class="form-control">
@@ -25,6 +26,9 @@
         <option value="EN_JUEGO">En Juego</option>
         <option value="TERMINADA">Terminada</option>
       </select>
+      @if (estado.invalid && estado.touched) {
+        <div class="field-error">Debe seleccionar un estado</div>
+      }
     </div>
 
     <div class="form-group">
@@ -33,10 +37,21 @@
         type="number" 
         id="mapaId"
         name="mapaId"
+        #mapaId="ngModel"
         [(ngModel)]="partida().mapaId"
         required
+        min="1"
         class="form-control"
         placeholder="Ingresa el ID del mapa">
+      @if (mapaId.invalid && mapaId.touched) {
+        <div class="field-error">
+          @if (mapaId.errors?.['required']) {
+            El ID del mapa es obligatorio
+          } @else if (mapaId.errors?.['min']) {
+            El ID del mapa debe ser mayor a 0
+          }
+        </div>
+      }
     </div>
 
     <div class="form-actions">
@@ -49,7 +64,7 @@
       <button 
         type="submit" 
         class="btn btn-primary"
-        [disabled]="saving() || !partida().isValid()">
+        [disabled]="saving() || partidaForm.invalid">
         @if (saving()) {
           Guardando...
         } @else {

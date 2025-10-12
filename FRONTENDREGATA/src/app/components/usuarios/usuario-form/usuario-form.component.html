@@ -18,12 +18,16 @@
         type="text" 
         id="nombre"
         name="nombre"
+        #nombre="ngModel"
         [(ngModel)]="usuario().nombre"
         required
         minlength="2"
         maxlength="50"
         class="form-control"
         placeholder="Ingresa el nombre del usuario">
+      @if (nombre.invalid && nombre.touched) {
+        <div class="field-error">El nombre debe tener entre 2 y 50 caracteres y no puede estar vacío</div>
+      }
     </div>
 
     <div class="form-group">
@@ -32,23 +36,51 @@
         type="email" 
         id="email"
         name="email"
+        #email="ngModel"
         [(ngModel)]="usuario().email"
         required
+        email
         class="form-control"
         placeholder="Ingresa el email del usuario">
+      @if (email.invalid && email.touched) {
+        <div class="field-error">
+          @if (email.errors?.['required']) {
+            El email es obligatorio
+          } @else if (email.errors?.['email']) {
+            El email debe ser válido
+          }
+        </div>
+      }
     </div>
 
     <div class="form-group">
-      <label for="password">Contraseña *</label>
+      <label for="password">
+        Contraseña 
+        @if (!isEditMode()) {
+          *
+        } @else {
+          (opcional - deja vacío para mantener la actual)
+        }
+      </label>
       <input 
         type="password" 
         id="password"
         name="password"
+        #password="ngModel"
         [(ngModel)]="usuario().password"
-        required
+        [required]="!isEditMode()"
         minlength="6"
         class="form-control"
-        placeholder="Ingresa la contraseña">
+        [placeholder]="isEditMode() ? 'Deja vacío para mantener la contraseña actual' : 'Ingresa la contraseña'">
+      @if (password.invalid && password.touched) {
+        <div class="field-error">
+          @if (password.errors?.['required']) {
+            La contraseña es obligatoria
+          } @else if (password.errors?.['minlength']) {
+            La contraseña debe tener al menos 6 caracteres
+          }
+        </div>
+      }
     </div>
 
     <div class="form-group">
@@ -56,6 +88,7 @@
       <select 
         id="rol"
         name="rol"
+        #rol="ngModel"
         [(ngModel)]="usuario().rol"
         required
         class="form-control">
@@ -63,6 +96,9 @@
         <option value="JUGADOR">Jugador</option>
         <option value="ADMIN">Administrador</option>
       </select>
+      @if (rol.invalid && rol.touched) {
+        <div class="field-error">Debe seleccionar un rol</div>
+      }
     </div>
 
     <div class="form-actions">
@@ -75,7 +111,7 @@
       <button 
         type="submit" 
         class="btn btn-primary"
-        [disabled]="saving() || !usuario().isValid()">
+        [disabled]="saving() || usuarioForm.invalid">
         @if (saving()) {
           Guardando...
         } @else {

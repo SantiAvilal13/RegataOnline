@@ -26,14 +26,18 @@ export class UsuarioService {
   }
 
   createUsuario(usuario: Usuario): Observable<Usuario> {
-    return this.http.post<Usuario>(environment.apiUrl + '/usuarios', usuario);
+    return this.http.post<any>(environment.apiUrl + '/usuarios', usuario.toDTO()).pipe(
+      map(response => new Usuario(response))
+    );
   }
 
   updateUsuario(id: number, usuario: Usuario): Observable<Usuario> {
-    return this.http.put<Usuario>(
+    return this.http.put<any>(
       `${environment.apiUrl}/usuarios/${id}`,
-       usuario,
-       { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) });
+       usuario.toDTO(),
+       { headers: new HttpHeaders({ 'Content-Type': 'application/json' }) }).pipe(
+      map(response => new Usuario(response))
+    );
   }
 
   deleteUsuario(id: number): Observable<void> {

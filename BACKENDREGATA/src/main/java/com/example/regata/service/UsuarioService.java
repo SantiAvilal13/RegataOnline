@@ -35,7 +35,12 @@ public class UsuarioService {
         
         existingUsuario.setNombre(usuario.getNombre());
         existingUsuario.setEmail(usuario.getEmail());
-        existingUsuario.setPasswordHash(usuario.getPasswordHash());
+        
+        // Solo actualizar la contraseña si se proporciona una nueva
+        if (usuario.getPasswordHash() != null && !usuario.getPasswordHash().trim().isEmpty()) {
+            existingUsuario.setPasswordHash(usuario.getPasswordHash());
+        }
+        
         existingUsuario.setRol(usuario.getRol());
         
         return usuarioRepository.save(existingUsuario);

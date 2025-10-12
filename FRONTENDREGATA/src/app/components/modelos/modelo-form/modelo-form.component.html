@@ -18,12 +18,16 @@
         type="text" 
         id="nombre"
         name="nombre"
+        #nombre="ngModel"
         [(ngModel)]="modelo().nombre"
         required
         minlength="2"
         maxlength="50"
         class="form-control"
         placeholder="Ingresa el nombre del modelo">
+      @if (nombre.invalid && nombre.touched) {
+        <div class="field-error">El nombre debe tener entre 2 y 50 caracteres y no puede estar vacío</div>
+      }
     </div>
 
     <div class="form-group">
@@ -32,10 +36,14 @@
         type="color" 
         id="colorHex"
         name="colorHex"
+        #colorHex="ngModel"
         [(ngModel)]="modelo().colorHex"
         required
         class="form-control color-input">
       <small class="form-text">Color: {{ modelo().colorHex }}</small>
+      @if (colorHex.invalid && colorHex.touched) {
+        <div class="field-error">Debe seleccionar un color</div>
+      }
     </div>
 
     <div class="form-actions">
@@ -48,7 +56,7 @@
       <button 
         type="submit" 
         class="btn btn-primary"
-        [disabled]="saving() || !modelo().isValid()">
+        [disabled]="saving() || modeloForm.invalid">
         @if (saving()) {
           Guardando...
         } @else {

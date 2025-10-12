@@ -56,9 +56,19 @@ export class UsuarioFormComponent {
   }
 
   saveUsuario() {
-    if (!this.usuario().isValid()) {
-      this.error.set('Por favor completa todos los campos requeridos');
-      return;
+    // Validación específica según el modo
+    if (this.isEditMode()) {
+
+      if (!this.usuario().nombre || !this.usuario().email || !this.usuario().rol) {
+        this.error.set('Por favor completa todos los campos requeridos');
+        return;
+      }
+    } else {
+     
+      if (!this.usuario().isValid()) {
+        this.error.set('Por favor completa todos los campos requeridos');
+        return;
+      }
     }
 
     this.saving.set(true);
@@ -71,6 +81,12 @@ export class UsuarioFormComponent {
     
     operation.subscribe({
       next: () => {
+        console.log('Confirmación de datos guardados:', {
+          nombre: usuario.nombre,
+          email: usuario.email,
+          rol: usuario.rol,
+          ...(usuario.idUsuario && { idUsuario: usuario.idUsuario })
+        });
         this.saving.set(false);
         alert(this.isEditMode() ? 'Usuario actualizado exitosamente' : 'Usuario creado exitosamente');
         this.router.navigate(['/usuarios']);
