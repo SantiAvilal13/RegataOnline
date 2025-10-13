@@ -3,7 +3,15 @@ package com.example.regata.restcontroller;
 import com.example.regata.dto.PartidaDTO;
 import com.example.regata.mapper.PartidaMapper;
 import com.example.regata.model.Partida;
+import com.example.regata.model.Usuario;
+import com.example.regata.model.Barco;
+import com.example.regata.model.Celda;
+import com.example.regata.model.Participacion;
 import com.example.regata.service.PartidaService;
+import com.example.regata.service.UsuarioService;
+import com.example.regata.service.BarcoService;
+import com.example.regata.service.CeldaService;
+import com.example.regata.service.ParticipacionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -15,6 +23,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -24,11 +33,23 @@ import java.util.stream.Collectors;
 @Tag(name = "Gestión de Partidas", description = "API para gestionar partidas del juego")
 public class PartidaRestController {
     
-    @Autowired
-    private PartidaService partidaService;
+        @Autowired
+        private PartidaService partidaService;
 
-    @Autowired
-    private PartidaMapper partidaMapper;
+        @Autowired
+        private PartidaMapper partidaMapper;
+        
+        @Autowired
+        private UsuarioService usuarioService;
+        
+        @Autowired
+        private BarcoService barcoService;
+        
+        @Autowired
+        private CeldaService celdaService;
+        
+        @Autowired
+        private ParticipacionService participacionService;
 
     @GetMapping
     @Operation(summary = "Listar todas las partidas", description = "Obtiene una lista de todas las partidas registradas")
@@ -81,6 +102,62 @@ public class PartidaRestController {
             Partida savedPartida = partidaService.save(partida);
             PartidaDTO savedPartidaDTO = partidaMapper.toDTO(savedPartida);
             return ResponseEntity.status(HttpStatus.CREATED).body(savedPartidaDTO);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @PostMapping("/crear-y-jugar")
+    @Operation(summary = "Crear partida y obtener participación", description = "Crea una nueva partida y retorna información para jugar")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Partida creada exitosamente"),
+        @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
+    })
+    public ResponseEntity<?> crearPartidaYJugar(
+            @Parameter(description = "Datos de la partida a crear", required = true) @RequestBody PartidaDTO partidaDTO) {
+        try {
+            // Crear la partida
+            Partida partida = partidaMapper.toEntity(partidaDTO);
+            Partida savedPartida = partidaService.save(partida);
+            
+            // Obtener el primer usuario disponible (JUGADOR)
+            Usuario jugador = usuarioService.findAll().stream()
+                    .filter(u -> u.getRol() == Usuario.Rol.JUGADOR)
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("No hay usuarios jugadores disponibles"));
+            
+            // Obtener el primer barco disponible del jugador
+            Barco barco = barcoService.findAll().stream()
+                    .filter(b -> b.getUsuario().getIdUsuario().equals(jugador.getIdUsuario()))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("No hay barcos disponibles para el jugador"));
+            
+            // Encontrar la celda de partida del mapa
+            Celda celdaPartida = celdaService.findByMapaAndTipo(savedPartida.getMapa(), Celda.Tipo.PARTIDA)
+                    .stream()
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("No se encontró celda de partida en el mapa"));
+            
+            // Crear participación automática
+            Participacion participacion = participacionService.crearParticipacion(
+                    savedPartida, 
+                    jugador, 
+                    barco, 
+                    celdaPartida, 
+                    1 // Primer turno
+            );
+            
+            // Cambiar estado de la partida a EN_JUEGO
+            savedPartida.iniciarPartida();
+            partidaService.save(savedPartida);
+            
+            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of(
+                "partidaId", savedPartida.getIdPartida(),
+                "participacionId", participacion.getIdParticipacion(),
+                "mapaId", savedPartida.getMapa().getIdMapa(),
+                "redirectTo", "/game/participacion/" + participacion.getIdParticipacion()
+            ));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }

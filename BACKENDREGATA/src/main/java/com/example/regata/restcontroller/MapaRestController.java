@@ -87,7 +87,6 @@ public class MapaRestController {
                         }
                         
                         Map<String, Object> response = new HashMap<>();
-                        response.put("mapa", mapa);
                         response.put("matriz", matriz);
                         response.put("filas", mapa.getTamFilas());
                         response.put("columnas", mapa.getTamColumnas());
@@ -107,9 +106,7 @@ public class MapaRestController {
                 .nombre(mapa.getNombre())
                 .tamFilas(mapa.getTamFilas())
                 .tamColumnas(mapa.getTamColumnas())
-                .celdas(mapa.getCeldas().stream()
-                    .map(this::convertirACeldaDTO)
-                    .collect(Collectors.toList()))
+                .celdas(null) // No incluir celdas para evitar referencias circulares
                 .build();
     }
     

@@ -3,7 +3,7 @@ package com.example.regata.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
- 
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "movimientos",
@@ -12,13 +12,13 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(exclude = {"participacion", "celda"})
+@EqualsAndHashCode(exclude = {"participacion", "celdaDestino"})
 public class Movimiento {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_mov")
-    private Long idMov;
+    @Column(name = "id_movimiento")
+    private Long idMovimiento;
     
     @Column(nullable = false)
     private Integer turno;
@@ -35,17 +35,20 @@ public class Movimiento {
     @Column(name = "vel_y", nullable = false)
     private Integer velY;
     
-    @Enumerated(EnumType.STRING)
     @Column(name = "delta_vx", nullable = false)
-    private DeltaVelocidad deltaVx;
+    private Integer deltaVx;
+    
+    @Column(name = "delta_vy", nullable = false)
+    private Integer deltaVy;
     
     @Enumerated(EnumType.STRING)
-    @Column(name = "delta_vy", nullable = false)
-    private DeltaVelocidad deltaVy;
-    
     @Column(nullable = false)
     @Builder.Default
-    private Boolean colision = false;
+    private Resultado resultado = Resultado.OK;
+    
+    @Column(name = "fecha_movimiento")
+    @Builder.Default
+    private LocalDateTime fechaMovimiento = LocalDateTime.now();
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_participacion", nullable = false)
@@ -53,22 +56,45 @@ public class Movimiento {
     private Participacion participacion;
     
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id_celda")
-    private Celda celda;
+    @JoinColumn(name = "id_celda_destino")
+    private Celda celdaDestino;
     
-    // Enum para los cambios de velocidad
-    public enum DeltaVelocidad {
-        DECREMENTO(-1), MANTENER(0), INCREMENTO(1);
-        
-        private final int valor;
-        
-        DeltaVelocidad(int valor) {
-            this.valor = valor;
-        }
-        
-        public int getValor() {
-            return valor;
-        }
+    // Enum para los resultados del movimiento
+    public enum Resultado {
+        OK, COLISION_PARED, COLISION_META, FUERA_MAPA
+    }
+    
+    // Métodos de utilidad
+    public boolean fueExitoso() {
+        return Resultado.OK.equals(this.resultado);
+    }
+    
+    public boolean huboColision() {
+        return Resultado.COLISION_PARED.equals(this.resultado);
+    }
+    
+    public boolean llegoAMeta() {
+        return Resultado.COLISION_META.equals(this.resultado);
+    }
+    
+    public boolean salioDelMapa() {
+        return Resultado.FUERA_MAPA.equals(this.resultado);
+    }
+    
+    // Constructor para movimiento inicial (turno 0)
+    public static Movimiento movimientoInicial(Participacion participacion, Celda celdaInicial) {
+        return Movimiento.builder()
+                .turno(0)
+                .posX(celdaInicial.getCoordX())
+                .posY(celdaInicial.getCoordY())
+                .velX(0)
+                .velY(0)
+                .deltaVx(0)
+                .deltaVy(0)
+                .resultado(Resultado.OK)
+                .participacion(participacion)
+                .celdaDestino(celdaInicial)
+                .build();
     }
 }
 

@@ -2,26 +2,22 @@ package com.example.regata.dto;
 
 import com.example.regata.model.Participacion;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class ParticipacionDTO {
     
     private Long idParticipacion;
     
-    private Integer turnoActual;
-    
-    @NotNull(message = "La posición X es obligatoria")
-    private Integer posX;
-    
-    @NotNull(message = "La posición Y es obligatoria")
-    private Integer posY;
-    
-    private Integer velX;
-    
-    private Integer velY;
-    
     @NotNull(message = "El estado es obligatorio")
     private Participacion.Estado estado;
+    
+    @NotNull(message = "El orden de turno es obligatorio")
+    private Integer ordenTurno;
+    
+    private LocalDateTime fechaInicio;
+    
+    private LocalDateTime fechaFin;
     
     @NotNull(message = "La partida es obligatoria")
     private Long partidaId;
@@ -38,25 +34,27 @@ public class ParticipacionDTO {
     
     private String jugadorNombre;
     
+    @NotNull(message = "La celda inicial es obligatoria")
+    private Long celdaInicialId;
+    
+    private String celdaInicialInfo;
+    
     // Campos adicionales para la vista
     private List<MovimientoDTO> movimientos;
     private Long totalMovimientos;
-    private Long duracionTurnos;
     private Boolean esGanador;
     
     // Constructores
     public ParticipacionDTO() {}
     
-    public ParticipacionDTO(Long partidaId, Long barcoId, Long jugadorId, Integer posX, Integer posY) {
+    public ParticipacionDTO(Long partidaId, Long barcoId, Long jugadorId, Long celdaInicialId, Integer ordenTurno) {
         this.partidaId = partidaId;
         this.barcoId = barcoId;
         this.jugadorId = jugadorId;
-        this.posX = posX;
-        this.posY = posY;
-        this.velX = 0;
-        this.velY = 0;
-        this.turnoActual = 0;
+        this.celdaInicialId = celdaInicialId;
+        this.ordenTurno = ordenTurno;
         this.estado = Participacion.Estado.ACTIVO;
+        this.fechaInicio = LocalDateTime.now();
     }
     
     // Getters y Setters
@@ -68,44 +66,44 @@ public class ParticipacionDTO {
         this.idParticipacion = idParticipacion;
     }
     
-    public Integer getTurnoActual() {
-        return turnoActual;
+    public Integer getOrdenTurno() {
+        return ordenTurno;
     }
     
-    public void setTurnoActual(Integer turnoActual) {
-        this.turnoActual = turnoActual;
+    public void setOrdenTurno(Integer ordenTurno) {
+        this.ordenTurno = ordenTurno;
     }
     
-    public Integer getPosX() {
-        return posX;
+    public LocalDateTime getFechaInicio() {
+        return fechaInicio;
     }
     
-    public void setPosX(Integer posX) {
-        this.posX = posX;
+    public void setFechaInicio(LocalDateTime fechaInicio) {
+        this.fechaInicio = fechaInicio;
     }
     
-    public Integer getPosY() {
-        return posY;
+    public LocalDateTime getFechaFin() {
+        return fechaFin;
     }
     
-    public void setPosY(Integer posY) {
-        this.posY = posY;
+    public void setFechaFin(LocalDateTime fechaFin) {
+        this.fechaFin = fechaFin;
     }
     
-    public Integer getVelX() {
-        return velX;
+    public Long getCeldaInicialId() {
+        return celdaInicialId;
     }
     
-    public void setVelX(Integer velX) {
-        this.velX = velX;
+    public void setCeldaInicialId(Long celdaInicialId) {
+        this.celdaInicialId = celdaInicialId;
     }
     
-    public Integer getVelY() {
-        return velY;
+    public String getCeldaInicialInfo() {
+        return celdaInicialInfo;
     }
     
-    public void setVelY(Integer velY) {
-        this.velY = velY;
+    public void setCeldaInicialInfo(String celdaInicialInfo) {
+        this.celdaInicialInfo = celdaInicialInfo;
     }
     
     public Participacion.Estado getEstado() {
@@ -180,14 +178,6 @@ public class ParticipacionDTO {
         this.totalMovimientos = totalMovimientos;
     }
     
-    public Long getDuracionTurnos() {
-        return duracionTurnos;
-    }
-    
-    public void setDuracionTurnos(Long duracionTurnos) {
-        this.duracionTurnos = duracionTurnos;
-    }
-    
     public Boolean getEsGanador() {
         return esGanador;
     }
@@ -213,24 +203,14 @@ public class ParticipacionDTO {
         return estado != null ? estado.name() : "";
     }
     
-    public String getPosicion() {
-        return posX != null && posY != null ? "(" + posX + "," + posY + ")" : "(0,0)";
-    }
-    
-    public String getVelocidad() {
-        return velX != null && velY != null ? "(" + velX + "," + velY + ")" : "(0,0)";
-    }
-    
     @Override
     public String toString() {
         return "ParticipacionDTO{" +
                 "idParticipacion=" + idParticipacion +
-                ", turnoActual=" + turnoActual +
-                ", posX=" + posX +
-                ", posY=" + posY +
-                ", velX=" + velX +
-                ", velY=" + velY +
+                ", ordenTurno=" + ordenTurno +
                 ", estado=" + estado +
+                ", fechaInicio=" + fechaInicio +
+                ", fechaFin=" + fechaFin +
                 ", jugadorNombre='" + jugadorNombre + '\'' +
                 ", barcoAlias='" + barcoAlias + '\'' +
                 '}';

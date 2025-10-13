@@ -53,22 +53,24 @@ public interface ParticipacionRepository extends JpaRepository<Participacion, Lo
     Optional<Participacion> findByPartidaIdAndBarcoId(@Param("partidaId") Long partidaId, 
                                                      @Param("barcoId") Long barcoId);
     
-    // Buscar participaciones por posición
-    @Query("SELECT p FROM Participacion p WHERE p.partida.idPartida = :partidaId AND p.posX = :posX AND p.posY = :posY")
-    List<Participacion> findByPartidaIdAndPosicion(@Param("partidaId") Long partidaId, 
-                                                  @Param("posX") Integer posX, 
-                                                  @Param("posY") Integer posY);
-    
-    // Buscar participaciones ordenadas por turno actual
-    @Query("SELECT p FROM Participacion p WHERE p.partida.idPartida = :partidaId ORDER BY p.turnoActual ASC")
-    List<Participacion> findByPartidaIdOrderByTurnoActualAsc(@Param("partidaId") Long partidaId);
+    // Buscar participaciones ordenadas por orden de turno
+    @Query("SELECT p FROM Participacion p WHERE p.partida.idPartida = :partidaId ORDER BY p.ordenTurno ASC")
+    List<Participacion> findByPartidaIdOrderByOrdenTurnoAsc(@Param("partidaId") Long partidaId);
     
     // Contar participaciones por estado en una partida
     @Query("SELECT COUNT(p) FROM Participacion p WHERE p.partida.idPartida = :partidaId AND p.estado = :estado")
     Long countByPartidaIdAndEstado(@Param("partidaId") Long partidaId, @Param("estado") Participacion.Estado estado);
     
     // Buscar participaciones que llegaron a la meta
-    @Query("SELECT p FROM Participacion p WHERE p.partida.idPartida = :partidaId AND p.estado = 'EN_META' ORDER BY p.turnoActual ASC")
+    @Query("SELECT p FROM Participacion p WHERE p.partida.idPartida = :partidaId AND p.estado = 'EN_META' ORDER BY p.fechaFin ASC")
     List<Participacion> findParticipacionesEnMetaByPartidaId(@Param("partidaId") Long partidaId);
+    
+    // Verificar si existe participación para un jugador en una partida
+    @Query("SELECT COUNT(p) > 0 FROM Participacion p WHERE p.partida.idPartida = :partidaId AND p.jugador.idUsuario = :usuarioId")
+    boolean existsByPartidaIdAndJugadorId(@Param("partidaId") Long partidaId, @Param("usuarioId") Long usuarioId);
+    
+    // Verificar si existe participación para un barco en una partida
+    @Query("SELECT COUNT(p) > 0 FROM Participacion p WHERE p.partida.idPartida = :partidaId AND p.barco.idBarco = :barcoId")
+    boolean existsByPartidaIdAndBarcoId(@Param("partidaId") Long partidaId, @Param("barcoId") Long barcoId);
 }
 

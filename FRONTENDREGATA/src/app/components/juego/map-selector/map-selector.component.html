@@ -1,0 +1,41 @@
+<div class="map-selector-container">
+  <h2>Seleccionar Mapa</h2>
+  
+  @if (loading()) {
+    <div class="loading">Cargando mapas...</div>
+  }
+
+  @if (error()) {
+    <div class="error">{{ error() }}</div>
+  }
+
+  @if (mapas().length > 0 && !loading()) {
+    <div class="mapas-grid">
+      @for (mapa of mapas(); track mapa.idMapa) {
+        <div class="mapa-card" (click)="seleccionarMapa(mapa)">
+          <div class="mapa-info">
+            <h3>{{ mapa.nombre }}</h3>
+            <p>Dimensiones: {{ mapa.getTamFilas() }} x {{ mapa.getTamColumnas() }}</p>
+            <div class="mapa-preview">
+              <div class="preview-grid" 
+                   [style.grid-template-columns]="'repeat(' + mapa.getTamColumnas() + ', 1fr)'">
+                @for (row of [].constructor(Math.min(mapa.getTamFilas(), 10)); track $index) {
+                  @for (col of [].constructor(mapa.getTamColumnas()); track $index) {
+                    <div class="preview-cell"></div>
+                  }
+                }
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-primary">Jugar</button>
+        </div>
+      }
+    </div>
+  }
+
+  @if (mapas().length === 0 && !loading()) {
+    <div class="no-maps">
+      <p>No hay mapas disponibles</p>
+    </div>
+  }
+</div>

@@ -3,6 +3,7 @@ package com.example.regata.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -15,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(exclude = {"partida", "barco", "jugador", "movimientos"})
+@EqualsAndHashCode(exclude = {"partida", "barco", "jugador", "movimientos", "celdaInicial"})
 @ToString(exclude = {"movimientos"})
 public class Participacion {
     
@@ -24,27 +25,20 @@ public class Participacion {
     @Column(name = "id_participacion")
     private Long idParticipacion;
     
-    @Column(name = "turno_actual", nullable = false)
-    @Builder.Default
-    private Integer turnoActual = 0;
-    
-    @Column(name = "pos_x", nullable = false)
-    private Integer posX;
-    
-    @Column(name = "pos_y", nullable = false)
-    private Integer posY;
-    
-    @Column(name = "vel_x", nullable = false)
-    @Builder.Default
-    private Integer velX = 0;
-    
-    @Column(name = "vel_y", nullable = false)
-    @Builder.Default
-    private Integer velY = 0;
-    
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Estado estado;
+    @Builder.Default
+    private Estado estado = Estado.ACTIVO;
+    
+    @Column(name = "orden_turno", nullable = false)
+    private Integer ordenTurno;
+    
+    @Column(name = "fecha_inicio")
+    @Builder.Default
+    private LocalDateTime fechaInicio = LocalDateTime.now();
+    
+    @Column(name = "fecha_fin")
+    private LocalDateTime fechaFin;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_partida", nullable = false)
@@ -61,6 +55,11 @@ public class Participacion {
     @NotNull(message = "El jugador es obligatorio")
     private Usuario jugador;
     
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_celda_inicial", nullable = false)
+    @NotNull(message = "La celda inicial es obligatoria")
+    private Celda celdaInicial;
+    
     @OneToMany(mappedBy = "participacion", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Movimiento> movimientos;
     
@@ -69,27 +68,27 @@ public class Participacion {
         ACTIVO, DESTRUIDO, EN_META
     }
     
-    // Métodos de negocio
-    public void avanzarTurno() {
-        this.turnoActual++;
-    }
-    
-    public void mover(Integer nuevaPosX, Integer nuevaPosY) {
-        this.posX = nuevaPosX;
-        this.posY = nuevaPosY;
-    }
-    
-    public void actualizarVelocidad(Integer nuevaVelX, Integer nuevaVelY) {
-        this.velX = nuevaVelX;
-        this.velY = nuevaVelY;
-    }
-    
+    // Métodos de negocio - solo para cambios de estado
     public void destruir() {
         this.estado = Estado.DESTRUIDO;
+        this.fechaFin = LocalDateTime.now();
     }
     
     public void llegarAMeta() {
         this.estado = Estado.EN_META;
+        this.fechaFin = LocalDateTime.now();
+    }
+    
+    public boolean estaActiva() {
+        return Estado.ACTIVO.equals(this.estado);
+    }
+    
+    public boolean estaDestruida() {
+        return Estado.DESTRUIDO.equals(this.estado);
+    }
+    
+    public boolean llegoAMeta() {
+        return Estado.EN_META.equals(this.estado);
     }
 }
 

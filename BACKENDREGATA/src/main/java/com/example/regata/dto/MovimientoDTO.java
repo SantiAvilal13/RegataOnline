@@ -2,10 +2,11 @@ package com.example.regata.dto;
 
 import com.example.regata.model.Movimiento;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDateTime;
 
 public class MovimientoDTO {
     
-    private Long idMov;
+    private Long idMovimiento;
     
     @NotNull(message = "El turno es obligatorio")
     private Integer turno;
@@ -23,28 +24,30 @@ public class MovimientoDTO {
     private Integer velY;
     
     @NotNull(message = "El cambio de velocidad X es obligatorio")
-    private Movimiento.DeltaVelocidad deltaVx;
+    private Integer deltaVx;
     
     @NotNull(message = "El cambio de velocidad Y es obligatorio")
-    private Movimiento.DeltaVelocidad deltaVy;
+    private Integer deltaVy;
     
-    private Boolean colision;
+    @NotNull(message = "El resultado es obligatorio")
+    private Movimiento.Resultado resultado;
+    
+    private LocalDateTime fechaMovimiento;
     
     @NotNull(message = "La participación es obligatoria")
     private Long participacionId;
     
     private String participacionInfo;
     
-    private Long celdaId;
+    private Long celdaDestinoId;
     
-    private String celdaInfo;
+    private String celdaDestinoInfo;
     
     // Constructores
     public MovimientoDTO() {}
     
     public MovimientoDTO(Integer turno, Integer posX, Integer posY, Integer velX, Integer velY, 
-                        Movimiento.DeltaVelocidad deltaVx, Movimiento.DeltaVelocidad deltaVy, 
-                        Long participacionId) {
+                        Integer deltaVx, Integer deltaVy, Movimiento.Resultado resultado, Long participacionId) {
         this.turno = turno;
         this.posX = posX;
         this.posY = posY;
@@ -52,17 +55,18 @@ public class MovimientoDTO {
         this.velY = velY;
         this.deltaVx = deltaVx;
         this.deltaVy = deltaVy;
+        this.resultado = resultado;
         this.participacionId = participacionId;
-        this.colision = false;
+        this.fechaMovimiento = LocalDateTime.now();
     }
     
     // Getters y Setters
-    public Long getIdMov() {
-        return idMov;
+    public Long getIdMovimiento() {
+        return idMovimiento;
     }
 
-    public void setIdMov(Long idMov) {
-        this.idMov = idMov;
+    public void setIdMovimiento(Long idMovimiento) {
+        this.idMovimiento = idMovimiento;
     }
     
     public Integer getTurno() {
@@ -105,28 +109,36 @@ public class MovimientoDTO {
         this.velY = velY;
     }
     
-    public Movimiento.DeltaVelocidad getDeltaVx() {
+    public Integer getDeltaVx() {
         return deltaVx;
     }
     
-    public void setDeltaVx(Movimiento.DeltaVelocidad deltaVx) {
+    public void setDeltaVx(Integer deltaVx) {
         this.deltaVx = deltaVx;
     }
     
-    public Movimiento.DeltaVelocidad getDeltaVy() {
+    public Integer getDeltaVy() {
         return deltaVy;
     }
     
-    public void setDeltaVy(Movimiento.DeltaVelocidad deltaVy) {
+    public void setDeltaVy(Integer deltaVy) {
         this.deltaVy = deltaVy;
     }
     
-    public Boolean getColision() {
-        return colision;
+    public Movimiento.Resultado getResultado() {
+        return resultado;
     }
     
-    public void setColision(Boolean colision) {
-        this.colision = colision;
+    public void setResultado(Movimiento.Resultado resultado) {
+        this.resultado = resultado;
+    }
+    
+    public LocalDateTime getFechaMovimiento() {
+        return fechaMovimiento;
+    }
+    
+    public void setFechaMovimiento(LocalDateTime fechaMovimiento) {
+        this.fechaMovimiento = fechaMovimiento;
     }
     
     public Long getParticipacionId() {
@@ -145,25 +157,37 @@ public class MovimientoDTO {
         this.participacionInfo = participacionInfo;
     }
     
-    public Long getCeldaId() {
-        return celdaId;
-    }
-
-    public void setCeldaId(Long celdaId) {
-        this.celdaId = celdaId;
+    public Long getCeldaDestinoId() {
+        return celdaDestinoId;
     }
     
-    public String getCeldaInfo() {
-        return celdaInfo;
+    public void setCeldaDestinoId(Long celdaDestinoId) {
+        this.celdaDestinoId = celdaDestinoId;
     }
     
-    public void setCeldaInfo(String celdaInfo) {
-        this.celdaInfo = celdaInfo;
+    public String getCeldaDestinoInfo() {
+        return celdaDestinoInfo;
+    }
+    
+    public void setCeldaDestinoInfo(String celdaDestinoInfo) {
+        this.celdaDestinoInfo = celdaDestinoInfo;
     }
     
     // Métodos de utilidad
-    public boolean tieneColision() {
-        return Boolean.TRUE.equals(this.colision);
+    public boolean fueExitoso() {
+        return Movimiento.Resultado.OK.equals(this.resultado);
+    }
+    
+    public boolean huboColision() {
+        return Movimiento.Resultado.COLISION_PARED.equals(this.resultado);
+    }
+    
+    public boolean llegoAMeta() {
+        return Movimiento.Resultado.COLISION_META.equals(this.resultado);
+    }
+    
+    public boolean salioDelMapa() {
+        return Movimiento.Resultado.FUERA_MAPA.equals(this.resultado);
     }
     
     public String getPosicion() {
@@ -176,21 +200,13 @@ public class MovimientoDTO {
     
     public String getDeltaVelocidad() {
         return deltaVx != null && deltaVy != null ? 
-               "(" + deltaVx.getValor() + "," + deltaVy.getValor() + ")" : "(0,0)";
-    }
-    
-    public String getDeltaVxDisplayName() {
-        return deltaVx != null ? deltaVx.name() : "";
-    }
-    
-    public String getDeltaVyDisplayName() {
-        return deltaVy != null ? deltaVy.name() : "";
+               "(" + deltaVx + "," + deltaVy + ")" : "(0,0)";
     }
     
     @Override
     public String toString() {
         return "MovimientoDTO{" +
-                "idMov=" + idMov +
+                "idMovimiento=" + idMovimiento +
                 ", turno=" + turno +
                 ", posX=" + posX +
                 ", posY=" + posY +
@@ -198,7 +214,7 @@ public class MovimientoDTO {
                 ", velY=" + velY +
                 ", deltaVx=" + deltaVx +
                 ", deltaVy=" + deltaVy +
-                ", colision=" + colision +
+                ", resultado=" + resultado +
                 '}';
     }
 }

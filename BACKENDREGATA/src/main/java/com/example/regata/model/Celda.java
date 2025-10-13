@@ -3,7 +3,6 @@ package com.example.regata.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import java.util.List;
 
 @Entity
 @Table(name = "celdas", 
@@ -12,8 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@EqualsAndHashCode(exclude = {"mapa", "movimientos"})
-@ToString(exclude = {"movimientos"})
+@EqualsAndHashCode(exclude = {"mapa"})
 public class Celda {
     
     @Id
@@ -36,8 +34,8 @@ public class Celda {
     @NotNull(message = "El mapa es obligatorio")
     private Mapa mapa;
     
-    @OneToMany(mappedBy = "celda", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Movimiento> movimientos;
+    // Relación eliminada - Los movimientos no están directamente asociados a celdas
+    // sino que representan el estado del barco en cada turno
     
     // Enum para los tipos de celda
     public enum Tipo {

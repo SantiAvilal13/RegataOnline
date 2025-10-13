@@ -28,6 +28,10 @@ export class PartidaService {
     return this.http.post<Partida>(environment.apiUrl + '/partidas', partida);
   }
 
+  createPartidaAndPlay(partida: Partida): Observable<any> {
+    return this.http.post<any>(environment.apiUrl + '/partidas/crear-y-jugar', partida);
+  }
+
   updatePartida(id: number, partida: Partida): Observable<Partida> {
     return this.http.put<Partida>(`${environment.apiUrl}/partidas/${id}`, partida);
   }

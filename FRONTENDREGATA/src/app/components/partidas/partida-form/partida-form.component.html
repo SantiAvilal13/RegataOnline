@@ -1,6 +1,9 @@
 <div class="partida-form">
   <div class="header">
-    <h2>{{ isEditMode() ? 'Editar Partida' : 'Crear Nueva Partida' }}</h2>
+    <h2>{{ isEditMode() ? 'Editar Partida' : 'Nueva Regata' }}</h2>
+    @if (!isEditMode()) {
+      <p>Selecciona un mapa y comienza tu aventura en la regata</p>
+    }
   </div>
 
   @if (loading()) {
@@ -13,45 +16,25 @@
 
   <form (ngSubmit)="savePartida()" #partidaForm="ngForm">
     <div class="form-group">
-      <label for="estado">Estado *</label>
+      <label for="mapa">Selecciona un Mapa *</label>
       <select 
-        id="estado"
-        name="estado"
-        #estado="ngModel"
-        [(ngModel)]="partida().estado"
-        required
-        class="form-control">
-        <option value="">Selecciona un estado</option>
-        <option value="ESPERANDO">Esperando</option>
-        <option value="EN_JUEGO">En Juego</option>
-        <option value="TERMINADA">Terminada</option>
-      </select>
-      @if (estado.invalid && estado.touched) {
-        <div class="field-error">Debe seleccionar un estado</div>
-      }
-    </div>
-
-    <div class="form-group">
-      <label for="mapaId">ID del Mapa *</label>
-      <input 
-        type="number" 
-        id="mapaId"
-        name="mapaId"
-        #mapaId="ngModel"
+        id="mapa"
+        name="mapa"
+        #mapa="ngModel"
         [(ngModel)]="partida().mapaId"
         required
-        min="1"
-        class="form-control"
-        placeholder="Ingresa el ID del mapa">
-      @if (mapaId.invalid && mapaId.touched) {
-        <div class="field-error">
-          @if (mapaId.errors?.['required']) {
-            El ID del mapa es obligatorio
-          } @else if (mapaId.errors?.['min']) {
-            El ID del mapa debe ser mayor a 0
-          }
-        </div>
+        class="form-control">
+        <option value="">Selecciona un mapa para tu regata</option>
+        @for (mapa of mapasDisponibles(); track mapa.idMapa) {
+          <option [value]="mapa.idMapa">{{ mapa.nombre }} ({{ mapa.getTamFilas() }}x{{ mapa.getTamColumnas() }})</option>
+        }
+      </select>
+      @if (mapa.invalid && mapa.touched) {
+        <div class="field-error">Debe seleccionar un mapa</div>
       }
+      <div class="form-help">
+        <small>Elige el mapa donde quieres competir. El juego comenzará automáticamente.</small>
+      </div>
     </div>
 
     <div class="form-actions">
@@ -66,9 +49,17 @@
         class="btn btn-primary"
         [disabled]="saving() || partidaForm.invalid">
         @if (saving()) {
-          Guardando...
+          @if (isEditMode()) {
+            Actualizando...
+          } @else {
+            Preparando regata...
+          }
         } @else {
-          {{ isEditMode() ? 'Actualizar' : 'Crear' }} Partida
+          @if (isEditMode()) {
+            Actualizar Partida
+          } @else {
+            🏁 Comenzar Regata
+          }
         }
       </button>
     </div>

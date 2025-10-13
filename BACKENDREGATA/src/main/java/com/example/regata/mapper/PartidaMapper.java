@@ -2,10 +2,26 @@ package com.example.regata.mapper;
 
 import com.example.regata.dto.PartidaDTO;
 import com.example.regata.model.Partida;
+import com.example.regata.model.Mapa;
+import com.example.regata.model.Usuario;
+import com.example.regata.model.Barco;
+import com.example.regata.service.MapaService;
+import com.example.regata.service.UsuarioService;
+import com.example.regata.service.BarcoService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PartidaMapper {
+
+    @Autowired
+    private MapaService mapaService;
+
+    @Autowired
+    private UsuarioService usuarioService;
+
+    @Autowired
+    private BarcoService barcoService;
 
     public PartidaDTO toDTO(Partida partida) {
         if (partida == null) {
@@ -49,9 +65,20 @@ public class PartidaMapper {
         partida.setFechaFin(dto.getFechaFin());
         partida.setEstado(dto.getEstado());
         
-        // Nota: Los objetos relacionados (mapa, ganadorUsuario, ganadorBarco) 
-        // deberían ser cargados desde el servicio usando los IDs del DTO
-        // para evitar problemas de referencias circulares
+        // Cargar el mapa si se proporciona el ID
+        if (dto.getMapaId() != null) {
+            mapaService.findById(dto.getMapaId()).ifPresent(partida::setMapa);
+        }
+        
+        // Cargar el usuario ganador si se proporciona el ID
+        if (dto.getGanadorUsuarioId() != null) {
+            usuarioService.findById(dto.getGanadorUsuarioId()).ifPresent(partida::setGanadorUsuario);
+        }
+        
+        // Cargar el barco ganador si se proporciona el ID
+        if (dto.getGanadorBarcoId() != null) {
+            barcoService.findById(dto.getGanadorBarcoId()).ifPresent(partida::setGanadorBarco);
+        }
 
         return partida;
     }

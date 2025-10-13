@@ -12,7 +12,8 @@ import { ModeloDetailComponent } from './components/modelos/modelo-detail/modelo
 import { PartidasListComponent } from './components/partidas/partidas-list/partidas-list.component';
 import { PartidaFormComponent } from './components/partidas/partida-form/partida-form.component';
 import { PartidaDetailComponent } from './components/partidas/partida-detail/partida-detail.component';
-import { GameBoardComponent } from './components/game/game-board/game-board.component';``
+import { GameBoardComponent } from './components/juego/game-board/game-board.component';
+import { MapSelectorComponent } from './components/juego/map-selector/map-selector.component';
 
 
 
@@ -43,8 +44,10 @@ export const routes: Routes = [
   { path: 'partidas/new', component: PartidaFormComponent },
   { path: 'partidas/:id', component: PartidaDetailComponent },
   
-  // Ruta de Juego
-  { path: 'game', component: GameBoardComponent },
+      // Rutas de Juego
+      { path: 'game', component: MapSelectorComponent },
+      { path: 'game/mapa/:mapaId', component: GameBoardComponent },
+      { path: 'game/participacion/:participacionId', component: GameBoardComponent },
   
   // Ruta 404
   { path: '**', redirectTo: '/home' }

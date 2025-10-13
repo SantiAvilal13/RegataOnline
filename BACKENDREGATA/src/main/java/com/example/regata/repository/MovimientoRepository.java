@@ -33,11 +33,11 @@ public interface MovimientoRepository extends JpaRepository<Movimiento, Long> {
                                                          @Param("turnoFin") Integer turnoFin);
     
     // Buscar movimientos con colisiones
-    @Query("SELECT m FROM Movimiento m WHERE m.colision = true")
+    @Query("SELECT m FROM Movimiento m WHERE m.resultado = 'COLISION_PARED'")
     List<Movimiento> findMovimientosConColision();
     
     // Buscar movimientos con colisiones en una participación específica
-    @Query("SELECT m FROM Movimiento m WHERE m.participacion.idParticipacion = :participacionId AND m.colision = true")
+    @Query("SELECT m FROM Movimiento m WHERE m.participacion.idParticipacion = :participacionId AND m.resultado = 'COLISION_PARED'")
     List<Movimiento> findMovimientosConColisionByParticipacionId(@Param("participacionId") Long participacionId);
     
     // Buscar movimientos por posición específica
@@ -47,14 +47,18 @@ public interface MovimientoRepository extends JpaRepository<Movimiento, Long> {
                                                      @Param("posX") Integer posX, 
                                                      @Param("posY") Integer posY);
     
-    // Buscar último movimiento de una participación
+    // QUERIES CLAVE: Obtener estado actual (último movimiento)
     @Query("SELECT m FROM Movimiento m WHERE m.participacion.idParticipacion = :participacionId ORDER BY m.turno DESC LIMIT 1")
-    Optional<Movimiento> findUltimoMovimientoByParticipacionId(@Param("participacionId") Long participacionId);
+    Optional<Movimiento> findUltimoMovimiento(@Param("participacionId") Long participacionId);
+    
+    // Obtener historial completo ordenado por turno
+    @Query("SELECT m FROM Movimiento m WHERE m.participacion.idParticipacion = :participacionId ORDER BY m.turno ASC")
+    List<Movimiento> findHistorialCompleto(@Param("participacionId") Long participacionId);
     
     // Buscar movimientos por cambio de velocidad específico
     @Query("SELECT m FROM Movimiento m WHERE m.deltaVx = :deltaVx AND m.deltaVy = :deltaVy")
-    List<Movimiento> findByDeltaVelocidad(@Param("deltaVx") Movimiento.DeltaVelocidad deltaVx,
-                                         @Param("deltaVy") Movimiento.DeltaVelocidad deltaVy);
+    List<Movimiento> findByDeltaVelocidad(@Param("deltaVx") Integer deltaVx,
+                                         @Param("deltaVy") Integer deltaVy);
     
     // Contar movimientos por participación
     @Query("SELECT COUNT(m) FROM Movimiento m WHERE m.participacion.idParticipacion = :participacionId")
@@ -68,7 +72,20 @@ public interface MovimientoRepository extends JpaRepository<Movimiento, Long> {
     @Query("SELECT m FROM Movimiento m WHERE m.participacion.idParticipacion = :participacionId AND " +
            "m.velX = :velX AND m.velY = :velY")
     List<Movimiento> findByParticipacionIdAndVelocidad(@Param("participacionId") Long participacionId,
-                                                      @Param("velX") Integer velX,
+                                                      @Param("velX") Integer velX, 
                                                       @Param("velY") Integer velY);
+    
+    // Buscar movimientos por resultado específico
+    @Query("SELECT m FROM Movimiento m WHERE m.resultado = :resultado")
+    List<Movimiento> findByResultado(@Param("resultado") Movimiento.Resultado resultado);
+    
+    // Buscar movimientos por resultado en una participación específica
+    @Query("SELECT m FROM Movimiento m WHERE m.participacion.idParticipacion = :participacionId AND m.resultado = :resultado")
+    List<Movimiento> findByParticipacionIdAndResultado(@Param("participacionId") Long participacionId,
+                                                      @Param("resultado") Movimiento.Resultado resultado);
+    
+    // Obtener el siguiente número de turno para una participación
+    @Query("SELECT COALESCE(MAX(m.turno), -1) + 1 FROM Movimiento m WHERE m.participacion.idParticipacion = :participacionId")
+    Integer getSiguienteTurno(@Param("participacionId") Long participacionId);
 }
 
