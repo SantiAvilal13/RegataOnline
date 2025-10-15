@@ -112,6 +112,91 @@
   100% { transform: scale(1); }
 }
 
+@keyframes pulse-danger {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.7; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Banner de resultado del juego */
+.game-result-banner {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.5s ease-in;
+}
+
+.game-result-banner.win {
+  background-color: rgba(40, 167, 69, 0.9);
+}
+
+.game-result-banner.lose {
+  background-color: rgba(220, 53, 69, 0.9);
+}
+
+.banner-content {
+  background-color: white;
+  padding: 40px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  max-width: 500px;
+  animation: slideIn 0.5s ease-out;
+}
+
+.banner-content h2 {
+  margin: 0 0 20px 0;
+  font-size: 2.5rem;
+  font-weight: bold;
+}
+
+.game-result-banner.win .banner-content h2 {
+  color: #28a745;
+}
+
+.game-result-banner.lose .banner-content h2 {
+  color: #dc3545;
+}
+
+.banner-content p {
+  margin: 0 0 30px 0;
+  font-size: 1.2rem;
+  color: #333;
+  line-height: 1.5;
+}
+
+.btn-restart {
+  font-size: 1.1rem;
+  padding: 15px 30px;
+  border-radius: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { 
+    opacity: 0;
+    transform: translateY(-50px) scale(0.8);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
 .movement-controls {
   background-color: #f8f9fa;
   padding: 20px;
@@ -294,6 +379,12 @@
   box-shadow: 0 0 15px rgba(255, 193, 7, 0.5);
 }
 
+.cell.inevitable-collision {
+  border: 3px solid #dc3545; /* Rojo para colisión inevitable */
+  box-shadow: 0 0 20px rgba(220, 53, 69, 0.7);
+  animation: pulse-danger 1s infinite;
+}
+
 .destination {
   position: absolute;
   top: 50%;
@@ -309,6 +400,16 @@
   right: 2px;
   font-size: 12px;
   opacity: 0.7;
+}
+
+.inevitable-collision-indicator {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 18px;
+  z-index: 25;
+  animation: pulse-danger 1s infinite;
 }
 
 /* Instrucciones de clic */

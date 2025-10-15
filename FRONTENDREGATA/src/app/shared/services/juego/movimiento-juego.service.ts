@@ -35,4 +35,12 @@ export class MovimientoJuegoService {
       map(movimientos => movimientos.map(movimiento => new Movimiento(movimiento)))
     );
   }
+
+  obtenerDestinosPosibles(participacionId: number): Observable<any[]> {
+    return this.http.get<any>(
+      `${environment.apiUrl}/movimientos/participacion/${participacionId}/destinos-posibles`
+    ).pipe(
+      map(response => response.destinos || [])
+    );
+  }
 }

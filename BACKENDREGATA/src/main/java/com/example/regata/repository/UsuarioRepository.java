@@ -27,4 +27,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     List<Usuario> findByRol(Usuario.Rol rol);
     
     Long countByRol(Usuario.Rol rol);
+    
+    @Query("SELECT COUNT(p) FROM Partida p WHERE p.ganadorUsuario.idUsuario = :usuarioId")
+    Long countPartidasGanadasByUsuarioId(@Param("usuarioId") Long usuarioId);
 }

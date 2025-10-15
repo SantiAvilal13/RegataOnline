@@ -42,7 +42,16 @@
               </td>
               <td>{{ partida.fechaInicio | date:'short' }}</td>
               <td>{{ partida.fechaFin | date:'short' }}</td>
-              <td>{{ partida.ganadorUsuarioNombre || 'Sin ganador' }}</td>
+              <td>
+                @if (partida.ganadorUsuarioNombre) {
+                  <div class="winner-info">
+                    <div class="winner-user">🏆 {{ partida.ganadorUsuarioNombre }}</div>
+                    <div class="winner-boat">🚢 {{ partida.ganadorBarcoAlias }}</div>
+                  </div>
+                } @else {
+                  <span class="no-winner">Sin ganador</span>
+                }
+              </td>
               <td>{{ partida.totalParticipantes || 0 }}</td>
               <td>
                 <button class="btn btn-sm btn-info" [routerLink]="['/partidas', partida.idPartida]">Ver</button>

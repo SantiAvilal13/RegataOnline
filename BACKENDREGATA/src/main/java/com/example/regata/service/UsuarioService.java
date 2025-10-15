@@ -88,4 +88,8 @@ public class UsuarioService {
     public Long countByRol(Usuario.Rol rol) {
         return usuarioRepository.countByRol(rol);
     }
+    
+    public Long countPartidasGanadasByUsuarioId(Long usuarioId) {
+        return usuarioRepository.countPartidasGanadasByUsuarioId(usuarioId);
+    }
 }

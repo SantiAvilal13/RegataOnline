@@ -1,7 +1,7 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap, map } from 'rxjs';
 import { MapaJuegoService } from '../../../shared/services/juego/mapa-juego.service';
 import { MovimientoJuegoService } from '../../../shared/services/juego/movimiento-juego.service';
@@ -19,12 +19,14 @@ export class GameBoardComponent implements OnInit {
   mapaService = inject(MapaJuegoService);
   movimientoService = inject(MovimientoJuegoService);
   route = inject(ActivatedRoute);
+  router = inject(Router);
 
       // Estados del juego
       mapa = signal<Mapa | null>(null);
       celdas = signal<Celda[]>([]);
       estadoActual = signal<Movimiento | null>(null);
       estadoAnterior = signal<Movimiento | null>(null);
+      destinosPosibles = signal<any[]>([]);
       loading = signal(false);
       error = signal<string | null>(null);
   
@@ -32,15 +34,21 @@ export class GameBoardComponent implements OnInit {
   deltaVx = signal(0);
   deltaVy = signal(0);
 
-  // Opciones de velocidad
-  velocidades = [-1, 0, 1];
+  // Opciones de velocidad - Ya no se usan, el backend calcula todo
   
   // Estado de validación
   movimientoValido = signal(true);
   mensajeValidacion = signal<string | null>(null);
+
+  // Estado del juego
+  juegoTerminado = signal(false);
+  resultadoJuego = signal<'ganado' | 'perdido' | null>(null);
   
   // Selección de casillas
   celdaSeleccionada = signal<{x: number, y: number} | null>(null);
+  
+  // Cache para optimizar rendimiento
+  private cacheSeleccionable = new Map<string, boolean>();
 
   ngOnInit() {
     this.route.params.pipe(
@@ -97,6 +105,11 @@ export class GameBoardComponent implements OnInit {
           if (movimiento.turno && movimiento.turno > 0) {
             this.cargarEstadoAnterior(movimiento.participacionId!, movimiento.turno - 1);
           }
+          // Cargar destinos posibles
+          this.cargarDestinosPosibles(movimiento.participacionId!);
+          
+          // Verificar estado del juego
+          this.verificarEstadoJuego();
         }
       },
       error: (err) => {
@@ -120,6 +133,27 @@ export class GameBoardComponent implements OnInit {
       error: (err) => {
         console.log('⚠️ Error al cargar estado anterior:', err.message);
         // No es crítico si no se puede cargar el estado anterior
+      }
+    });
+  }
+
+  cargarDestinosPosibles(participacionId: number) {
+    console.log('🎯 Cargando destinos posibles para participacionId:', participacionId);
+    this.movimientoService.obtenerDestinosPosibles(participacionId).subscribe({
+      next: (destinos) => {
+        this.destinosPosibles.set(destinos);
+        // Limpiar cache cuando se cargan nuevos destinos
+        this.cacheSeleccionable.clear();
+        console.log('🎯 Destinos posibles cargados:', destinos.length, 'opciones');
+        console.log('🎯 Destinos detalles:', destinos);
+        
+        // Debug específico para colisiones inevitables
+        const colisionesInev = destinos.filter(d => d.colisionInevitable === true);
+        console.log('💥 Colisiones inevitables encontradas:', colisionesInev);
+      },
+      error: (err) => {
+        console.log('⚠️ Error al cargar destinos posibles:', err.message);
+        this.destinosPosibles.set([]);
       }
     });
   }
@@ -218,6 +252,12 @@ export class GameBoardComponent implements OnInit {
             this.estadoActual.set(movimiento);
             this.loading.set(false);
             this.error.set(null);
+            
+            // Verificar si el juego ha terminado
+            this.verificarEstadoJuego();
+            
+            // Recargar destinos posibles para el nuevo estado
+            this.cargarDestinosPosibles(participacionId);
             // Limpiar selección después del movimiento
             this.limpiarSeleccion();
           },
@@ -279,102 +319,98 @@ export class GameBoardComponent implements OnInit {
   }
 
   esCeldaSeleccionable(x: number, y: number): boolean {
-    const estado = this.estadoActual();
-    if (!estado || !this.mapa()) {
-      return false;
-    }
-
-    // No se puede seleccionar la posición actual
-    if (estado.posX === x && estado.posY === y) {
-      return false;
-    }
-
-    // No se puede seleccionar paredes
-    const celda = this.getCelda(x, y);
-    if (celda && celda.tipo === 'PARED') {
-      return false;
-    }
-
-    // Verificar que esté dentro de los límites del mapa
-    if (x < 0 || x >= this.mapa()!.getTamFilas() || y < 0 || y >= this.mapa()!.getTamColumnas()) {
-      return false;
-    }
-
-    // Calcular el delta necesario para llegar al destino
-    const deltaX = x - estado.posX - estado.velX;
-    const deltaY = y - estado.posY - estado.velY;
+    const key = `${x},${y}`;
     
-    // Si el delta es 0,0, no es un movimiento válido (no hay cambio de velocidad)
-    if (deltaX === 0 && deltaY === 0) {
-      return false;
+    // Verificar cache primero
+    if (this.cacheSeleccionable.has(key)) {
+      return this.cacheSeleccionable.get(key)!;
     }
-
-    // Limitar delta a -1, 0, o 1 según las reglas del juego
-    const deltaVx = Math.max(-1, Math.min(1, deltaX));
-    const deltaVy = Math.max(-1, Math.min(1, deltaY));
-
-    // Calcular la nueva velocidad (puede ser cualquier valor, no limitado a [-1,1])
-    const nuevaVelX = estado.velX + deltaVx;
-    const nuevaVelY = estado.velY + deltaVy;
-
-    // NO limitar la velocidad final - solo el delta por turno está limitado a [-1,0,1]
-
-    // Calcular la posición final con la nueva velocidad
-    const nuevaPosX = estado.posX + nuevaVelX;
-    const nuevaPosY = estado.posY + nuevaVelY;
-
-    // Validar si la posición final está fuera del mapa
-    if (nuevaPosX < 0 || nuevaPosX >= this.mapa()!.getTamFilas() ||
-        nuevaPosY < 0 || nuevaPosY >= this.mapa()!.getTamColumnas()) {
-      return false;
+    
+    // Usar los destinos calculados por el backend para mayor seguridad
+    const destinos = this.destinosPosibles();
+    
+    // Buscar si esta celda está en los destinos posibles
+    const destino = destinos.find(d => d.x === x && d.y === y);
+    
+    let esSeleccionable = false;
+    if (destino) {
+      esSeleccionable = destino.valido === true;
+      // Log temporal para debuggear
+      if (destino.colisionInevitable) {
+        console.log(`🔍 DEBUG - Celda (${x},${y}) con colisión inevitable, valido: ${destino.valido}`);
+      }
     }
-
-    // Validar si la posición final es una pared
-    const celdaFinal = this.getCelda(nuevaPosX, nuevaPosY);
-    if (celdaFinal && celdaFinal.tipo === 'PARED') {
-      return false;
-    }
-
-    return true;
+    
+    // Guardar en cache
+    this.cacheSeleccionable.set(key, esSeleccionable);
+    
+    return esSeleccionable;
   }
 
-  calcularMovimientoHaciaDestino(destinoX: number, destinoY: number) {
+  esColisionInevitableEn(x: number, y: number): boolean {
+    const destinos = this.destinosPosibles();
+    const destino = destinos.find(d => d.x === x && d.y === y);
+    const esColision = destino ? destino.colisionInevitable : false;
+    
+    // Log temporal para debuggear
+    if (destino && destino.colisionInevitable) {
+      console.log(`💥 DEBUG - Celda (${x},${y}) ES colisión inevitable:`, destino);
+    }
+    
+    return esColision;
+  }
+
+  verificarEstadoJuego() {
     const estado = this.estadoActual();
-    if (!estado) {
+    if (!estado) return;
+
+    console.log('🎮 DEBUG - Verificando estado del juego:', {
+      llegoAMeta: estado.llegoAMeta,
+      colision: estado.colision,
+      salioDelMapa: estado.salioDelMapa
+    });
+
+    // Verificar si llegó a la meta
+    if (estado.llegoAMeta) {
+      console.log('🏆 DEBUG - Juego ganado!');
+      this.juegoTerminado.set(true);
+      this.resultadoJuego.set('ganado');
       return;
     }
 
-    // Según las reglas del juego:
-    // Nueva posición = Posición actual + Nueva velocidad
-    // Nueva velocidad = Velocidad actual + Delta velocidad (limitado a -1,0,1)
-    // Delta velocidad = (Destino - Posición actual - Velocidad actual)
-    
-    const deltaX = destinoX - estado.posX - estado.velX;
-    const deltaY = destinoY - estado.posY - estado.velY;
+    // Verificar si hubo colisión o salió del mapa
+    if (estado.colision || estado.salioDelMapa) {
+      console.log('💥 DEBUG - Juego perdido!', { colision: estado.colision, salioDelMapa: estado.salioDelMapa });
+      this.juegoTerminado.set(true);
+      this.resultadoJuego.set('perdido');
+      return;
+    }
 
-    console.log('🧮 Cálculo movimiento:');
-    console.log('  Estado actual: Pos(', estado.posX, ',', estado.posY, ') Vel(', estado.velX, ',', estado.velY, ')');
-    console.log('  Destino: (', destinoX, ',', destinoY, ')');
-    console.log('  Delta necesario: (', deltaX, ',', deltaY, ')');
+    // El juego continúa
+    console.log('🎮 DEBUG - Juego continúa...');
+    this.juegoTerminado.set(false);
+    this.resultadoJuego.set(null);
+  }
 
-    // Limitar delta a -1, 0, o 1 según las reglas del juego
-    const deltaVx = Math.max(-1, Math.min(1, deltaX));
-    const deltaVy = Math.max(-1, Math.min(1, deltaY));
+  reiniciarJuego() {
+    // Navegar de vuelta al selector de mapas
+    this.router.navigate(['/game']);
+  }
+
+  calcularMovimientoHaciaDestino(destinoX: number, destinoY: number) {
+    // Buscar el destino en la lista de destinos posibles del backend
+    const destinos = this.destinosPosibles();
+    const destino = destinos.find(d => d.x === destinoX && d.y === destinoY);
     
-    console.log('  Delta limitado: (', deltaVx, ',', deltaVy, ')');
-    
-    // Calcular posición final con el delta limitado
-    const nuevaVelX = estado.velX + deltaVx;
-    const nuevaVelY = estado.velY + deltaVy;
-    const posFinalX = estado.posX + nuevaVelX;
-    const posFinalY = estado.posY + nuevaVelY;
-    
-    console.log('  ✅ Nueva velocidad: (', nuevaVelX, ',', nuevaVelY, ') - ¡PUEDE SER MAYOR QUE 1!');
-    console.log('  🎯 Posición final: (', posFinalX, ',', posFinalY, ')');
-    console.log('  📏 Diferencia con destino: (', destinoX - posFinalX, ',', destinoY - posFinalY, ')');
-    
-    this.deltaVx.set(deltaVx);
-    this.deltaVy.set(deltaVy);
+    if (destino) {
+      console.log('🎯 Destino encontrado en backend:', destino);
+      this.deltaVx.set(destino.deltaVx);
+      this.deltaVy.set(destino.deltaVy);
+    } else {
+      console.log('❌ Destino no válido según el backend');
+      this.deltaVx.set(0);
+      this.deltaVy.set(0);
+    }
   }
 
   getDestinoPreview(): string {
@@ -383,39 +419,38 @@ export class GameBoardComponent implements OnInit {
       return "Sin destino seleccionado";
     }
 
-    const estado = this.estadoActual();
-    if (!estado) {
-      return `Destino: (${seleccionada.x}, ${seleccionada.y})`;
-    }
-
-    // Calcular delta según las reglas correctas
-    const deltaX = seleccionada.x - estado.posX - estado.velX;
-    const deltaY = seleccionada.y - estado.posY - estado.velY;
-
-    // Limitar delta a -1, 0, o 1 según las reglas del juego
-    const deltaVx = Math.max(-1, Math.min(1, deltaX));
-    const deltaVy = Math.max(-1, Math.min(1, deltaY));
-
-    // Calcular posición final
-    const nuevaVelX = estado.velX + deltaVx;
-    const nuevaVelY = estado.velY + deltaVy;
-    const posFinalX = estado.posX + nuevaVelX;
-    const posFinalY = estado.posY + nuevaVelY;
-
-    let direccion = "";
-    if (deltaVy < 0) direccion += "Arriba";
-    if (deltaVy > 0) direccion += "Abajo";
-    if (deltaVx < 0) direccion += (direccion ? "-" : "") + "Izquierda";
-    if (deltaVx > 0) direccion += (direccion ? "-" : "") + "Derecha";
-
-    // Mostrar información detallada
-    const diferenciaX = seleccionada.x - posFinalX;
-    const diferenciaY = seleccionada.y - posFinalY;
+    // Buscar el destino en la lista de destinos posibles del backend
+    const destinos = this.destinosPosibles();
+    const destino = destinos.find(d => d.x === seleccionada.x && d.y === seleccionada.y);
     
-    if (diferenciaX === 0 && diferenciaY === 0) {
-      return `✅ Llegarás exactamente a (${seleccionada.x}, ${seleccionada.y}) - Velocidad: (${estado.velX},${estado.velY}) → (${nuevaVelX},${nuevaVelY})`;
+    if (destino) {
+      const estado = this.estadoActual();
+      if (!estado) {
+        return `Destino: (${seleccionada.x}, ${seleccionada.y})`;
+      }
+      
+      // Verificar si es una colisión inevitable
+      if (destino.colisionInevitable) {
+        return `💥 COLISIÓN INEVITABLE - Chocarás con una pared en (${destino.x}, ${destino.y}) - La velocidad actual (${estado.velX},${estado.velY}) te llevará directamente a una pared`;
+      }
+      
+      let direccion = "";
+      if (destino.deltaVy < 0) direccion += "Arriba";
+      if (destino.deltaVy > 0) direccion += "Abajo";
+      if (destino.deltaVx < 0) direccion += (direccion ? "-" : "") + "Izquierda";
+      if (destino.deltaVx > 0) direccion += (direccion ? "-" : "") + "Derecha";
+      
+      let mensaje = `✅ Llegarás exactamente a (${destino.x}, ${destino.y})`;
+      mensaje += ` - Velocidad: (${estado.velX},${estado.velY}) → (${destino.nuevaVelX},${destino.nuevaVelY})`;
+      mensaje += ` - Cambio: ${direccion || "Mantener"}`;
+      
+      if (destino.esMeta) {
+        mensaje += " 🏁 ¡META!";
+      }
+      
+      return mensaje;
     } else {
-      return `🎯 Te acercarás a (${seleccionada.x}, ${seleccionada.y}) - Llegarás a (${posFinalX}, ${posFinalY}) - Velocidad: (${estado.velX},${estado.velY}) → (${nuevaVelX},${nuevaVelY}) - Quedarán (${diferenciaX}, ${diferenciaY}) casillas`;
+      return "❌ Destino no válido según las reglas del juego";
     }
   }
 
@@ -429,15 +464,19 @@ export class GameBoardComponent implements OnInit {
       return `Tu barco está aquí - (${x}, ${y})`;
     }
 
+    // Verificar si es una colisión inevitable
+    const destinos = this.destinosPosibles();
+    const destino = destinos.find(d => d.x === x && d.y === y);
+    
+    if (destino && destino.colisionInevitable) {
+      return `💥 COLISIÓN INEVITABLE - (${x}, ${y}) - Chocarás aquí con la velocidad actual`;
+    }
+
     if (tipo === 'PARED') {
       return `Pared - (${x}, ${y}) - No navegable`;
     }
 
     if (this.esCeldaSeleccionable(x, y)) {
-      // Calcular delta según las reglas correctas
-      const deltaX = x - estado.posX - estado.velX;
-      const deltaY = y - estado.posY - estado.velY;
-      
       return `Destino posible - (${x}, ${y}) - Clic para navegar aquí`;
     }
 
@@ -445,39 +484,25 @@ export class GameBoardComponent implements OnInit {
   }
 
   validarMovimiento() {
-    const estado = this.estadoActual();
-    if (!estado || !this.mapa()) {
+    // La validación ahora se hace completamente en el backend
+    // Solo validamos que hay un destino seleccionado
+    const seleccionada = this.celdaSeleccionada();
+    if (!seleccionada) {
+      this.movimientoValido.set(false);
+      this.mensajeValidacion.set("⚠️ Selecciona un destino primero");
+      return;
+    }
+
+    // Si hay un destino seleccionado y está en la lista de destinos válidos del backend, es válido
+    const destinos = this.destinosPosibles();
+    const destinoValido = destinos.some(d => d.x === seleccionada.x && d.y === seleccionada.y);
+    
+    if (destinoValido) {
       this.movimientoValido.set(true);
       this.mensajeValidacion.set(null);
-      return;
-    }
-
-    // Según las reglas del juego:
-    // Nueva velocidad = Velocidad actual + Delta velocidad
-    // Nueva posición = Posición actual + Nueva velocidad
-    const nuevaVelX = estado.velX + this.deltaVx();
-    const nuevaVelY = estado.velY + this.deltaVy();
-    const nuevaPosX = estado.posX + nuevaVelX;
-    const nuevaPosY = estado.posY + nuevaVelY;
-    
-    // Validar límites del mapa
-    if (nuevaPosX < 0 || nuevaPosX >= this.mapa()!.getTamFilas() || 
-        nuevaPosY < 0 || nuevaPosY >= this.mapa()!.getTamColumnas()) {
+    } else {
       this.movimientoValido.set(false);
-      this.mensajeValidacion.set("⚠️ Te saldrías del mapa con este movimiento");
-      return;
+      this.mensajeValidacion.set("⚠️ Destino no válido según las reglas del juego");
     }
-
-    // Validar si la nueva posición es una pared
-    const nuevaCelda = this.getCelda(nuevaPosX, nuevaPosY);
-    if (nuevaCelda && nuevaCelda.tipo === 'PARED') {
-      this.movimientoValido.set(false);
-      this.mensajeValidacion.set("⚠️ Chocarías con una pared");
-      return;
-    }
-
-    // Movimiento válido
-    this.movimientoValido.set(true);
-    this.mensajeValidacion.set(null);
   }
 }

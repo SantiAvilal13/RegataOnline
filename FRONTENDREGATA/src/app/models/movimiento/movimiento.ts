@@ -10,6 +10,8 @@ export class Movimiento {
   deltaVx: DeltaVelocidad = DeltaVelocidad.MANTENER;
   deltaVy: DeltaVelocidad = DeltaVelocidad.MANTENER;
   colision?: boolean;
+  llegoAMeta?: boolean;
+  salioDelMapa?: boolean;
   participacionId: number = 0;
   participacionInfo?: string;
   celdaId?: number;
@@ -88,6 +90,8 @@ export class Movimiento {
       deltaVx: this.deltaVx,
       deltaVy: this.deltaVy,
       colision: this.colision,
+      llegoAMeta: this.llegoAMeta,
+      salioDelMapa: this.salioDelMapa,
       participacionId: this.participacionId,
       participacionInfo: this.participacionInfo,
       celdaId: this.celdaId,
@@ -107,6 +111,8 @@ export class Movimiento {
       deltaVx: dto.deltaVx,
       deltaVy: dto.deltaVy,
       colision: dto.colision,
+      llegoAMeta: dto.llegoAMeta,
+      salioDelMapa: dto.salioDelMapa,
       participacionId: dto.participacionId,
       participacionInfo: dto.participacionInfo,
       celdaId: dto.celdaId,
@@ -126,6 +132,8 @@ export class Movimiento {
       deltaVx: this.deltaVx,
       deltaVy: this.deltaVy,
       colision: this.colision,
+      llegoAMeta: this.llegoAMeta,
+      salioDelMapa: this.salioDelMapa,
       participacionId: this.participacionId,
       celdaId: this.celdaId
     };

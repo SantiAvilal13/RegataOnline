@@ -5,16 +5,20 @@ import com.example.regata.model.Movimiento;
 import com.example.regata.model.Participacion;
 import com.example.regata.model.Celda;
 import com.example.regata.model.Mapa;
+import com.example.regata.model.Partida;
 import com.example.regata.repository.MovimientoRepository;
 import com.example.regata.repository.ParticipacionRepository;
 import com.example.regata.repository.CeldaRepository;
 import com.example.regata.service.MovimientoService;
+import com.example.regata.service.PartidaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.HashMap;
 
 @Service
 @Transactional
@@ -28,6 +32,9 @@ public class MovimientoServiceImpl implements MovimientoService {
     
     @Autowired
     private CeldaRepository celdaRepository;
+    
+    @Autowired
+    private PartidaService partidaService;
     
     @Override
     @Transactional(readOnly = true)
@@ -265,6 +272,15 @@ public class MovimientoServiceImpl implements MovimientoService {
         } else if (resultado == Movimiento.Resultado.COLISION_META) {
             participacion.llegarAMeta();
             participacionRepository.save(participacion);
+            
+            // ¡VICTORIA! Terminar la partida con el ganador
+            Partida partida = participacion.getPartida();
+            partida.terminarPartida(participacion.getJugador(), participacion.getBarco());
+            partidaService.save(partida);
+            
+            System.out.println("🏆 VICTORIA! Jugador " + participacion.getJugador().getNombre() + 
+                             " con barco " + participacion.getBarco().getAlias() + 
+                             " ganó la partida " + partida.getIdPartida());
         }
         
         return nuevoMovimiento;
@@ -276,9 +292,137 @@ public class MovimientoServiceImpl implements MovimientoService {
         return movimientoRepository.getSiguienteTurno(participacionId);
     }
     
-    @Override
-    @Transactional(readOnly = true)
-    public Long countByParticipacionId(Long participacionId) {
-        return movimientoRepository.countByParticipacionId(participacionId);
+        @Override
+        @Transactional(readOnly = true)
+        public Long countByParticipacionId(Long participacionId) {
+            return movimientoRepository.countByParticipacionId(participacionId);
+        }
+        
+        @Override
+        @Transactional(readOnly = true)
+        public List<Map<String, Object>> obtenerDestinosPosibles(Long participacionId) {
+            System.out.println("🎯 DEBUG - Calculando destinos posibles para participacionId=" + participacionId);
+            
+            // Obtener la participación
+            Participacion participacion = participacionRepository.findById(participacionId)
+                    .orElseThrow(() -> new GameException("No se encontró la participación con ID: " + participacionId));
+            
+            // Obtener el estado actual
+            Optional<Movimiento> estadoActualOpt = obtenerEstadoActual(participacionId);
+            Movimiento estadoActual = estadoActualOpt
+                    .orElseThrow(() -> new GameException("No se encontró el estado actual de la participación"));
+            
+            // Obtener el mapa
+            Mapa mapa = participacion.getPartida().getMapa();
+            
+            List<Map<String, Object>> destinos = new java.util.ArrayList<>();
+            boolean colisionInevitable = true; // Asumimos colisión inevitable hasta probar lo contrario
+            
+            // Calcular todos los destinos posibles considerando los límites de delta [-1,0,1]
+            for (int deltaVx = -1; deltaVx <= 1; deltaVx++) {
+                for (int deltaVy = -1; deltaVy <= 1; deltaVy++) {
+                    // Calcular nueva velocidad
+                    int nuevaVelX = estadoActual.getVelX() + deltaVx;
+                    int nuevaVelY = estadoActual.getVelY() + deltaVy;
+                    
+                    // Calcular nueva posición
+                    int nuevaPosX = estadoActual.getPosX() + nuevaVelX;
+                    int nuevaPosY = estadoActual.getPosY() + nuevaVelY;
+                    
+                    // Validar límites del mapa
+                    if (nuevaPosX < 0 || nuevaPosX >= mapa.getTamFilas() || 
+                        nuevaPosY < 0 || nuevaPosY >= mapa.getTamColumnas()) {
+                        continue; // Fuera del mapa
+                    }
+                    
+                    // Buscar la celda destino
+                    Optional<Celda> celdaDestino = celdaRepository.findByMapaAndCoordXAndCoordY(mapa, nuevaPosX, nuevaPosY);
+                    
+                    if (celdaDestino.isPresent()) {
+                        Celda celda = celdaDestino.get();
+                        
+                        // Si encontramos al menos un destino válido (no pared), no hay colisión inevitable
+                        if (celda.getTipo() != Celda.Tipo.PARED) {
+                            colisionInevitable = false;
+                            
+                            // Crear información del destino
+                            Map<String, Object> destino = new HashMap<>();
+                            destino.put("x", nuevaPosX);
+                            destino.put("y", nuevaPosY);
+                            destino.put("deltaVx", deltaVx);
+                            destino.put("deltaVy", deltaVy);
+                            destino.put("nuevaVelX", nuevaVelX);
+                            destino.put("nuevaVelY", nuevaVelY);
+                            destino.put("tipo", celda.getTipo().name());
+                            destino.put("valido", true);
+                            
+                            // Determinar si es un movimiento especial
+                            if (celda.getTipo() == Celda.Tipo.META) {
+                                destino.put("esMeta", true);
+                            } else {
+                                destino.put("esMeta", false);
+                            }
+                            
+                            destinos.add(destino);
+                        }
+                    }
+                }
+            }
+            
+            // Si hay colisión inevitable, agregar información especial
+            if (colisionInevitable) {
+                System.out.println("💥 DEBUG - Colisión inevitable detectada para participacionId=" + participacionId);
+                
+                // Encontrar la pared más cercana donde va a chocar
+                int posColisionX = estadoActual.getPosX() + estadoActual.getVelX();
+                int posColisionY = estadoActual.getPosY() + estadoActual.getVelY();
+                
+                // Si está fuera del mapa, buscar la pared más cercana en la dirección del movimiento
+                if (posColisionX < 0 || posColisionX >= mapa.getTamFilas() || 
+                    posColisionY < 0 || posColisionY >= mapa.getTamColumnas()) {
+                    
+                    // Buscar paredes en la dirección del movimiento
+                    int velX = estadoActual.getVelX();
+                    int velY = estadoActual.getVelY();
+                    
+                    if (velX < 0) {
+                        // Moviéndose hacia la izquierda, buscar pared en x=0
+                        posColisionX = 0;
+                        posColisionY = estadoActual.getPosY();
+                    } else if (velX > 0) {
+                        // Moviéndose hacia la derecha, buscar pared en x=max
+                        posColisionX = mapa.getTamFilas() - 1;
+                        posColisionY = estadoActual.getPosY();
+                    }
+                    
+                    if (velY < 0) {
+                        // Moviéndose hacia arriba, buscar pared en y=0
+                        posColisionY = 0;
+                    } else if (velY > 0) {
+                        // Moviéndose hacia abajo, buscar pared en y=max
+                        posColisionY = mapa.getTamColumnas() - 1;
+                    }
+                }
+                
+                Map<String, Object> destinoColision = new HashMap<>();
+                destinoColision.put("x", posColisionX);
+                destinoColision.put("y", posColisionY);
+                destinoColision.put("deltaVx", 0);
+                destinoColision.put("deltaVy", 0);
+                destinoColision.put("nuevaVelX", estadoActual.getVelX());
+                destinoColision.put("nuevaVelY", estadoActual.getVelY());
+                destinoColision.put("tipo", "PARED");
+                destinoColision.put("valido", true); 
+                destinoColision.put("colisionInevitable", true);
+                destinoColision.put("esMeta", false);
+                
+                destinos.add(destinoColision);
+                
+                System.out.println("💥 DEBUG - Colisión inevitable en posición (" + posColisionX + ", " + posColisionY + ")");
+            }
+            
+            System.out.println("🎯 DEBUG - Encontrados " + destinos.size() + " destinos posibles" + 
+                             (colisionInevitable ? " (incluyendo colisión inevitable)" : ""));
+            return destinos;
+        }
     }
-}

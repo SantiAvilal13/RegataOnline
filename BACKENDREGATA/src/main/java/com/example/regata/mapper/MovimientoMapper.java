@@ -40,6 +40,11 @@ public class MovimientoMapper {
                                   movimiento.getCeldaDestino().getTipo());
         }
         
+        // Calcular propiedades booleanas para el frontend
+        dto.setColision(dto.huboColision());
+        dto.setLlegoAMeta(dto.llegoAMeta());
+        dto.setSalioDelMapa(dto.salioDelMapa());
+        
         return dto;
     }
     

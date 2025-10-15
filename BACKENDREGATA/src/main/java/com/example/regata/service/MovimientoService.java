@@ -5,6 +5,7 @@ import com.example.regata.model.Participacion;
 import com.example.regata.model.Celda;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 public interface MovimientoService {
@@ -23,6 +24,7 @@ public interface MovimientoService {
     // QUERIES CLAVE: Estado actual y historial
     Optional<Movimiento> obtenerEstadoActual(Long participacionId);
     List<Movimiento> obtenerHistorialCompleto(Long participacionId);
+    List<Map<String, Object>> obtenerDestinosPosibles(Long participacionId);
     
     // Búsquedas por resultado
     List<Movimiento> findMovimientosConColision();

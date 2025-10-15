@@ -25,6 +25,7 @@
                 @let tipo = getTipoCelda(x, y);
                 @let esSeleccionable = esCeldaSeleccionable(x, y);
                 @let esSeleccionada = celdaSeleccionada() && celdaSeleccionada()!.x === x && celdaSeleccionada()!.y === y;
+                @let esColisionInevitable = esColisionInevitableEn(x, y);
 
                 <div class="cell"
                      [style.background-color]="getColorCelda(tipo)"
@@ -35,6 +36,7 @@
                      [class.selectable]="esSeleccionable"
                      [class.selected]="esSeleccionada"
                      [class.current-position]="estadoActual() && estadoActual()!.posX === x && estadoActual()!.posY === y"
+                     [class.inevitable-collision]="esColisionInevitable"
                      (click)="seleccionarCelda(x, y)"
                      [title]="getTooltipCelda(x, y, tipo)">
 
@@ -57,8 +59,13 @@
                     <div class="destination">🎯</div>
                   }
 
+                  <!-- Indicador de colisión inevitable -->
+                  @if (esColisionInevitable) {
+                    <div class="inevitable-collision-indicator">💥</div>
+                  }
+
                   <!-- Indicador de casillas seleccionables -->
-                  @if (esSeleccionable && !esSeleccionada && !(estadoActual() && estadoActual()!.posX === x && estadoActual()!.posY === y)) {
+                  @if (esSeleccionable && !esSeleccionada && !(estadoActual() && estadoActual()!.posX === x && estadoActual()!.posY === y) && !esColisionInevitable) {
                     <div class="selectable-indicator">✨</div>
                   }
                 </div>
@@ -74,6 +81,8 @@
             
             <div class="click-instructions">
               <p>🎯 <strong>Haz clic en una casilla verde (✨) para seleccionar tu destino</strong></p>
+              <p>💥 <strong>Las casillas rojas (💥) indican colisiones inevitables</strong></p>
+              <p><small>Destinos disponibles: {{ destinosPosibles().length }} opciones</small></p>
             </div>
 
             <div class="movement-preview">
@@ -193,4 +202,22 @@
           </div>
         }
   }
+
+    <!-- Banner de victoria/derrota -->
+    @if (juegoTerminado()) {
+      <div class="game-result-banner" [class.win]="resultadoJuego() === 'ganado'" [class.lose]="resultadoJuego() === 'perdido'">
+        <div class="banner-content">
+          @if (resultadoJuego() === 'ganado') {
+            <h2>🎉 ¡FELICIDADES! ¡GANASTE! 🎉</h2>
+            <p>¡Llegaste a la meta! ¡Excelente navegación!</p>
+          } @else if (resultadoJuego() === 'perdido') {
+            <h2>💥 ¡PERDISTE! 💥</h2>
+            <p>Tu barco chocó o salió del mapa. ¡Inténtalo de nuevo!</p>
+          }
+          <button class="btn btn-primary btn-restart" (click)="reiniciarJuego()">
+            🔄 Jugar de Nuevo
+          </button>
+        </div>
+      </div>
+    }
 </div>

@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -183,6 +184,17 @@ public class MovimientoRestController {
         return ResponseEntity.ok(dtos);
     }
     
+    // ENDPOINT CLAVE: Obtener destinos posibles
+    @GetMapping("/participacion/{participacionId}/destinos-posibles")
+    public ResponseEntity<?> obtenerDestinosPosibles(@PathVariable Long participacionId) {
+        try {
+            List<Map<String, Object>> destinos = movimientoService.obtenerDestinosPosibles(participacionId);
+            return ResponseEntity.ok(Map.of("destinos", destinos));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", e.getMessage()));
+        }
+    }
+
     // ENDPOINT CLAVE: Realizar movimiento
     @PostMapping("/participacion/{participacionId}/mover")
     public ResponseEntity<MovimientoDTO> realizarMovimiento(

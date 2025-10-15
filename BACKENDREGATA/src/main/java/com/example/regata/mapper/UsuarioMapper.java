@@ -2,10 +2,15 @@ package com.example.regata.mapper;
 
 import com.example.regata.dto.UsuarioDTO;
 import com.example.regata.model.Usuario;
+import com.example.regata.service.UsuarioService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class UsuarioMapper {
+    
+    @Autowired
+    private UsuarioService usuarioService;
     
     public UsuarioDTO toDTO(Usuario usuario) {
         if (usuario == null) {
@@ -17,6 +22,10 @@ public class UsuarioMapper {
         dto.setNombre(usuario.getNombre());
         dto.setEmail(usuario.getEmail());
         dto.setRol(usuario.getRol());
+        
+        // Calcular estadísticas
+        dto.setTotalPartidasGanadas(usuarioService.countPartidasGanadasByUsuarioId(usuario.getIdUsuario()));
+        dto.setTotalBarcos(usuarioService.countBarcosByUsuarioId(usuario.getIdUsuario()));
         
         // No incluimos password por seguridad
         // No incluimos relaciones para evitar referencias circulares

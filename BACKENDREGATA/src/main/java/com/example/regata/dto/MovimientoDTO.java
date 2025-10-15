@@ -43,6 +43,11 @@ public class MovimientoDTO {
     
     private String celdaDestinoInfo;
     
+    // Propiedades calculadas para el frontend
+    private Boolean colision;
+    private Boolean llegoAMeta;
+    private Boolean salioDelMapa;
+    
     // Constructores
     public MovimientoDTO() {}
     
@@ -171,6 +176,30 @@ public class MovimientoDTO {
     
     public void setCeldaDestinoInfo(String celdaDestinoInfo) {
         this.celdaDestinoInfo = celdaDestinoInfo;
+    }
+    
+    public Boolean getColision() {
+        return colision;
+    }
+    
+    public void setColision(Boolean colision) {
+        this.colision = colision;
+    }
+    
+    public Boolean getLlegoAMeta() {
+        return llegoAMeta;
+    }
+    
+    public void setLlegoAMeta(Boolean llegoAMeta) {
+        this.llegoAMeta = llegoAMeta;
+    }
+    
+    public Boolean getSalioDelMapa() {
+        return salioDelMapa;
+    }
+    
+    public void setSalioDelMapa(Boolean salioDelMapa) {
+        this.salioDelMapa = salioDelMapa;
     }
     
     // Métodos de utilidad

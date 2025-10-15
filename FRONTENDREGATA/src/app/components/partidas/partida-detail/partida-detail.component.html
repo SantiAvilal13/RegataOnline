@@ -41,14 +41,21 @@
             <label>Total Participantes:</label>
             <span>{{ partida()!.totalParticipantes || 0 }}</span>
           </div>
-          <div class="detail-item">
-            <label>Ganador:</label>
-            <span>{{ partida()!.ganadorUsuarioNombre || 'Sin ganador' }}</span>
-          </div>
-          <div class="detail-item">
-            <label>ID Ganador (Usuario):</label>
-            <span>{{ partida()!.ganadorUsuarioId || 'N/A' }}</span>
-          </div>
+          @if (partida()!.ganadorUsuarioNombre) {
+            <div class="winner-section">
+              <h4>🏆 Ganador</h4>
+              <div class="winner-card">
+                <div class="winner-user">👤 {{ partida()!.ganadorUsuarioNombre }}</div>
+                <div class="winner-boat">🚢 {{ partida()!.ganadorBarcoAlias }}</div>
+                <div class="winner-id">ID: {{ partida()!.ganadorUsuarioId }}</div>
+              </div>
+            </div>
+          } @else {
+            <div class="detail-item">
+              <label>Ganador:</label>
+              <span class="no-winner">Sin ganador</span>
+            </div>
+          }
         </div>
 
         <div class="detail-card">
