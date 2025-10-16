@@ -1,0 +1,55 @@
+<div class="modelos-list">
+  <div class="header">
+    <h2>Lista de Modelos</h2>
+    <div>
+      <button class="btn btn-success" [routerLink]="['/modelos/new']">Nuevo Modelo</button>
+      <button class="btn btn-primary" (click)="loadModelos()">Actualizar</button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading">Cargando modelos...</div>
+  }
+
+  @if (error()) {
+    <div class="error">{{ error() }}</div>
+  }
+
+  @if (modelos().length === 0 && !loading()) {
+    <div class="no-data">No hay modelos registrados</div>
+  }
+
+  @if (modelos().length > 0) {
+    <div class="table-container">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Color</th>
+            <th>Total Barcos</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (modelo of modelos(); track modelo.idModelo) {
+            <tr>
+              <td>{{ modelo.idModelo }}</td>
+              <td>{{ modelo.nombre }}</td>
+              <td>
+                <div class="color-preview" [style.background-color]="modelo.colorHex"></div>
+                <span>{{ modelo.colorHex }}</span>
+              </td>
+              <td>{{ modelo.getCantidadBarcos() }}</td>
+              <td>
+                <button class="btn btn-sm btn-info" [routerLink]="['/modelos', modelo.idModelo]">Ver</button>
+                <button class="btn btn-sm btn-warning" [routerLink]="['/modelos', modelo.idModelo, 'edit']">Editar</button>
+                <button class="btn btn-sm btn-danger" (click)="deleteModelo(modelo.idModelo!)">Eliminar</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

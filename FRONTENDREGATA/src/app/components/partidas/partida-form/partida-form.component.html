@@ -1,0 +1,67 @@
+<div class="partida-form">
+  <div class="header">
+    <h2>{{ isEditMode() ? 'Editar Partida' : 'Nueva Regata' }}</h2>
+    @if (!isEditMode()) {
+      <p>Selecciona un mapa y comienza tu aventura en la regata</p>
+    }
+  </div>
+
+  @if (loading()) {
+    <div class="loading">Cargando datos...</div>
+  }
+
+  @if (error()) {
+    <div class="error">{{ error() }}</div>
+  }
+
+  <form (ngSubmit)="savePartida()" #partidaForm="ngForm">
+    <div class="form-group">
+      <label for="mapa">Selecciona un Mapa *</label>
+      <select 
+        id="mapa"
+        name="mapa"
+        #mapa="ngModel"
+        [(ngModel)]="partida().mapaId"
+        required
+        class="form-control">
+        <option value="">Selecciona un mapa para tu regata</option>
+        @for (mapa of mapasDisponibles(); track mapa.idMapa) {
+          <option [value]="mapa.idMapa">{{ mapa.nombre }} ({{ mapa.getTamFilas() }}x{{ mapa.getTamColumnas() }})</option>
+        }
+      </select>
+      @if (mapa.invalid && mapa.touched) {
+        <div class="field-error">Debe seleccionar un mapa</div>
+      }
+      <div class="form-help">
+        <small>Elige el mapa donde quieres competir. El juego comenzará automáticamente.</small>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button 
+        type="button" 
+        class="btn btn-secondary"
+        (click)="partidaForm.resetForm()">
+        Limpiar
+      </button>
+      <button 
+        type="submit" 
+        class="btn btn-primary"
+        [disabled]="saving() || partidaForm.invalid">
+        @if (saving()) {
+          @if (isEditMode()) {
+            Actualizando...
+          } @else {
+            Preparando regata...
+          }
+        } @else {
+          @if (isEditMode()) {
+            Actualizar Partida
+          } @else {
+            🏁 Comenzar Regata
+          }
+        }
+      </button>
+    </div>
+  </form>
+</div>

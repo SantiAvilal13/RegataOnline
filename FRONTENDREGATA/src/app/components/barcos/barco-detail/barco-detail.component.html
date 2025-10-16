@@ -1,0 +1,85 @@
+<div class="barco-detail">
+  @if (loading()) {
+    <div class="loading">Cargando barco...</div>
+  }
+
+  @if (error()) {
+    <div class="error">{{ error() }}</div>
+  }
+
+  @if (barco() && !loading()) {
+    <div class="detail-container">
+      <div class="header">
+        <h2>{{ barco()!.getDisplayName() }}</h2>
+        <div class="status-badge" [class]="barco()!.getStatusBadgeClass()">
+          {{ barco()!.getWinRateDisplay() }}
+        </div>
+      </div>
+
+      <div class="detail-grid">
+        <div class="detail-card">
+          <h3>Información Básica</h3>
+          <div class="detail-item">
+            <label>ID:</label>
+            <span>{{ barco()!.idBarco }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Alias:</label>
+            <span>{{ barco()!.alias }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Usuario:</label>
+            <span>{{ barco()!.getUsuarioNombre() }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Modelo:</label>
+            <span>{{ barco()!.getModeloNombre() }}</span>
+          </div>
+        </div>
+
+        <div class="detail-card">
+          <h3>Estadísticas</h3>
+          <div class="detail-item">
+            <label>Total Participaciones:</label>
+            <span>{{ barco()!.getTotalParticipaciones() }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Partidas Ganadas:</label>
+            <span>{{ barco()!.getPartidasGanadas() }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Porcentaje de Victorias:</label>
+            <span>{{ barco()!.getWinRate() }}%</span>
+          </div>
+          <div class="detail-item">
+            <label>Resumen:</label>
+            <span>{{ barco()!.getStatsSummary() }}</span>
+          </div>
+        </div>
+
+        <div class="detail-card">
+          <h3>Estado del Barco</h3>
+          <div class="detail-item">
+            <label>Puede ser editado:</label>
+            <span class="status" [class.status-yes]="barco()!.canBeEdited()" [class.status-no]="!barco()!.canBeEdited()">
+              {{ barco()!.canBeEdited() ? 'Sí' : 'No' }}
+            </span>
+          </div>
+          <div class="detail-item">
+            <label>Puede ser eliminado:</label>
+            <span class="status" [class.status-yes]="barco()!.canBeDeleted()" [class.status-no]="!barco()!.canBeDeleted()">
+              {{ barco()!.canBeDeleted() ? 'Sí' : 'No' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-secondary" [routerLink]="['/barcos']">Volver</button>
+        <button class="btn btn-info" [routerLink]="['/usuarios', barco()!.usuarioId]">Ver Usuario</button>
+        <button class="btn btn-info" [routerLink]="['/modelos', barco()!.modeloId]">Ver Modelo</button>
+        <button class="btn btn-warning" [routerLink]="['/barcos', barco()!.idBarco, 'edit']">Editar Barco</button>
+      </div>
+    </div>
+  }
+</div>

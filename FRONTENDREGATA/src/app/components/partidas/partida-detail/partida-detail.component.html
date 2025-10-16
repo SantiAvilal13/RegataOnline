@@ -1,0 +1,102 @@
+<div class="partida-detail">
+  @if (loading()) {
+    <div class="loading">Cargando partida...</div>
+  }
+
+  @if (error()) {
+    <div class="error">{{ error() }}</div>
+  }
+
+  @if (partida() && !loading()) {
+    <div class="detail-container">
+      <div class="header">
+        <h2>Partida #{{ partida()!.idPartida }}</h2>
+        <span class="badge badge-info">{{ partida()!.estado }}</span>
+      </div>
+
+      <div class="detail-grid">
+        <div class="detail-card">
+          <h3>Información Básica</h3>
+          <div class="detail-item">
+            <label>ID:</label>
+            <span>{{ partida()!.idPartida }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Estado:</label>
+            <span>{{ partida()!.estado }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Fecha Inicio:</label>
+            <span>{{ partida()!.fechaInicio | date:'medium' }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Fecha Fin:</label>
+            <span>{{ partida()!.fechaFin ? (partida()!.fechaFin | date:'medium') : 'Sin finalizar' }}</span>
+          </div>
+        </div>
+
+        <div class="detail-card">
+          <h3>Participantes</h3>
+          <div class="detail-item">
+            <label>Total Participantes:</label>
+            <span>{{ partida()!.totalParticipantes || 0 }}</span>
+          </div>
+          @if (partida()!.ganadorUsuarioNombre) {
+            <div class="winner-section">
+              <h4>🏆 Ganador</h4>
+              <div class="winner-card">
+                <div class="winner-user">👤 {{ partida()!.ganadorUsuarioNombre }}</div>
+                <div class="winner-boat">🚢 {{ partida()!.ganadorBarcoAlias }}</div>
+                <div class="winner-id">ID: {{ partida()!.ganadorUsuarioId }}</div>
+              </div>
+            </div>
+          } @else {
+            <div class="detail-item">
+              <label>Ganador:</label>
+              <span class="no-winner">Sin ganador</span>
+            </div>
+          }
+        </div>
+
+        <div class="detail-card">
+          <h3>Estado de la Partida</h3>
+          <div class="detail-item">
+            <label>Está Terminada:</label>
+            <span class="status" [class.status-yes]="partida()!.estaTerminada()" [class.status-no]="!partida()!.estaTerminada()">
+              {{ partida()!.estaTerminada() ? 'Sí' : 'No' }}
+            </span>
+          </div>
+          <div class="detail-item">
+            <label>Está Activa:</label>
+            <span class="status" [class.status-yes]="partida()!.esActiva()" [class.status-no]="!partida()!.esActiva()">
+              {{ partida()!.esActiva() ? 'Sí' : 'No' }}
+            </span>
+          </div>
+          <div class="detail-item">
+            <label>Está Esperando:</label>
+            <span class="status" [class.status-yes]="partida()!.estaEsperando()" [class.status-no]="!partida()!.estaEsperando()">
+              {{ partida()!.estaEsperando() ? 'Sí' : 'No' }}
+            </span>
+          </div>
+          <div class="detail-item">
+            <label>Tiene Ganador:</label>
+            <span class="status" [class.status-yes]="partida()!.ganadorUsuarioId" [class.status-no]="!partida()!.ganadorUsuarioId">
+              {{ partida()!.ganadorUsuarioId ? 'Sí' : 'No' }}
+            </span>
+          </div>
+          <div class="detail-item">
+            <label>Duración (minutos):</label>
+            <span>{{ partida()!.getDuracionMinutos() }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button class="btn btn-secondary" [routerLink]="['/partidas']">Volver</button>
+        @if (!partida()!.estaTerminada()) {
+          <button class="btn btn-success" [routerLink]="['/game']">Jugar</button>
+        }
+      </div>
+    </div>
+  }
+</div>

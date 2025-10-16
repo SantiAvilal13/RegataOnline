@@ -1,0 +1,223 @@
+<div class="game-board-container">
+  @if (loading()) {
+    <div class="loading">Cargando mapa...</div>
+  }
+
+  @if (error()) {
+    <div class="error">{{ error() }}</div>
+  }
+
+  @if (mapa() && !loading()) {
+    <div class="game-info">
+      <h2>{{ mapa()!.nombre }}</h2>
+      <div class="map-info">
+        <span>Dimensiones: {{ mapa()!.getTamFilas() }} x {{ mapa()!.getTamColumnas() }}</span>
+      </div>
+    </div>
+
+    <div class="game-board">
+      <div class="map-grid" 
+           [style.grid-template-columns]="'repeat(' + mapa()!.getTamColumnas() + ', 1fr)'"
+           [style.grid-template-rows]="'repeat(' + mapa()!.getTamFilas() + ', 1fr)'">
+        
+            @for (row of [].constructor(mapa()!.getTamFilas()); track $index; let x = $index) {
+              @for (col of [].constructor(mapa()!.getTamColumnas()); track $index; let y = $index) {
+                @let tipo = getTipoCelda(x, y);
+                @let esSeleccionable = esCeldaSeleccionable(x, y);
+                @let esSeleccionada = celdaSeleccionada() && celdaSeleccionada()!.x === x && celdaSeleccionada()!.y === y;
+                @let esColisionInevitable = esColisionInevitableEn(x, y);
+
+                <div class="cell"
+                     [style.background-color]="getColorCelda(tipo)"
+                     [class.wall]="tipo === 'PARED'"
+                     [class.start]="tipo === 'PARTIDA'"
+                     [class.goal]="tipo === 'META'"
+                     [class.water]="tipo === 'AGUA'"
+                     [class.selectable]="esSeleccionable"
+                     [class.selected]="esSeleccionada"
+                     [class.current-position]="estadoActual() && estadoActual()!.posX === x && estadoActual()!.posY === y"
+                     [class.inevitable-collision]="esColisionInevitable"
+                     (click)="seleccionarCelda(x, y)"
+                     [title]="getTooltipCelda(x, y, tipo)">
+
+                  @if (tipo !== 'AGUA') {
+                    <span class="cell-symbol">{{ getSimboloCelda(tipo) }}</span>
+                  }
+
+                  <!-- Posición anterior del barco -->
+                  @if (estadoAnterior() && estadoAnterior()!.posX === x && estadoAnterior()!.posY === y) {
+                    <div class="previous-position">📍</div>
+                  }
+
+                  <!-- Posición actual del barco -->
+                  @if (estadoActual() && estadoActual()!.posX === x && estadoActual()!.posY === y) {
+                    <div class="boat">🚢</div>
+                  }
+
+                  <!-- Indicador de destino seleccionado -->
+                  @if (esSeleccionada) {
+                    <div class="destination">🎯</div>
+                  }
+
+                  <!-- Indicador de colisión inevitable -->
+                  @if (esColisionInevitable) {
+                    <div class="inevitable-collision-indicator">💥</div>
+                  }
+
+                  <!-- Indicador de casillas seleccionables -->
+                  @if (esSeleccionable && !esSeleccionada && !(estadoActual() && estadoActual()!.posX === x && estadoActual()!.posY === y) && !esColisionInevitable) {
+                    <div class="selectable-indicator">✨</div>
+                  }
+                </div>
+              }
+            }
+      </div>
+    </div>
+
+        <!-- Controles de movimiento - Solo en modo juego activo -->
+        @if (isModoJuego()) {
+          <div class="movement-controls">
+            <h3>Controles de Movimiento</h3>
+            
+            <div class="click-instructions">
+              <p>🎯 <strong>Haz clic en una casilla verde (✨) para seleccionar tu destino</strong></p>
+              <p>💥 <strong>Las casillas rojas (💥) indican colisiones inevitables</strong></p>
+              <p><small>Destinos disponibles: {{ destinosPosibles().length }} opciones</small></p>
+            </div>
+
+            <div class="movement-preview">
+              @if (celdaSeleccionada()) {
+                <div class="preview-text">
+                  <strong>Destino seleccionado:</strong> {{ getDestinoPreview() }}
+                </div>
+                @if (mensajeValidacion()) {
+                  <div class="validation-message" 
+                       [class.valid]="movimientoValido()"
+                       [class.invalid]="!movimientoValido()">
+                    {{ mensajeValidacion() }}
+                  </div>
+                }
+              } @else {
+                <div class="preview-text no-selection">
+                  Selecciona una casilla en el mapa para moverte
+                </div>
+              }
+            </div>
+
+            <button class="btn btn-primary btn-move" 
+                    (click)="realizarMovimiento()" 
+                    [disabled]="loading() || !celdaSeleccionada() || !movimientoValido()">
+              @if (loading()) {
+                🚢 Navegando...
+              } @else {
+                🚢 Navegar a Destino
+              }
+            </button>
+
+            @if (celdaSeleccionada()) {
+              <button class="btn btn-secondary btn-clear" 
+                      (click)="limpiarSeleccion()">
+                ❌ Cancelar Selección
+              </button>
+            }
+          </div>
+
+          <!-- Estado anterior -->
+          @if (estadoAnterior()) {
+            <div class="game-status previous">
+              <h3>📜 Estado Anterior</h3>
+              <div class="status-info">
+                <div class="status-item">
+                  <strong>Posición:</strong> {{ getPosicionAnterior() }}
+                </div>
+                <div class="status-item">
+                  <strong>Velocidad:</strong> {{ getVelocidadAnterior() }}
+                </div>
+                <div class="status-item">
+                  <strong>Turno:</strong> {{ estadoAnterior()!.turno }}
+                </div>
+                <div class="status-item">
+                  <strong>Colisión:</strong> {{ estadoAnterior()!.colision ? 'Sí' : 'No' }}
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Estado actual -->
+          <div class="game-status">
+            <h3>📍 Estado Actual</h3>
+            <div class="status-info">
+              <div class="status-item">
+                <strong>Posición:</strong> {{ getPosicionActual() }}
+              </div>
+              <div class="status-item">
+                <strong>Velocidad:</strong> {{ getVelocidadActual() }}
+              </div>
+              @if (estadoActual()) {
+                <div class="status-item">
+                  <strong>Turno:</strong> {{ estadoActual()!.turno }}
+                </div>
+                <div class="status-item">
+                  <strong>Colisión:</strong> {{ estadoActual()!.colision ? 'Sí' : 'No' }}
+                </div>
+              }
+            </div>
+            
+            <!-- Información sobre velocidad acumulada -->
+            <div class="velocity-info">
+              <h4>💡 Cómo funciona la velocidad:</h4>
+              <ul>
+                <li><strong>Velocidad (0,0):</strong> Te mueves 1 casilla por turno</li>
+                <li><strong>Velocidad (1,0):</strong> Te mueves 2 casillas hacia la derecha</li>
+                <li><strong>Velocidad (3,2):</strong> Te mueves 4 casillas derecha + 3 abajo</li>
+                <li><strong>Cambio por turno:</strong> máximo ±1 por eje (la velocidad se acumula!)</li>
+                <li><strong>Estrategia:</strong> Acelera gradualmente hacia destinos lejanos</li>
+              </ul>
+              <p><em>🎯 La velocidad puede crecer indefinidamente - ¡planifica tus movimientos!</em></p>
+            </div>
+          </div>
+        } @else {
+          <!-- Modo visualización - Solo mostrar información del mapa -->
+          <div class="map-info-only">
+            <h3>Vista del Mapa</h3>
+            <p>Este es el mapa de la regata. Para jugar, crea una partida desde la sección "Partidas".</p>
+            <div class="map-legend">
+              <div class="legend-item">
+                <span class="legend-color agua"></span>
+                <span>Agua - Navegable</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-color pared"></span>
+                <span>Pared - Obstáculo</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-color partida"></span>
+                <span>P - Punto de Partida</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-color meta"></span>
+                <span>M - Meta</span>
+              </div>
+            </div>
+          </div>
+        }
+  }
+
+    <!-- Banner de victoria/derrota -->
+    @if (juegoTerminado()) {
+      <div class="game-result-banner" [class.win]="resultadoJuego() === 'ganado'" [class.lose]="resultadoJuego() === 'perdido'">
+        <div class="banner-content">
+          @if (resultadoJuego() === 'ganado') {
+            <h2>🎉 ¡FELICIDADES! ¡GANASTE! 🎉</h2>
+            <p>¡Llegaste a la meta! ¡Excelente navegación!</p>
+          } @else if (resultadoJuego() === 'perdido') {
+            <h2>💥 ¡PERDISTE! 💥</h2>
+            <p>Tu barco chocó o salió del mapa. ¡Inténtalo de nuevo!</p>
+          }
+          <button class="btn btn-primary btn-restart" (click)="reiniciarJuego()">
+            🔄 Jugar de Nuevo
+          </button>
+        </div>
+      </div>
+    }
+</div>

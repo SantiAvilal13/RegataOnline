@@ -1,0 +1,65 @@
+<div class="partidas-list">
+  <div class="header">
+    <h2>Lista de Partidas</h2>
+    <div>
+      <button class="btn btn-success" [routerLink]="['/partidas/new']">Nueva Partida</button>
+      <button class="btn btn-primary" (click)="loadPartidas()">Actualizar</button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading">Cargando partidas...</div>
+  }
+
+  @if (error()) {
+    <div class="error">{{ error() }}</div>
+  }
+
+  @if (partidas().length === 0 && !loading()) {
+    <div class="no-data">No hay partidas registradas</div>
+  }
+
+  @if (partidas().length > 0) {
+    <div class="table-container">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Estado</th>
+            <th>Fecha Inicio</th>
+            <th>Fecha Fin</th>
+            <th>Ganador</th>
+            <th>Participantes</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (partida of partidas(); track partida.idPartida) {
+            <tr>
+              <td>{{ partida.idPartida }}</td>
+              <td>
+                <span class="badge badge-info">{{ partida.estado }}</span>
+              </td>
+              <td>{{ partida.fechaInicio | date:'short' }}</td>
+              <td>{{ partida.fechaFin | date:'short' }}</td>
+              <td>
+                @if (partida.ganadorUsuarioNombre) {
+                  <div class="winner-info">
+                    <div class="winner-user">🏆 {{ partida.ganadorUsuarioNombre }}</div>
+                    <div class="winner-boat">🚢 {{ partida.ganadorBarcoAlias }}</div>
+                  </div>
+                } @else {
+                  <span class="no-winner">Sin ganador</span>
+                }
+              </td>
+              <td>{{ partida.totalParticipantes || 0 }}</td>
+              <td>
+                <button class="btn btn-sm btn-info" [routerLink]="['/partidas', partida.idPartida]">Ver</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>

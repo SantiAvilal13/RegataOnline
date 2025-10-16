@@ -1,239 +1,310 @@
-# Regata Online
+# 🚢 RegataOnline - Sistema de Regatas Online
 
-Sistema de gestión para carreras de barcos multijugador desarrollado con Spring Boot.
+## 📋 Descripción del Proyecto
 
-## Descripción
+RegataOnline es una aplicación web completa para la gestión y simulación de regatas náuticas online. El sistema permite a los usuarios crear partidas, gestionar barcos, participar en regatas virtuales y seguir el progreso de las competiciones en tiempo real.
 
-Regata Online es una aplicación web que permite gestionar jugadores, modelos de barcos y flotas completas para regatas multijugador. La aplicación implementa operaciones CRUD completas para todas las entidades principales.
+## 🏗️ Arquitectura del Sistema
 
-## Características
+El proyecto está dividido en dos aplicaciones principales:
 
-- **Gestión de Jugadores**: Crear, editar, eliminar y visualizar jugadores
-- **Gestión de Modelos**: Administrar diferentes tipos de barcos con sus características
-- **Gestión de Barcos**: Asignar barcos a jugadores con modelos específicos
-- **Interfaz Web Moderna**: Diseño responsivo con Bootstrap y Thymeleaf
-- **Base de Datos H2**: Base de datos en memoria para desarrollo
-- **Datos de Prueba**: Inicialización automática con datos de ejemplo
+- **BACKENDREGATA**: API REST desarrollada con Spring Boot
+- **FRONTENDREGATA**: Aplicación web desarrollada con Angular
 
-## Tecnologías Utilizadas
+## 🛠️ Tecnologías Utilizadas
 
+### Backend (Spring Boot)
+- **Java 17**
 - **Spring Boot 3.5.6**
-- **Spring Data JPA**
-- **Spring Web MVC**
-- **Thymeleaf**
-- **H2 Database**
-- **Bootstrap 5.3.0**
-- **Font Awesome 6.0.0**
-- **Maven**
+- **Spring Web** - Para crear APIs REST
+- **Spring Data JPA** - Para persistencia de datos
+- **Spring Security** - Para autenticación y autorización
+- **Spring Validation** - Para validación de datos
+- **H2 Database** - Base de datos en memoria para desarrollo
+- **Thymeleaf** - Motor de plantillas
+- **SpringDoc OpenAPI** - Documentación automática de API (Swagger)
+- **ModelMapper** - Mapeo entre entidades y DTOs
+- **Lombok** - Reducción de código boilerplate
+- **Maven** - Gestión de dependencias
 
-## Estructura del Proyecto
+### Frontend (Angular)
+- **Angular 20.3.0**
+- **TypeScript 5.9.2**
+- **RxJS** - Programación reactiva
+- **Angular Router** - Navegación
+- **Angular Forms** - Formularios reactivos
+- **Karma + Jasmine** - Testing
+- **npm** - Gestión de dependencias
 
+## 📁 Estructura del Proyecto
+
+### Backend Structure
 ```
-src/main/java/com/example/regata/
-├── controller/          # Controladores REST
-│   ├── BarcoController.java
-│   ├── JugadorController.java
-│   ├── ModeloController.java
-│   └── HomeController.java
-├── model/              # Entidades JPA
-│   ├── Barco.java
-│   ├── Jugador.java
-│   └── Modelo.java
-├── repository/         # Repositorios JPA
-│   ├── BarcoRepository.java
-│   ├── JugadorRepository.java
-│   └── ModeloRepository.java
-├── service/           # Servicios de negocio
-│   ├── BarcoService.java
-│   ├── JugadorService.java
-│   ├── ModeloService.java
-│   └── impl/          # Implementaciones
-├── init/              # Inicialización de datos
-│   └── DbInitializer.java
-└── RegataOnlineApplication.java
+BACKENDREGATA/
+├── src/main/java/com/example/regata/
+│   ├── RegataOnlineApplication.java          # Clase principal
+│   ├── config/                               # Configuraciones
+│   │   ├── CorsConfig.java                   # Configuración CORS
+│   │   └── RegataConfig.java                 # Configuración general
+│   ├── dto/                                  # Data Transfer Objects
+│   │   ├── BarcoDTO.java
+│   │   ├── CeldaDTO.java
+│   │   ├── EstadoActualDTO.java
+│   │   ├── MapaDTO.java
+│   │   ├── ModeloDTO.java
+│   │   ├── MovimientoDTO.java
+│   │   ├── ParticipacionDTO.java
+│   │   ├── PartidaDTO.java
+│   │   └── UsuarioDTO.java
+│   ├── exception/                            # Manejo de excepciones
+│   │   └── GameException.java
+│   ├── init/                                 # Inicialización de datos
+│   │   └── DbInitializer.java
+│   ├── mapper/                               # Mappers DTO-Entity
+│   │   ├── BarcoMapper.java
+│   │   ├── ModeloMapper.java
+│   │   ├── MovimientoMapper.java
+│   │   ├── ParticipacionMapper.java
+│   │   ├── PartidaMapper.java
+│   │   └── UsuarioMapper.java
+│   ├── model/                                # Entidades JPA
+│   │   ├── Barco.java
+│   │   ├── Celda.java
+│   │   ├── Mapa.java
+│   │   ├── Modelo.java
+│   │   ├── Movimiento.java
+│   │   ├── Participacion.java
+│   │   ├── Partida.java
+│   │   └── Usuario.java
+│   ├── repository/                           # Repositorios JPA
+│   │   ├── BarcoRepository.java
+│   │   ├── CeldaRepository.java
+│   │   ├── MapaRepository.java
+│   │   ├── ModeloRepository.java
+│   │   ├── MovimientoRepository.java
+│   │   ├── ParticipacionRepository.java
+│   │   ├── PartidaRepository.java
+│   │   └── UsuarioRepository.java
+│   ├── restcontroller/                       # Controladores REST
+│   │   ├── BarcoRestController.java
+│   │   ├── HomeRestController.java
+│   │   ├── MapaRestController.java
+│   │   ├── ModeloRestController.java
+│   │   ├── MovimientoRestController.java
+│   │   ├── ParticipacionRestController.java
+│   │   ├── PartidaRestController.java
+│   │   ├── SpaController.java
+│   │   └── UsuarioRestController.java
+│   ├── security/                             # Configuración de seguridad
+│   │   ├── CustomUserDetailsService.java
+│   │   └── WebSecurityConfig.java
+│   └── service/                              # Lógica de negocio
+│       ├── BarcoService.java
+│       ├── CeldaService.java
+│       ├── MapaService.java
+│       ├── ModeloService.java
+│       ├── MovimientoService.java
+│       ├── ParticipacionService.java
+│       ├── PartidaService.java
+│       ├── UsuarioService.java
+│       └── impl/                             # Implementaciones
+│           ├── MovimientoServiceImpl.java
+│           ├── ParticipacionServiceImpl.java
+│           └── PartidaServiceImpl.java
+└── src/main/resources/
+    ├── application.properties                # Configuración principal
+    ├── application-swagger.properties        # Configuración Swagger
+    └── static/css/
+        └── app.css                          # Estilos CSS
 ```
 
-## Instalación y Ejecución
+### Frontend Structure
+```
+FRONTENDREGATA/
+├── src/app/
+│   ├── components/                           # Componentes de la aplicación
+│   │   ├── barcos/                          # Gestión de barcos
+│   │   │   ├── barco-detail/
+│   │   │   ├── barco-form/
+│   │   │   └── barcos-list/
+│   │   ├── home/                            # Página principal
+│   │   ├── juego/                           # Componentes del juego
+│   │   │   ├── game-board/                  # Tablero de juego
+│   │   │   └── map-selector/                # Selector de mapas
+│   │   ├── layout/                          # Componentes de layout
+│   │   │   ├── footer/
+│   │   │   └── navbar/
+│   │   ├── modelos/                         # Gestión de modelos de barcos
+│   │   │   ├── modelo-detail/
+│   │   │   ├── modelo-form/
+│   │   │   └── modelos-list/
+│   │   ├── partidas/                        # Gestión de partidas
+│   │   │   ├── partida-detail/
+│   │   │   ├── partida-form/
+│   │   │   └── partidas-list/
+│   │   ├── shared/                          # Componentes compartidos
+│   │   │   ├── error/
+│   │   │   └── loading/
+│   │   └── usuarios/                        # Gestión de usuarios
+│   │       ├── usuario-detail/
+│   │       ├── usuario-form/
+│   │       └── usuarios-list/
+│   ├── models/                              # Modelos TypeScript
+│   │   ├── barco/
+│   │   ├── celda/
+│   │   ├── enums/                           # Enumeraciones
+│   │   │   ├── celda-tipo.ts
+│   │   │   ├── delta-velocidad.ts
+│   │   │   ├── participacion-estado.ts
+│   │   │   ├── partida-estado.ts
+│   │   │   └── usuario-rol.ts
+│   │   ├── mapa/
+│   │   ├── modelo/
+│   │   ├── movimiento/
+│   │   ├── participacion/
+│   │   ├── partida/
+│   │   └── usuario/
+│   ├── services/                            # Servicios utilitarios
+│   │   └── utils/
+│   └── shared/services/                     # Servicios compartidos
+│       ├── auth/                            # Autenticación
+│       ├── barcos/                          # Servicio de barcos
+│       ├── http/                            # Servicios HTTP
+│       ├── juego/                           # Lógica del juego
+│       ├── modelos/                         # Servicio de modelos
+│       ├── notifications/                   # Notificaciones
+│       ├── partidas/                        # Servicio de partidas
+│       └── usuarios/                        # Servicio de usuarios
+├── environments/                            # Configuraciones de entorno
+└── public/                                  # Archivos públicos
+```
+
+## 🚀 Funcionalidades Principales
+
+### 👥 Gestión de Usuarios
+- Registro y autenticación de usuarios
+- Perfiles de usuario con roles (ADMIN, USER)
+- Sistema de autenticación y autorización
+
+### 🚢 Gestión de Barcos y Modelos
+- Creación y edición de modelos de barcos
+- Gestión de barcos individuales
+- Configuración de características náuticas
+
+### 🗺️ Sistema de Mapas
+- Mapas de regata con celdas configurables
+- Diferentes tipos de celdas (agua, tierra, viento, etc.)
+- Sistema de coordenadas para navegación
+
+### 🏁 Gestión de Partidas
+- Creación de nuevas regatas
+- Sistema de participación en partidas
+- Estados de partida (PREPARACION, EN_CURSO, FINALIZADA)
+- Seguimiento en tiempo real
+
+### 🎮 Motor de Juego
+- Sistema de movimientos por turnos
+- Cálculo de velocidades y posiciones
+- Efectos del viento y condiciones marítimas
+- Validación de movimientos legales
+
+## 📦 Instalación y Configuración
 
 ### Prerrequisitos
+- **Java 17** o superior
+- **Node.js 18** o superior
+- **npm** o **yarn**
+- **Maven 3.6** o superior
 
-- Java 17 o superior
-- Maven 3.6 o superior
+### Configuración del Backend
 
-### Pasos para ejecutar
-
-1. **Clonar el repositorio**
+1. **Navegar al directorio del backend:**
    ```bash
-   git clone <repository-url>
-   cd RegataOnline
+   cd BACKENDREGATA
    ```
 
-2. **Compilar el proyecto**
+2. **Instalar dependencias:**
    ```bash
-   mvn clean compile
+   mvn clean install
    ```
 
-3. **Ejecutar la aplicación**
+3. **Ejecutar la aplicación:**
    ```bash
    mvn spring-boot:run
    ```
 
-4. **Acceder a la aplicación**
-   - URL: http://localhost:8080
-   - Consola H2: http://localhost:8080/h2-console
-   - JDBC URL: jdbc:h2:mem:regata
-   - Usuario: sa
-   - Contraseña: (vacía)
+4. **La API estará disponible en:**
+   - URL: `http://localhost:8080`
+   - Swagger UI: `http://localhost:8080/swagger-ui.html`
+   - H2 Console: `http://localhost:8080/h2-console`
 
-## Funcionalidades Implementadas
+### Configuración del Frontend
 
-### Jugadores
-- ✅ Listar todos los jugadores
-- ✅ Crear nuevo jugador
-- ✅ Editar jugador existente
-- ✅ Eliminar jugador
-- ✅ Ver detalle del jugador
-- ✅ Buscar jugadores por nombre
-- ✅ Validación de email único
+1. **Navegar al directorio del frontend:**
+   ```bash
+   cd FRONTENDREGATA
+   ```
 
-### Modelos de Barcos
-- ✅ Listar todos los modelos
-- ✅ Crear nuevo modelo
-- ✅ Editar modelo existente
-- ✅ Eliminar modelo
-- ✅ Ver detalle del modelo
-- ✅ Buscar modelos por nombre
-- ✅ Filtrar por características (velocidad, resistencia, maniobrabilidad)
+2. **Instalar dependencias:**
+   ```bash
+   npm install
+   ```
 
-### Barcos
-- ✅ Listar todos los barcos
-- ✅ Crear nuevo barco
-- ✅ Editar barco existente
-- ✅ Eliminar barco
-- ✅ Ver detalle del barco
-- ✅ Buscar barcos por nombre
-- ✅ Filtrar barcos por jugador
-- ✅ Filtrar barcos por modelo
-- ✅ Agregar puntos a barcos
-- ✅ Resetear estadísticas
+3. **Ejecutar en modo desarrollo:**
+   ```bash
+   npm start
+   ```
 
-## Datos de Prueba
+4. **La aplicación estará disponible en:**
+   - URL: `http://localhost:4200`
 
-La aplicación se inicializa automáticamente con:
+### Compilación para Producción
 
-- **5 Jugadores**: María García, Carlos López, Ana Martínez, Pedro Rodríguez, Laura Sánchez
-- **10 Modelos de Barcos**: Velero Clásico, Catamarán Rápido, Yate de Lujo, etc.
-- **50 Barcos**: 10 barcos por jugador, distribuidos entre los diferentes modelos
-
-## Características de la Interfaz
-
-- **Diseño Responsivo**: Adaptable a dispositivos móviles y de escritorio
-- **Navegación Intuitiva**: Menú de navegación claro y accesible
-- **Formularios Validados**: Validación tanto en cliente como en servidor
-- **Mensajes de Retroalimentación**: Alertas de éxito y error
-- **Tablas Interactivas**: Ordenamiento y búsqueda en tiempo real
-- **Estadísticas Visuales**: Gráficos de barras para comparar características
-
-## API Endpoints
-
-### Jugadores
-- `GET /jugadores` - Listar jugadores
-- `GET /jugadores/nuevo` - Formulario nuevo jugador
-- `POST /jugadores/guardar` - Crear jugador
-- `GET /jugadores/editar/{id}` - Formulario editar jugador
-- `POST /jugadores/actualizar/{id}` - Actualizar jugador
-- `GET /jugadores/eliminar/{id}` - Eliminar jugador
-- `GET /jugadores/detalle/{id}` - Ver detalle jugador
-- `GET /jugadores/buscar` - Buscar jugadores
-
-### Modelos
-- `GET /modelos` - Listar modelos
-- `GET /modelos/nuevo` - Formulario nuevo modelo
-- `POST /modelos/guardar` - Crear modelo
-- `GET /modelos/editar/{id}` - Formulario editar modelo
-- `POST /modelos/actualizar/{id}` - Actualizar modelo
-- `GET /modelos/eliminar/{id}` - Eliminar modelo
-- `GET /modelos/detalle/{id}` - Ver detalle modelo
-- `GET /modelos/buscar` - Buscar modelos
-- `GET /modelos/filtrar` - Filtrar modelos
-
-### Barcos
-- `GET /barcos` - Listar barcos
-- `GET /barcos/nuevo` - Formulario nuevo barco
-- `POST /barcos/guardar` - Crear barco
-- `GET /barcos/editar/{id}` - Formulario editar barco
-- `POST /barcos/actualizar/{id}` - Actualizar barco
-- `GET /barcos/eliminar/{id}` - Eliminar barco
-- `GET /barcos/detalle/{id}` - Ver detalle barco
-- `GET /barcos/buscar` - Buscar barcos
-- `GET /barcos/por-jugador/{id}` - Barcos por jugador
-- `GET /barcos/por-modelo/{id}` - Barcos por modelo
-- `POST /barcos/ganar-puntos/{id}` - Agregar puntos
-- `POST /barcos/resetear-estadisticas/{id}` - Resetear estadísticas
-
-## Configuración
-
-### Base de Datos
-- **Tipo**: H2 Database (en memoria)
-- **URL**: jdbc:h2:mem:regata
-- **Usuario**: sa
-- **Contraseña**: (vacía)
-- **Consola**: http://localhost:8080/h2-console
-
-### Propiedades de la Aplicación
-```properties
-spring.application.name=regata-online
-spring.datasource.url=jdbc:h2:mem:regata
-spring.jpa.hibernate.ddl-auto=create-drop
-spring.h2.console.enabled=true
+#### Backend
+```bash
+cd BACKENDREGATA
+mvn clean package
+mvn spring-boot:run
 ```
 
-## Desarrollo
+#### Frontend
+```bash
+cd FRONTENDREGATA
+ng serve
+```
 
-### Estructura MVC
-El proyecto sigue el patrón Modelo-Vista-Controlador:
+## 🔧 Configuración de Base de Datos
 
-- **Modelo**: Entidades JPA (Barco, Jugador, Modelo)
-- **Vista**: Plantillas Thymeleaf
-- **Controlador**: Controladores Spring MVC
+El proyecto utiliza **H2 Database** en memoria por defecto para desarrollo. La configuración se encuentra en:
 
-### Validaciones
-- Validación de campos obligatorios
-- Validación de formato de email
-- Validación de valores numéricos positivos
-- Validación de unicidad de email
+- `BACKENDREGATA/src/main/resources/application.properties`
 
-### Manejo de Errores
-- Mensajes de error personalizados
-- Redirección con mensajes flash
-- Validación en tiempo real
 
-## Próximas Mejoras
 
-- [ ] Sistema de autenticación y autorización
-- [ ] API REST completa
-- [ ] Sistema de carreras en tiempo real
-- [ ] Chat multijugador
-- [ ] Estadísticas avanzadas
-- [ ] Exportación de datos
-- [ ] Notificaciones push
+## 📚 API Documentation
 
-## Contribución
+La documentación de la API está disponible a través de **Swagger UI** una vez que el backend esté ejecutándose:
 
-1. Fork el proyecto
-2. Crear una rama para la nueva funcionalidad
-3. Commit los cambios
-4. Push a la rama
-5. Crear un Pull Request
+- **URL**: `http://localhost:8080/swagger-ui.html`
 
-## Licencia
+## 🧪 Testing
 
-Este proyecto está bajo la Licencia MIT. Ver el archivo LICENSE para más detalles.
+### Backend
+```bash
+cd BACKENDREGATA
+mvn test
+```
 
-## Contacto
+### Frontend
+```bash
+cd FRONTENDREGATA
+npm test
+```
 
-Para preguntas o sugerencias, contactar al equipo de desarrollo.
+## 👨‍💻 Desarrolladores
 
----
+- **Equipo RegataOnline** - Desarrollo inicial
 
-**Regata Online** - Sistema de Gestión de Carreras de Barcos Multijugador
+
+
+**¡Disfruta navegando con RegataOnline! ⛵**

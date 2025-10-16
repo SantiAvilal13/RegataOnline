@@ -1,0 +1,60 @@
+<div class="usuarios-list">
+  <div class="header">
+    <h2>Lista de Usuarios</h2>
+    <div>
+      <button class="btn btn-success" [routerLink]="['/usuarios/new']">Nuevo Usuario</button>
+      <button class="btn btn-primary" (click)="loadUsuarios()">Actualizar</button>
+    </div>
+  </div>
+
+  @if (loading()) {
+    <div class="loading">Cargando usuarios...</div>
+  }
+
+  @if (error()) {
+    <div class="error">{{ error() }}</div>
+  }
+
+  @if (usuarios().length === 0 && !loading()) {
+    <div class="no-data">No hay usuarios registrados</div>
+  }
+
+  @if (usuarios().length > 0) {
+    <div class="table-container">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Email</th>
+            <th>Rol</th>
+            <th>Partidas Ganadas</th>
+            <th>Total Barcos</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (usuario of usuarios(); track usuario.idUsuario) {
+            <tr>
+              <td>{{ usuario.idUsuario }}</td>
+              <td>{{ usuario.nombre }}</td>
+              <td>{{ usuario.email }}</td>
+              <td>
+                <span class="badge" [class.badge-admin]="usuario.esAdmin()" [class.badge-jugador]="usuario.esJugador()">
+                  {{ usuario.getRolDisplayName() }}
+                </span>
+              </td>
+              <td>{{ usuario.getTotalPartidasGanadas() }}</td>
+              <td>{{ usuario.getTotalBarcos() }}</td>
+              <td>
+                <button class="btn btn-sm btn-info" [routerLink]="['/usuarios', usuario.idUsuario]">Ver</button>
+                <button class="btn btn-sm btn-warning" [routerLink]="['/usuarios', usuario.idUsuario, 'edit']">Editar</button>
+                <button class="btn btn-sm btn-danger" (click)="deleteUsuario(usuario.idUsuario!)">Eliminar</button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</div>
