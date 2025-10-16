@@ -305,6 +305,9 @@ npm test
 
 - **Equipo RegataOnline** - Desarrollo inicial
 
+- Santiago Avila 
+- Vanesa Mayorga
+- Fernanda Rios
 
 
 **¡Disfruta navegando con RegataOnline! ⛵**
