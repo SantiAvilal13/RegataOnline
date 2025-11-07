@@ -34,10 +34,6 @@ public class Celda {
     @NotNull(message = "El mapa es obligatorio")
     private Mapa mapa;
     
-    // Relación eliminada - Los movimientos no están directamente asociados a celdas
-    // sino que representan el estado del barco en cada turno
-    
-    // Enum para los tipos de celda
     public enum Tipo {
         AGUA, PARED, PARTIDA, META
     }
