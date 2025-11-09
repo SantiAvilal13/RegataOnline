@@ -86,7 +86,7 @@ public class BarcoRestControllerIntegrationTest {
         barcoRestController.crearBarco(barco2);
     }
     
-    // Método helper para obtener el ID de un barco por su alias
+    // Método helper para obtener el ID de un barco por su alias ya que h2 los selecciona automáticamente y mejora la robustez en caso de que se agregue otro barco de test
     private Long obtenerBarcoIdPorAlias(String alias) {
         return webTestClient.get()
             .uri(SERVER_URL + "/barcos/buscar?alias=" + alias)
