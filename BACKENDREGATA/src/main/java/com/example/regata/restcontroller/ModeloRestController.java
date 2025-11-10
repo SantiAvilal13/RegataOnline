@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,6 +32,7 @@ public class ModeloRestController {
     private ModeloMapper modeloMapper;
     
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Listar todos los modelos", description = "Obtiene una lista de todos los modelos de barcos disponibles")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de modelos obtenida exitosamente"),
@@ -49,6 +51,7 @@ public class ModeloRestController {
     }
     
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ModeloDTO> obtenerModelo(@PathVariable Long id) {
         try {
             Optional<Modelo> modelo = modeloService.findById(id);
@@ -61,6 +64,7 @@ public class ModeloRestController {
     }
     
     @PostMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ModeloDTO> crearModelo(@RequestBody ModeloDTO modeloDTO) {
         try {
             Modelo modelo = modeloMapper.toEntity(modeloDTO);
@@ -73,6 +77,7 @@ public class ModeloRestController {
     }
     
     @PutMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ModeloDTO> actualizarModelo(@PathVariable Long id, @RequestBody ModeloDTO modeloDTO) {
         try {
             Modelo modelo = modeloMapper.toEntity(modeloDTO);
@@ -85,6 +90,7 @@ public class ModeloRestController {
     }
     
     @DeleteMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Void> eliminarModelo(@PathVariable Long id) {
         try {
             modeloService.deleteById(id);

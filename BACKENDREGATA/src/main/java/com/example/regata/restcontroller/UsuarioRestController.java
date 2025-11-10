@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,6 +32,7 @@ public class UsuarioRestController {
     private UsuarioMapper usuarioMapper;
     
     @GetMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     @Operation(summary = "Listar todos los usuarios", description = "Obtiene una lista de todos los usuarios registrados")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de usuarios obtenida exitosamente"),
@@ -49,6 +51,7 @@ public class UsuarioRestController {
     }
     
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<UsuarioDTO> obtenerUsuario(@PathVariable Long id) {
         try {
             Optional<Usuario> usuario = usuarioService.findById(id);
@@ -61,6 +64,7 @@ public class UsuarioRestController {
     }
     
     @PostMapping
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<UsuarioDTO> crearUsuario(@RequestBody UsuarioDTO usuarioDTO) {
         try {
             Usuario usuario = usuarioMapper.toEntity(usuarioDTO);
@@ -73,6 +77,7 @@ public class UsuarioRestController {
     }
     
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<UsuarioDTO> actualizarUsuario(@PathVariable Long id, @RequestBody UsuarioDTO usuarioDTO) {
         try {
             Usuario usuario = usuarioMapper.toEntity(usuarioDTO);
@@ -85,6 +90,7 @@ public class UsuarioRestController {
     }
     
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Void> eliminarUsuario(@PathVariable Long id) {
         try {
             usuarioService.deleteById(id);
@@ -95,6 +101,7 @@ public class UsuarioRestController {
     }
     
     @GetMapping("/buscar")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<UsuarioDTO>> buscarUsuarios(@RequestParam String nombre) {
         try {
             List<Usuario> usuarios = usuarioService.findByNombreContainingIgnoreCase(nombre);
@@ -108,6 +115,7 @@ public class UsuarioRestController {
     }
     
     @GetMapping("/rol/{rol}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<UsuarioDTO>> obtenerUsuariosPorRol(@PathVariable Usuario.Rol rol) {
         try {
             List<Usuario> usuarios = usuarioService.findByRol(rol);
@@ -121,6 +129,7 @@ public class UsuarioRestController {
     }
     
     @GetMapping("/jugadores")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<UsuarioDTO>> obtenerJugadores() {
         try {
             List<Usuario> jugadores = usuarioService.findJugadores();
@@ -134,6 +143,7 @@ public class UsuarioRestController {
     }
     
     @GetMapping("/administradores")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<List<UsuarioDTO>> obtenerAdministradores() {
         try {
             List<Usuario> administradores = usuarioService.findAdministradores();
@@ -147,6 +157,7 @@ public class UsuarioRestController {
     }
     
     @GetMapping("/email/{email}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<UsuarioDTO> obtenerUsuarioPorEmail(@PathVariable String email) {
         try {
             Optional<Usuario> usuario = usuarioService.findByEmail(email);
@@ -159,6 +170,7 @@ public class UsuarioRestController {
     }
     
     @GetMapping("/existe-email/{email}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Boolean> existeEmail(@PathVariable String email) {
         try {
             boolean existe = usuarioService.existsByEmail(email);
@@ -169,6 +181,7 @@ public class UsuarioRestController {
     }
     
     @GetMapping("/contar-por-rol/{rol}")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Long> contarUsuariosPorRol(@PathVariable Usuario.Rol rol) {
         try {
             Long count = usuarioService.countByRol(rol);

@@ -23,7 +23,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 /**
- * Configuración de seguridad siguiendo el patrón del ejemplo del profesor
+ * Configuración de seguridad 
  */
 @Configuration
 @EnableWebSecurity

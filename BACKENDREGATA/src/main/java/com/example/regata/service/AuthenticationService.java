@@ -15,7 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 /**
- * Servicio de autenticación siguiendo el patrón del ejemplo del profesor
+ * Servicio de autenticación 
  */
 @Service
 public class AuthenticationService {

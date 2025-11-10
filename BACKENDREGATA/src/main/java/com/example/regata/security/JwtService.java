@@ -37,8 +37,7 @@ public class JwtService {
     
     /**
      * Genera un token JWT con el username (email)
-     * Patrón simplificado del ejemplo del profesor
-     */
+        */
     public String generateToken(String username) {
         return Jwts
                 .builder()
