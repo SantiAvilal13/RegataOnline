@@ -38,6 +38,9 @@ public class DbInitializer implements CommandLineRunner {
     @Autowired
     private CeldaService celdaService;
     
+    @Autowired
+    private org.springframework.security.crypto.password.PasswordEncoder passwordEncoder;
+    
     @Override
     public void run(String... args) throws Exception {
         logger.info("Inicializando datos de la base de datos...");
@@ -49,35 +52,47 @@ public class DbInitializer implements CommandLineRunner {
     }
     
     private void inicializarDatos() {
-        // Crear 5 usuarios
+        logger.info("Creando usuarios con contraseñas encriptadas...");
+        
+        // Crear usuario ADMIN - Encriptando directamente como en el ejemplo del profesor
+        Usuario admin = Usuario.builder()
+                .nombre("Administrador")
+                .email("admin@regata.com")
+                .passwordHash(passwordEncoder.encode("admin123"))
+                .rol(Usuario.Rol.ADMIN)
+                .build();
+        admin = usuarioService.save(admin);
+        logger.info("Usuario ADMIN creado - Email: admin@regata.com | Password: admin123");
+        
+        // Crear usuarios JUGADORES - Encriptando directamente
         Usuario usuario1 = Usuario.builder()
                 .nombre("María García")
                 .email("maria.garcia@email.com")
-                .passwordHash("password123")
+                .passwordHash(passwordEncoder.encode("password123"))
                 .rol(Usuario.Rol.JUGADOR)
                 .build();
         Usuario usuario2 = Usuario.builder()
                 .nombre("Carlos López")
                 .email("carlos.lopez@email.com")
-                .passwordHash("password123")
+                .passwordHash(passwordEncoder.encode("password123"))
                 .rol(Usuario.Rol.JUGADOR)
                 .build();
         Usuario usuario3 = Usuario.builder()
                 .nombre("Ana Martínez")
                 .email("ana.martinez@email.com")
-                .passwordHash("password123")
+                .passwordHash(passwordEncoder.encode("password123"))
                 .rol(Usuario.Rol.JUGADOR)
                 .build();
         Usuario usuario4 = Usuario.builder()
                 .nombre("Pedro Rodríguez")
                 .email("pedro.rodriguez@email.com")
-                .passwordHash("password123")
+                .passwordHash(passwordEncoder.encode("password123"))
                 .rol(Usuario.Rol.JUGADOR)
                 .build();
         Usuario usuario5 = Usuario.builder()
                 .nombre("Laura Sánchez")
                 .email("laura.sanchez@email.com")
-                .passwordHash("password123")
+                .passwordHash(passwordEncoder.encode("password123"))
                 .rol(Usuario.Rol.JUGADOR)
                 .build();
         
@@ -86,6 +101,8 @@ public class DbInitializer implements CommandLineRunner {
         usuario3 = usuarioService.save(usuario3);
         usuario4 = usuarioService.save(usuario4);
         usuario5 = usuarioService.save(usuario5);
+        
+        logger.info("Usuarios JUGADORES creados - Email: [nombre]@email.com | Password: password123");
         
         // Crear 10 modelos de barcos
         Modelo modelo1 = Modelo.builder()

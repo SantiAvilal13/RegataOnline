@@ -4,6 +4,9 @@ import com.example.regata.exception.GameException;
 import com.example.regata.model.Usuario;
 import com.example.regata.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -91,5 +94,19 @@ public class UsuarioService {
     
     public Long countPartidasGanadasByUsuarioId(Long usuarioId) {
         return usuarioRepository.countPartidasGanadasByUsuarioId(usuarioId);
+    }
+    
+    /**
+     * Retorna un UserDetailsService para Spring Security
+     * (Patrón usado en el ejemplo del profesor)
+     */
+    public UserDetailsService userDetailsService() {
+        return new UserDetailsService() {
+            @Override
+            public UserDetails loadUserByUsername(String username) {
+                return usuarioRepository.findByEmail(username)
+                        .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado"));
+            }
+        };
     }
 }
