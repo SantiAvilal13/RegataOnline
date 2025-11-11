@@ -50,8 +50,10 @@
               </td>
               <td>
                 <button class="btn btn-sm btn-info" [routerLink]="['/barcos', barco.idBarco]">Ver</button>
-                <button class="btn btn-sm btn-warning" [routerLink]="['/barcos', barco.idBarco, 'edit']">Editar</button>
-                <button class="btn btn-sm btn-danger" (click)="deleteBarco(barco.idBarco!)">Eliminar</button>
+                @if (canEditOrDelete(barco)) {
+                  <button class="btn btn-sm btn-warning" [routerLink]="['/barcos', barco.idBarco, 'edit']">Editar</button>
+                  <button class="btn btn-sm btn-danger" (click)="deleteBarco(barco.idBarco!)">Eliminar</button>
+                }
               </td>
             </tr>
           }

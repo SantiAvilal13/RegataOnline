@@ -46,7 +46,7 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(request -> request
                         // Rutas públicas - Autenticación
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers("/auth/**", "/api/auth/**").permitAll()
                         
                         // Rutas públicas - H2 Console (solo desarrollo)
                         .requestMatchers("/h2-console/**", "/h2/**").permitAll()

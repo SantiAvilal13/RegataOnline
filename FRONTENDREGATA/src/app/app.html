@@ -1,21 +1,44 @@
 <div class="spa-container">
-  <!-- Navbar -->
-  <nav class="navbar">
-    <div class="nav-brand">
-      <h1>🏁 Regata Online</h1>
-    </div>
-    <div class="nav-links">
-      <a class="nav-link" routerLink="/home" routerLinkActive="active">Inicio</a>
-      <a class="nav-link" routerLink="/usuarios" routerLinkActive="active">Usuarios</a>
-      <a class="nav-link" routerLink="/barcos" routerLinkActive="active">Barcos</a>
-      <a class="nav-link" routerLink="/modelos" routerLinkActive="active">Modelos</a>
-      <a class="nav-link" routerLink="/partidas" routerLinkActive="active">Partidas</a>
-      <a class="nav-link" routerLink="/game" routerLinkActive="active">Juego</a>
-    </div>
-  </nav>
+  <!-- Navbar - Solo visible si está autenticado -->
+  @if (authService.isAuthenticated()) {
+    <nav class="navbar">
+      <div class="nav-brand">
+        <h1>🏁 Regata Online</h1>
+      </div>
+      <div class="nav-links">
+        <a class="nav-link" routerLink="/home" routerLinkActive="active">Inicio</a>
+        
+        <!-- Menú Usuarios - Solo ADMIN -->
+        @if (authService.isAdmin()) {
+          <a class="nav-link" routerLink="/usuarios" routerLinkActive="active">Usuarios</a>
+        }
+        
+        <a class="nav-link" routerLink="/barcos" routerLinkActive="active">Barcos</a>
+        <a class="nav-link" routerLink="/modelos" routerLinkActive="active">Modelos</a>
+        <a class="nav-link" routerLink="/partidas" routerLinkActive="active">Partidas</a>
+        <a class="nav-link" routerLink="/game" routerLinkActive="active">Juego</a>
+      </div>
+      
+      <!-- User Info y Logout -->
+      <div class="nav-user">
+        <span class="user-info">
+          <span class="user-icon">👤</span>
+          <span class="user-name">{{ authService.nombre() || authService.email() }}</span>
+          @if (authService.isAdmin()) {
+            <span class="user-badge admin">ADMIN</span>
+          } @else {
+            <span class="user-badge player">JUGADOR</span>
+          }
+        </span>
+        <button class="btn-logout" (click)="logout()">
+          <span>Cerrar Sesión</span>
+        </button>
+      </div>
+    </nav>
+  }
 
   <!-- Main Content Area -->
-  <main class="main-content">
+  <main class="main-content" [class.no-navbar]="!authService.isAuthenticated()">
     <router-outlet></router-outlet>
   </main>
 

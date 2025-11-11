@@ -67,6 +67,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             UserDetails userDetails = usuarioService.userDetailsService()
                     .loadUserByUsername(username);
             
+            log.info("Usuario autenticado: {}", username);
+            log.info("Authorities: {}", userDetails.getAuthorities());
+            
             // Si la información de autenticación no ha sido extraída previamente
             if (SecurityContextHolder.getContext().getAuthentication() == null) {
                 SecurityContext context = SecurityContextHolder.createEmptyContext();
@@ -75,6 +78,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 context.setAuthentication(authToken);
                 SecurityContextHolder.setContext(context);
+                log.info("SecurityContext establecido correctamente");
             }
             
             filterChain.doFilter(request, response);

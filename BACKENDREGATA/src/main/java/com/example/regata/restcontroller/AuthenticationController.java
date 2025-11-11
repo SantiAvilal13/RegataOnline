@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
  * Controlador de autenticación siguiendo el patrón del ejemplo del profesor
  */
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthenticationController {
     
     @Autowired

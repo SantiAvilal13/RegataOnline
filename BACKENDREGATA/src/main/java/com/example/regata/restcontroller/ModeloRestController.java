@@ -64,7 +64,7 @@ public class ModeloRestController {
     }
     
     @PostMapping
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ModeloDTO> crearModelo(@RequestBody ModeloDTO modeloDTO) {
         try {
             Modelo modelo = modeloMapper.toEntity(modeloDTO);
@@ -77,7 +77,7 @@ public class ModeloRestController {
     }
     
     @PutMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<ModeloDTO> actualizarModelo(@PathVariable Long id, @RequestBody ModeloDTO modeloDTO) {
         try {
             Modelo modelo = modeloMapper.toEntity(modeloDTO);
@@ -90,7 +90,7 @@ public class ModeloRestController {
     }
     
     @DeleteMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Void> eliminarModelo(@PathVariable Long id) {
         try {
             modeloService.deleteById(id);

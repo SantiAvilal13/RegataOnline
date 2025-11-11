@@ -2,7 +2,9 @@
   <div class="header">
     <h2>Lista de Modelos</h2>
     <div>
-      <button class="btn btn-success" [routerLink]="['/modelos/new']">Nuevo Modelo</button>
+      @if (authService.isAdmin()) {
+        <button class="btn btn-success" [routerLink]="['/modelos/new']">Nuevo Modelo</button>
+      }
       <button class="btn btn-primary" (click)="loadModelos()">Actualizar</button>
     </div>
   </div>
@@ -43,8 +45,10 @@
               <td>{{ modelo.getCantidadBarcos() }}</td>
               <td>
                 <button class="btn btn-sm btn-info" [routerLink]="['/modelos', modelo.idModelo]">Ver</button>
-                <button class="btn btn-sm btn-warning" [routerLink]="['/modelos', modelo.idModelo, 'edit']">Editar</button>
-                <button class="btn btn-sm btn-danger" (click)="deleteModelo(modelo.idModelo!)">Eliminar</button>
+                @if (authService.isAdmin()) {
+                  <button class="btn btn-sm btn-warning" [routerLink]="['/modelos', modelo.idModelo, 'edit']">Editar</button>
+                  <button class="btn btn-sm btn-danger" (click)="deleteModelo(modelo.idModelo!)">Eliminar</button>
+                }
               </td>
             </tr>
           }

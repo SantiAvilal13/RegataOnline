@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Modelo } from '../../../models';
 import { ModeloService } from '../../../shared/services/modelos/modelo.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-modelos-list',
@@ -16,6 +17,7 @@ export class ModelosListComponent {
   loading = signal(false);
   error = signal<string | null>(null);
   modeloService = inject(ModeloService);
+  authService = inject(AuthService);
 
   ngOnInit() {
     this.loadModelos();

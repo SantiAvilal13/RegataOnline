@@ -1,0 +1,122 @@
+<div class="register-container">
+  <div class="register-card">
+    <div class="header">
+      <h1>RegataOnline</h1>
+      <h2>Crear Cuenta</h2>
+      <p>Únete a la comunidad de RegataOnline</p>
+    </div>
+
+    @if (error()) {
+      <div class="error">{{ error() }}</div>
+    }
+
+    <form (ngSubmit)="register()" #registerForm="ngForm">
+      <div class="form-group">
+        <label for="nombre">Nombre Completo</label>
+        <input 
+          type="text" 
+          id="nombre"
+          name="nombre"
+          #nombre="ngModel"
+          [(ngModel)]="signupRequest().nombre"
+          required
+          minlength="2"
+          maxlength="50"
+          class="form-control"
+          placeholder="Tu nombre completo"
+          [disabled]="loading()">
+        @if (nombre.invalid && nombre.touched) {
+          <div class="field-error">El nombre debe tener entre 2 y 50 caracteres</div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input 
+          type="email" 
+          id="email"
+          name="email"
+          #email="ngModel"
+          [(ngModel)]="signupRequest().email"
+          required
+          email
+          class="form-control"
+          placeholder="tu@email.com"
+          [disabled]="loading()">
+        @if (email.invalid && email.touched) {
+          <div class="field-error">Por favor ingresa un email válido</div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <input 
+          type="password" 
+          id="password"
+          name="password"
+          #password="ngModel"
+          [(ngModel)]="signupRequest().password"
+          required
+          minlength="6"
+          class="form-control"
+          placeholder="Mínimo 6 caracteres"
+          [disabled]="loading()">
+        @if (password.invalid && password.touched) {
+          <div class="field-error">La contraseña debe tener al menos 6 caracteres</div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="passwordConfirm">Confirmar Contraseña</label>
+        <input 
+          type="password" 
+          id="passwordConfirm"
+          name="passwordConfirm"
+          #passwordConfirmField="ngModel"
+          [(ngModel)]="passwordConfirm"
+          required
+          minlength="6"
+          class="form-control"
+          placeholder="Repite tu contraseña"
+          [disabled]="loading()">
+        @if (passwordConfirmField.invalid && passwordConfirmField.touched) {
+          <div class="field-error">Confirma tu contraseña</div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="rol">Tipo de Usuario</label>
+        <select 
+          id="rol"
+          name="rol"
+          #rol="ngModel"
+          [(ngModel)]="signupRequest().rol"
+          required
+          class="form-control"
+          [disabled]="loading()">
+          <option value="JUGADOR">Jugador</option>
+          <option value="ADMIN">Administrador</option>
+        </select>
+      </div>
+
+      <div class="form-actions">
+        <button 
+          type="submit" 
+          class="btn btn-primary btn-block"
+          [disabled]="loading() || registerForm.invalid">
+          @if (loading()) {
+            <span>Registrando...</span>
+          } @else {
+            <span>Crear Cuenta</span>
+          }
+        </button>
+      </div>
+    </form>
+
+    <div class="footer">
+      <p>¿Ya tienes cuenta? 
+        <a (click)="goToLogin()" class="link">Inicia sesión aquí</a>
+      </p>
+    </div>
+  </div>
+</div>
