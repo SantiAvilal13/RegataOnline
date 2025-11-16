@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
@@ -17,22 +18,25 @@ import org.junit.jupiter.api.AfterEach;
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.assertions.PlaywrightAssertions;
 
-import com.example.regata.restcontroller.BarcoRestController;
+import com.example.regata.config.TestSecurityConfig;
 import com.example.regata.dto.BarcoDTO;
 import com.example.regata.model.Usuario;
 import com.example.regata.model.Modelo;
+import com.example.regata.model.Barco;
 import com.example.regata.service.UsuarioService;
 import com.example.regata.service.ModeloService;
+import com.example.regata.service.BarcoService;
 
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 @ActiveProfiles("system-testing")
+@Import(TestSecurityConfig.class)
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 public class BarcoSystemTest {
 
     private String SERVER_URL;
 
     @Autowired
-    private BarcoRestController barcoRestController;
+    private BarcoService barcoService;
     
     @Autowired
     private UsuarioService usuarioService;
@@ -74,24 +78,29 @@ public class BarcoSystemTest {
         barcoTestDTO.setUsuarioId(usuarioTest.getIdUsuario());
         barcoTestDTO.setModeloId(modeloTest.getIdModelo());
         
-        // Crear algunos barcos de prueba
-        BarcoDTO barco1 = new BarcoDTO();
-        barco1.setAlias("Barco Alpha");
-        barco1.setUsuarioId(usuarioTest.getIdUsuario());
-        barco1.setModeloId(modeloTest.getIdModelo());
-        barcoRestController.crearBarco(barco1);
+        // Crear algunos barcos de prueba usando el servicio
+        Barco barco1 = Barco.builder()
+                .alias("Barco Alpha")
+                .usuario(usuarioTest)
+                .modelo(modeloTest)
+                .build();
+        barcoService.save(barco1);
         
-        BarcoDTO barco2 = new BarcoDTO();
-        barco2.setAlias("Barco Beta");
-        barco2.setUsuarioId(usuarioTest.getIdUsuario());
-        barco2.setModeloId(modeloTest.getIdModelo());
-        barcoRestController.crearBarco(barco2);
+        Barco barco2 = Barco.builder()
+                .alias("Barco Beta")
+                .usuario(usuarioTest)
+                .modelo(modeloTest)
+                .build();
+        barcoService.save(barco2);
 
         this.playwright = Playwright.create();
         this.browser = playwright.chromium().launch(
             new BrowserType.LaunchOptions().setHeadless(false)
             );
-        this.browserContext = browser.newContext();
+        // Configurar HTTP Basic Auth en el contexto del navegador
+        this.browserContext = browser.newContext(
+            new Browser.NewContextOptions().setHttpCredentials("test@test.com", "password")
+        );
         this.page = browserContext.newPage();
         this.SERVER_URL = "http://localhost:8080/api";
     }
@@ -200,12 +209,13 @@ public class BarcoSystemTest {
 
     @Test
     void crearBarco() {
-        // Crear un nuevo barco usando el controller
-        BarcoDTO nuevoBarco = new BarcoDTO();
-        nuevoBarco.setAlias("Mi Barco Favorito");
-        nuevoBarco.setUsuarioId(usuarioTest.getIdUsuario());
-        nuevoBarco.setModeloId(modeloTest.getIdModelo());
-        barcoRestController.crearBarco(nuevoBarco);
+        // Crear un nuevo barco usando el API context de Playwright con autenticación
+        Barco nuevoBarco = Barco.builder()
+                .alias("Mi Barco Favorito")
+                .usuario(usuarioTest)
+                .modelo(modeloTest)
+                .build();
+        barcoService.save(nuevoBarco);
         
         // Navegar y verificar que el nuevo barco existe con todos sus campos
         page.navigate(SERVER_URL + "/barcos/buscar?alias=Favorito");
@@ -230,12 +240,10 @@ public class BarcoSystemTest {
         // Obtener el ID de un barco existente
         Long barcoId = obtenerBarcoIdPorAlias("Barco Alpha");
         
-        // Actualizar el barco
-        BarcoDTO barcoActualizado = new BarcoDTO();
-        barcoActualizado.setAlias("Barco Alpha Actualizado");
-        barcoActualizado.setUsuarioId(usuarioTest.getIdUsuario());
-        barcoActualizado.setModeloId(modeloTest.getIdModelo());
-        barcoRestController.actualizarBarco(barcoId, barcoActualizado);
+        // Actualizar el barco usando el servicio
+        Barco barcoExistente = barcoService.findById(barcoId).orElseThrow();
+        barcoExistente.setAlias("Barco Alpha Actualizado");
+        barcoService.save(barcoExistente);
         
         // Verificar la actualización con todos los campos
         page.navigate(SERVER_URL + "/barcos/" + barcoId);
@@ -374,8 +382,8 @@ public class BarcoSystemTest {
         // Obtener el ID de un barco existente
         Long barcoId = obtenerBarcoIdPorAlias("Barco Alpha");
         
-        // Eliminar el barco
-        barcoRestController.eliminarBarco(barcoId);
+        // Eliminar el barco usando el servicio
+        barcoService.deleteById(barcoId);
         
         // Verificar que ya no está en la lista
         page.navigate(SERVER_URL + "/barcos");

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
@@ -17,6 +18,7 @@ import org.junit.jupiter.api.AfterEach;
 import com.microsoft.playwright.*;
 import com.microsoft.playwright.assertions.PlaywrightAssertions;
 
+import com.example.regata.config.TestSecurityConfig;
 import com.example.regata.dto.MapaDTO;
 import com.example.regata.model.Celda;
 import com.example.regata.model.Mapa;
@@ -27,6 +29,7 @@ import java.util.Map;
 
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 @ActiveProfiles("system-testing")
+@Import(TestSecurityConfig.class)
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 public class MapaSystemTest {
 
