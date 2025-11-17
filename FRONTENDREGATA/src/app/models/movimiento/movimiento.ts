@@ -14,6 +14,7 @@ export class Movimiento {
   salioDelMapa?: boolean;
   participacionId: number = 0;
   participacionInfo?: string;
+  partidaId?: number; // ID de la partida a la que pertenece
   celdaId?: number;
   celdaInfo?: string;
 
@@ -94,6 +95,7 @@ export class Movimiento {
       salioDelMapa: this.salioDelMapa,
       participacionId: this.participacionId,
       participacionInfo: this.participacionInfo,
+      partidaId: this.partidaId,
       celdaId: this.celdaId,
       celdaInfo: this.celdaInfo
     });
@@ -115,6 +117,7 @@ export class Movimiento {
       salioDelMapa: dto.salioDelMapa,
       participacionId: dto.participacionId,
       participacionInfo: dto.participacionInfo,
+      partidaId: dto.partidaId,
       celdaId: dto.celdaId,
       celdaInfo: dto.celdaInfo
     });
@@ -135,6 +138,7 @@ export class Movimiento {
       llegoAMeta: this.llegoAMeta,
       salioDelMapa: this.salioDelMapa,
       participacionId: this.participacionId,
+      partidaId: this.partidaId,
       celdaId: this.celdaId
     };
   }

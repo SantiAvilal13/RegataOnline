@@ -1,65 +1,177 @@
 <div class="partidas-list">
   <div class="header">
-    <h2>Lista de Partidas</h2>
-    <div>
-      <button class="btn btn-success" [routerLink]="['/partidas/new']">Nueva Partida</button>
-      <button class="btn btn-primary" (click)="loadPartidas()">Actualizar</button>
+    <h2>📋 Partidas Activas</h2>
+    <div class="header-actions">
+      <!-- Toggle Auto-refresh -->
+      <button 
+        [class.btn]="true"
+        [class.btn-success]="autoRefreshActivo()"
+        [class.btn-secondary]="!autoRefreshActivo()"
+        (click)="toggleAutoRefresh()"
+        title="Activar/Desactivar actualización automática">
+        @if (autoRefreshActivo()) {
+          ✅ Auto-refresh ON
+        } @else {
+          ⏸️ Auto-refresh OFF
+        }
+      </button>
+
+      <!-- Botón refrescar manual -->
+      <button class="btn btn-primary" (click)="loadPartidas()" [disabled]="loading()">
+        @if (loading()) {
+          🔄 Cargando...
+        } @else {
+          🔄 Refrescar
+        }
+      </button>
+
+      <!-- Crear partida multijugador -->
+      <button class="btn btn-success" (click)="crearPartidaMultijugador()">
+        ➕ Crear Multijugador
+      </button>
+
+      <!-- Crear partida solitario (antigua funcionalidad) -->
+      <button class="btn btn-info" (click)="crearPartidaSolitario()">
+        🎮 Crear Solitario
+      </button>
     </div>
   </div>
-
-  @if (loading()) {
-    <div class="loading">Cargando partidas...</div>
-  }
 
   @if (error()) {
     <div class="error">{{ error() }}</div>
   }
 
-  @if (partidas().length === 0 && !loading()) {
-    <div class="no-data">No hay partidas registradas</div>
-  }
-
-  @if (partidas().length > 0) {
+  @if (loading() && partidas().length === 0) {
+    <div class="loading">
+      <div class="spinner"></div>
+      Cargando partidas...
+    </div>
+  } @else if (partidas().length === 0) {
+    <div class="no-data">
+      <p>No hay partidas disponibles</p>
+      <p>Crea una nueva partida para comenzar a jugar</p>
+    </div>
+  } @else {
     <div class="table-container">
       <table class="table">
         <thead>
           <tr>
             <th>ID</th>
             <th>Estado</th>
-            <th>Fecha Inicio</th>
-            <th>Fecha Fin</th>
-            <th>Ganador</th>
+            <th>Jugadores</th>
             <th>Participantes</th>
+            <th>Mapa</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          @for (partida of partidas(); track partida.idPartida) {
-            <tr>
-              <td>{{ partida.idPartida }}</td>
+          @for (item of partidas(); track item.partida.idPartida) {
+            <tr [class.partida-esperando]="item.infoJugadores?.estado === 'ESPERANDO'"
+                [class.partida-jugando]="item.infoJugadores?.estado === 'EN_JUEGO'"
+                [class.partida-terminada]="item.infoJugadores?.estado === 'TERMINADA'">
+              
+              <!-- ID -->
+              <td><strong>#{{ item.partida.idPartida }}</strong></td>
+              
+              <!-- Estado -->
               <td>
-                <span class="badge badge-info">{{ partida.estado }}</span>
+                <span class="badge" [ngClass]="getEstadoBadgeClass(item.infoJugadores?.estado || 'DESCONOCIDO')">
+                  {{ item.infoJugadores?.estado || item.partida.estado }}
+                </span>
               </td>
-              <td>{{ partida.fechaInicio | date:'short' }}</td>
-              <td>{{ partida.fechaFin | date:'short' }}</td>
+              
+              <!-- Total Jugadores -->
               <td>
-                @if (partida.ganadorUsuarioNombre) {
-                  <div class="winner-info">
-                    <div class="winner-user">🏆 {{ partida.ganadorUsuarioNombre }}</div>
-                    <div class="winner-boat">🚢 {{ partida.ganadorBarcoAlias }}</div>
-                  </div>
-                } @else {
-                  <span class="no-winner">Sin ganador</span>
+                <strong>{{ item.infoJugadores?.totalJugadores || 0 }}</strong>
+                @if (item.infoJugadores?.estado === 'ESPERANDO') {
+                  <span class="text-muted"> jugador(es)</span>
                 }
               </td>
-              <td>{{ partida.totalParticipantes || 0 }}</td>
+              
+              <!-- Lista de Participantes -->
               <td>
-                <button class="btn btn-sm btn-info" [routerLink]="['/partidas', partida.idPartida]">Ver</button>
+                @if (item.infoJugadores && item.infoJugadores.jugadores.length > 0) {
+                  <div class="participantes-lista">
+                    @for (jugador of item.infoJugadores.jugadores; track jugador.numeroTurno) {
+                      <div class="participante-item">
+                        <span class="turno-badge">T{{ jugador.numeroTurno }}</span>
+                        <span class="jugador-nombre">{{ jugador.nombreUsuario }}</span>
+                        <span class="barco-alias">- {{ jugador.barcoAlias }}</span>
+                      </div>
+                    }
+                  </div>
+                } @else {
+                  <span class="text-muted">Sin jugadores</span>
+                }
+              </td>
+              
+              <!-- Mapa -->
+              <td>
+                Mapa #{{ item.partida.mapaId }}
+              </td>
+              
+              <!-- Acciones -->
+              <td>
+                <div class="acciones-grupo">
+                  @if (item.infoJugadores?.estado === 'ESPERANDO') {
+                    <!-- Partida en espera -->
+                    <button 
+                      class="btn btn-primary btn-sm" 
+                      (click)="unirseAPartida(item.partida.idPartida)"
+                      title="Unirse a esta partida">
+                      🎮 Unirse
+                    </button>
+                    <button 
+                      class="btn btn-success btn-sm" 
+                      (click)="iniciarPartida(item.partida.idPartida)"
+                      title="Iniciar partida (requiere al menos 2 jugadores)">
+                      ▶️ Iniciar
+                    </button>
+                  } @else if (item.infoJugadores?.estado === 'EN_JUEGO') {
+                    <!-- Partida en juego -->
+                    <button 
+                      class="btn btn-info btn-sm" 
+                      (click)="verPartida(item.partida.idPartida)"
+                      title="Ver detalles de la partida">
+                      👁️ Ver
+                    </button>
+                  } @else if (item.infoJugadores?.estado === 'TERMINADA') {
+                    <!-- Partida terminada -->
+                    <button 
+                      class="btn btn-info btn-sm" 
+                      (click)="verPartida(item.partida.idPartida)"
+                      title="Ver detalles de la partida finalizada">
+                      📊 Resultados
+                    </button>
+                  } @else {
+                    <!-- Estado desconocido -->
+                    <button 
+                      class="btn btn-info btn-sm" 
+                      (click)="verPartida(item.partida.idPartida)">
+                      Ver
+                    </button>
+                  }
+                  
+                  <!-- Botón eliminar (siempre disponible) -->
+                  <button 
+                    class="btn btn-danger btn-sm" 
+                    (click)="eliminarPartida(item.partida.idPartida)"
+                    title="Eliminar partida">
+                    🗑️
+                  </button>
+                </div>
               </td>
             </tr>
           }
         </tbody>
       </table>
+    </div>
+  }
+
+  <!-- Indicador de actualización automática -->
+  @if (autoRefreshActivo() && !loading()) {
+    <div class="auto-refresh-indicator">
+      🔄 Actualizando cada {{ REFRESH_INTERVAL / 1000 }} segundos...
     </div>
   }
 </div>

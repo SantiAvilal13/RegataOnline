@@ -1,4 +1,17 @@
 <div class="game-board-container">
+  <!-- Sistema de notificaciones toast -->
+  <div class="notifications-container">
+    @for (notificacion of notificaciones(); track notificacion.id) {
+      <div class="notification"
+           [class.notification-ganador]="notificacion.tipo === 'ganador'"
+           [class.notification-perdedor]="notificacion.tipo === 'perdedor'"
+           [class.notification-info]="notificacion.tipo === 'info'">
+        <span class="notification-mensaje">{{ notificacion.mensaje }}</span>
+        <button class="notification-close" (click)="eliminarNotificacion(notificacion.id)">✕</button>
+      </div>
+    }
+  </div>
+
   @if (loading()) {
     <div class="loading">Cargando mapa...</div>
   }
@@ -49,9 +62,18 @@
                     <div class="previous-position">📍</div>
                   }
 
-                  <!-- Posición actual del barco -->
+                  <!-- Posición actual de MI barco -->
                   @if (estadoActual() && estadoActual()!.posX === x && estadoActual()!.posY === y) {
-                    <div class="boat">🚢</div>
+                    <div class="boat my-boat">🚢</div>
+                  }
+
+                  <!-- Posiciones de los barcos de OTROS jugadores -->
+                  @for (jugador of obtenerJugadoresEnCelda(x, y); track jugador.participacionId) {
+                    <div class="boat other-boat" 
+                         [title]="jugador.usuarioNombre + ' (' + jugador.barcoAlias + ')'"
+                         [style.background-color]="jugador.barcoColor">
+                      ⛵
+                    </div>
                   }
 
                   <!-- Indicador de destino seleccionado -->

@@ -14,6 +14,8 @@ import { ModeloDetailComponent } from './components/modelos/modelo-detail/modelo
 import { PartidasListComponent } from './components/partidas/partidas-list/partidas-list.component';
 import { PartidaFormComponent } from './components/partidas/partida-form/partida-form.component';
 import { PartidaDetailComponent } from './components/partidas/partida-detail/partida-detail.component';
+import { PartidaCrearMultiComponent } from './components/partidas/partida-crear-multi/partida-crear-multi.component';
+import { PartidaUnirseComponent } from './components/partidas/partida-unirse/partida-unirse.component';
 import { GameBoardComponent } from './components/juego/game-board/game-board.component';
 import { MapSelectorComponent } from './components/juego/map-selector/map-selector.component';
 import { authGuard } from './guards/auth.guard';
@@ -49,6 +51,8 @@ export const routes: Routes = [
   // Rutas de Partidas (autenticadas - ADMIN + JUGADOR)
   { path: 'partidas', component: PartidasListComponent, canActivate: [authGuard] },
   { path: 'partidas/new', component: PartidaFormComponent, canActivate: [authGuard] },
+  { path: 'partidas/crear-multijugador', component: PartidaCrearMultiComponent, canActivate: [authGuard] },
+  { path: 'partidas/:id/unirse', component: PartidaUnirseComponent, canActivate: [authGuard] },
   { path: 'partidas/:id', component: PartidaDetailComponent, canActivate: [authGuard] },
   
   // Rutas de Juego (autenticadas - ADMIN + JUGADOR)

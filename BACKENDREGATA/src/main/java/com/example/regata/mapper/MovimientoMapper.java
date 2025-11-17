@@ -30,6 +30,11 @@ public class MovimientoMapper {
             dto.setParticipacionInfo(movimiento.getParticipacion().getJugador() != null ? 
                 movimiento.getParticipacion().getJugador().getNombre() + " - " + 
                 movimiento.getParticipacion().getBarco().getAlias() : null);
+            
+            // Incluir el ID de la partida
+            if (movimiento.getParticipacion().getPartida() != null) {
+                dto.setPartidaId(movimiento.getParticipacion().getPartida().getIdPartida());
+            }
         }
         
         // Información de la celda destino
