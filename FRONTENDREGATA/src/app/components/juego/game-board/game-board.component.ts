@@ -6,6 +6,7 @@ import { switchMap, map } from 'rxjs';
 import { MapaJuegoService } from '../../../shared/services/juego/mapa-juego.service';
 import { MovimientoJuegoService } from '../../../shared/services/juego/movimiento-juego.service';
 import { PartidaService } from '../../../shared/services/partidas/partida.service';
+import { AuthService } from '../../../services/auth.service';
 import { Mapa, Celda, Movimiento } from '../../../models';
 import { CeldaTipo } from '../../../models/enums/celda-tipo';
 
@@ -20,6 +21,7 @@ export class GameBoardComponent implements OnInit, OnDestroy {
   mapaService = inject(MapaJuegoService);
   movimientoService = inject(MovimientoJuegoService);
   partidaService = inject(PartidaService);
+  authService = inject(AuthService);
   route = inject(ActivatedRoute);
   router = inject(Router);
 
@@ -65,6 +67,13 @@ export class GameBoardComponent implements OnInit, OnDestroy {
   private cacheSeleccionable = new Map<string, boolean>();
 
   ngOnInit() {
+    // Verificar que el usuario no es administrador
+    if (this.authService.isAdmin()) {
+      this.error.set('Los administradores no pueden jugar. Solo pueden realizar operaciones CRUD.');
+      setTimeout(() => this.router.navigate(['/home']), 2000);
+      return;
+    }
+
     const participacionId = this.route.snapshot.params['participacionId'];
     
     if (participacionId) {

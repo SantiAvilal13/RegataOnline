@@ -25,6 +25,13 @@ export class PartidaCrearMultiComponent implements OnInit {
   usuarioId = signal<number | null>(null);
 
   ngOnInit() {
+    // Verificar que el usuario no es administrador
+    if (this.authService.isAdmin()) {
+      this.error.set('Los administradores no pueden jugar. Solo pueden realizar operaciones CRUD.');
+      setTimeout(() => this.router.navigate(['/partidas']), 2000);
+      return;
+    }
+
     const userId = this.authService.idUsuario();
     if (userId) {
       this.usuarioId.set(userId);

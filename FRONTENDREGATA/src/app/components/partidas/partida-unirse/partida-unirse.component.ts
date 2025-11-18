@@ -28,6 +28,13 @@ export class PartidaUnirseComponent implements OnInit {
   usuarioId = signal<number | null>(null);
 
   ngOnInit() {
+    // Verificar que el usuario no es administrador
+    if (this.authService.isAdmin()) {
+      this.error.set('Los administradores no pueden jugar. Solo pueden realizar operaciones CRUD.');
+      setTimeout(() => this.router.navigate(['/partidas']), 2000);
+      return;
+    }
+
     // Obtener ID de la partida de la ruta
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {

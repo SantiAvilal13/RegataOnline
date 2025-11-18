@@ -303,6 +303,12 @@ public class PartidaRestController {
             Usuario usuario = usuarioService.findById(usuarioId)
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
             
+            // Verificar que el usuario no es ADMIN
+            if (usuario.getRol() == Usuario.Rol.ADMIN) {
+                return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Los administradores no pueden jugar. Solo pueden realizar operaciones CRUD."));
+            }
+            
             Barco barco = barcoService.findById(barcoId)
                 .orElseThrow(() -> new RuntimeException("Barco no encontrado"));
             
@@ -423,14 +429,20 @@ public class PartidaRestController {
             @RequestParam Long usuarioId,
             @RequestParam Long barcoId) {
         try {
+            // Obtener el usuario que crea la partida
+            Usuario jugador = usuarioService.findById(usuarioId)
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            
+            // Verificar que el usuario no es ADMIN
+            if (jugador.getRol() == Usuario.Rol.ADMIN) {
+                return ResponseEntity.badRequest()
+                    .body(Map.of("error", "Los administradores no pueden jugar. Solo pueden realizar operaciones CRUD."));
+            }
+            
             // Crear la partida en estado ESPERANDO
             Partida partida = partidaMapper.toEntity(partidaDTO);
             partida.setEstado(Partida.Estado.ESPERANDO);
             Partida savedPartida = partidaService.save(partida);
-            
-            // Obtener el usuario que crea la partida
-            Usuario jugador = usuarioService.findById(usuarioId)
-                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
             
             // Obtener el barco seleccionado
             Barco barco = barcoService.findById(barcoId)

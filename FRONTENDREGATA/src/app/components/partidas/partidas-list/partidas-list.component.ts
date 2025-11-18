@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { Partida } from '../../../models';
 import { PartidaService } from '../../../shared/services/partidas/partida.service';
+import { AuthService } from '../../../services/auth.service';
 
 export interface PartidaConInfo {
   partida: any;
@@ -32,6 +33,7 @@ export class PartidasListComponent implements OnInit, OnDestroy {
   
   partidaService = inject(PartidaService);
   router = inject(Router);
+  authService = inject(AuthService);
   
   private autoRefreshInterval: any;
   readonly REFRESH_INTERVAL = 3000; // 3 segundos

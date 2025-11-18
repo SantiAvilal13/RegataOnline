@@ -2,6 +2,7 @@ import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { MapaJuegoService } from '../../../shared/services/juego/mapa-juego.service';
+import { AuthService } from '../../../services/auth.service';
 import { Mapa } from '../../../models';
 
 @Component({
@@ -14,6 +15,7 @@ import { Mapa } from '../../../models';
 export class MapSelectorComponent implements OnInit {
   mapaService = inject(MapaJuegoService);
   router = inject(Router);
+  authService = inject(AuthService);
   
   // Hacer Math disponible en el template
   Math = Math;
@@ -23,6 +25,13 @@ export class MapSelectorComponent implements OnInit {
   error = signal<string | null>(null);
 
   ngOnInit() {
+    // Verificar que el usuario no es administrador
+    if (this.authService.isAdmin()) {
+      this.error.set('Los administradores no pueden jugar. Solo pueden realizar operaciones CRUD.');
+      setTimeout(() => this.router.navigate(['/home']), 2000);
+      return;
+    }
+
     this.cargarMapas();
   }
 

@@ -25,15 +25,17 @@
         }
       </button>
 
-      <!-- Crear partida multijugador -->
-      <button class="btn btn-success" (click)="crearPartidaMultijugador()">
-        ➕ Crear Multijugador
-      </button>
+      <!-- Crear partida multijugador - Solo JUGADORES -->
+      @if (!authService.isAdmin()) {
+        <button class="btn btn-success" (click)="crearPartidaMultijugador()">
+          ➕ Crear Multijugador
+        </button>
 
-      <!-- Crear partida solitario (antigua funcionalidad) -->
-      <button class="btn btn-info" (click)="crearPartidaSolitario()">
-        🎮 Crear Solitario
-      </button>
+        <!-- Crear partida solitario (antigua funcionalidad) -->
+        <button class="btn btn-info" (click)="crearPartidaSolitario()">
+          🎮 Crear Solitario
+        </button>
+      }
     </div>
   </div>
 
@@ -115,12 +117,14 @@
                 <div class="acciones-grupo">
                   @if (item.infoJugadores?.estado === 'ESPERANDO') {
                     <!-- Partida en espera -->
-                    <button 
-                      class="btn btn-primary btn-sm" 
-                      (click)="unirseAPartida(item.partida.idPartida)"
-                      title="Unirse a esta partida">
-                      🎮 Unirse
-                    </button>
+                    @if (!authService.isAdmin()) {
+                      <button 
+                        class="btn btn-primary btn-sm" 
+                        (click)="unirseAPartida(item.partida.idPartida)"
+                        title="Unirse a esta partida">
+                        🎮 Unirse
+                      </button>
+                    }
                     <button 
                       class="btn btn-success btn-sm" 
                       (click)="iniciarPartida(item.partida.idPartida)"
