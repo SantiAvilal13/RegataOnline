@@ -5,6 +5,11 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Email;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
 import java.util.List;
 
 @Entity
@@ -15,7 +20,7 @@ import java.util.List;
 @Builder
 @EqualsAndHashCode(exclude = {"barcos", "participaciones", "partidasGanadas"})
 @ToString(exclude = {"barcos", "participaciones", "partidasGanadas"})
-public class Usuario {
+public class Usuario implements UserDetails {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,6 +58,43 @@ public class Usuario {
     // Enum para los roles
     public enum Rol {
         ADMIN, JUGADOR
+    }
+    
+    // Implementación de UserDetails para Spring Security
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        // Sin prefijo ROLE_ como en el ejemplo del profesor
+        return List.of(new SimpleGrantedAuthority(rol.name()));
+    }
+    
+    @Override
+    public String getPassword() {
+        return passwordHash;
+    }
+    
+    @Override
+    public String getUsername() {
+        return email;
+    }
+    
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+    
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+    
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+    
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }
 

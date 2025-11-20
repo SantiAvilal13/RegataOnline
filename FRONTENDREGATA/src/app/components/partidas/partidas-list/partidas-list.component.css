@@ -15,6 +15,12 @@
   color: #333;
 }
 
+.header-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .loading, .error, .no-data {
   text-align: center;
   padding: 20px;
@@ -128,6 +134,149 @@
 .btn-sm {
   padding: 6px 12px;
   font-size: 12px;
+}
+
+.btn-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background-color: #5a6268;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+}
+
+.btn-danger:hover {
+  background-color: #c82333;
+}
+
+/* Estilos para estados de partida */
+.partida-esperando {
+  background-color: #fff3cd !important;
+}
+
+.partida-jugando {
+  background-color: #d4edda !important;
+}
+
+.partida-terminada {
+  background-color: #e2e3e5 !important;
+}
+
+/* Badges de estado */
+.badge-warning {
+  background-color: #ffc107;
+  color: #000;
+}
+
+.badge-success {
+  background-color: #28a745;
+  color: white;
+}
+
+.badge-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+/* Lista de participantes en tabla */
+.participantes-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 250px;
+}
+
+.participante-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  padding: 2px 0;
+}
+
+.turno-badge {
+  background-color: #007bff;
+  color: white;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: bold;
+  min-width: 25px;
+  text-align: center;
+}
+
+.jugador-nombre {
+  font-weight: 600;
+  color: #333;
+}
+
+.barco-alias {
+  color: #6c757d;
+  font-style: italic;
+  font-size: 12px;
+}
+
+.text-muted {
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* Grupo de acciones */
+.acciones-grupo {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+}
+
+/* Indicador de auto-refresh */
+.auto-refresh-indicator {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background-color: #28a745;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  font-size: 14px;
+  animation: pulse 2s infinite;
+  z-index: 1000;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Spinner de carga */
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* Estilos específicos para ganadores */

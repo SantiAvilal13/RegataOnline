@@ -39,4 +39,40 @@ export class PartidaService {
   deletePartida(id: number): Observable<void> {
     return this.http.delete<void>(`${environment.apiUrl}/partidas/${id}`);
   }
+
+  // ===== MÉTODOS MULTIJUGADOR =====
+
+  obtenerInfoJugadores(partidaId: number): Observable<any> {
+    return this.http.get(`${environment.apiUrl}/partidas/${partidaId}/info-jugadores`);
+  }
+
+  listarPartidasDisponibles(): Observable<any[]> {
+    return this.http.get<any[]>(`${environment.apiUrl}/partidas/disponibles`);
+  }
+
+  unirseAPartida(partidaId: number, usuarioId: number, barcoId: number): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/partidas/${partidaId}/unirse`, null, {
+      params: { 
+        usuarioId: usuarioId.toString(), 
+        barcoId: barcoId.toString() 
+      }
+    });
+  }
+
+  iniciarPartida(partidaId: number): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/partidas/${partidaId}/iniciar`, null);
+  }
+
+  crearPartidaYEsperar(partidaData: any, usuarioId: number, barcoId: number): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/partidas/crear-y-esperar`, partidaData, {
+      params: {
+        usuarioId: usuarioId.toString(),
+        barcoId: barcoId.toString()
+      }
+    });
+  }
+
+  obtenerEstadoCompleto(partidaId: number): Observable<any> {
+    return this.http.get(`${environment.apiUrl}/partidas/${partidaId}/estado-completo`);
+  }
 }

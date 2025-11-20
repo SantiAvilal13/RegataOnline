@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Barco } from '../../../models';
 import { BarcoService } from '../../../shared/services/barcos/barco.service';
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-barcos-list',
@@ -16,6 +17,7 @@ export class BarcosListComponent {
   loading = signal(false);
   error = signal<string | null>(null);
   barcoService = inject(BarcoService);
+  authService = inject(AuthService);
 
   ngOnInit() {
     this.loadBarcos();
@@ -48,5 +50,24 @@ export class BarcosListComponent {
         }
       });
     }
+  }
+
+  /**
+   * Verifica si el usuario puede editar/eliminar un barco
+   * Un JUGADOR solo puede editar/eliminar sus propios barcos
+   * Un ADMIN puede editar/eliminar cualquier barco
+   */
+  canEditOrDelete(barco: Barco): boolean {
+    if (this.authService.isAdmin()) {
+      return true;
+    }
+    return barco.usuarioId === this.authService.idUsuario();
+  }
+
+  /**
+   * Verifica si el usuario solo puede ver el barco (no editar/eliminar)
+   */
+  canOnlyView(barco: Barco): boolean {
+    return !this.canEditOrDelete(barco);
   }
 }

@@ -1,0 +1,95 @@
+<div class="crear-multi-container">
+  <div class="card">
+    <div class="card-header">
+      <h2>🎮 Crear Partida Multijugador</h2>
+    </div>
+    
+    <div class="card-body">
+      @if (error()) {
+        <div class="error-message">
+          {{ error() }}
+        </div>
+      }
+
+      @if (loading()) {
+        <div class="loading">
+          <div class="spinner"></div>
+          <p>Creando partida...</p>
+        </div>
+      } @else {
+        <div class="info-box">
+          <h3>ℹ️ Información</h3>
+          <ul>
+            <li>Se creará una partida en estado <strong>ESPERANDO</strong></li>
+            <li>Otros jugadores podrán unirse desde la lista de partidas</li>
+            <li>Necesitas al menos <strong>2 jugadores</strong> para iniciar</li>
+            <li>Selecciona el barco con el que jugarás</li>
+            <li>Se usará el Mapa 1 por defecto</li>
+          </ul>
+        </div>
+
+        <div class="barcos-section">
+          <h3>⛵ Selecciona tu Barco</h3>
+          
+          @if (barcos().length === 0) {
+            <div class="no-barcos">
+              <p>❌ No tienes barcos disponibles</p>
+              <p>Debes crear al menos un barco antes de crear una partida.</p>
+              <button class="btn btn-primary" [routerLink]="['/barcos/new']">
+                Crear Barco
+              </button>
+            </div>
+          } @else {
+            <div class="barcos-grid">
+              @for (barco of barcos(); track barco.idBarco) {
+                <div 
+                  class="barco-card" 
+                  [class.selected]="barcoSeleccionado() === barco.idBarco"
+                  (click)="seleccionarBarco(barco.idBarco!)">
+                  
+                  <div class="barco-header">
+                    <h4>{{ barco.alias }}</h4>
+                    @if (barcoSeleccionado() === barco.idBarco) {
+                      <span class="check-icon">✓</span>
+                    }
+                  </div>
+                  
+                  <div class="barco-details">
+                    <div class="detail-item">
+                      <span class="label">Modelo:</span>
+                      <span class="value">{{ barco.modeloNombre }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="label">Color:</span>
+                      <span 
+                        class="color-preview" 
+                        [style.background-color]="barco.modeloColorHex">
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        @if (barcos().length > 0) {
+          <div class="actions">
+            <button 
+              class="btn btn-success btn-lg" 
+              (click)="crearPartida()"
+              [disabled]="!barcoSeleccionado()">
+              ✅ Crear Partida y Esperar Jugadores
+            </button>
+
+            <button 
+              class="btn btn-secondary btn-lg" 
+              (click)="cancelar()">
+              ❌ Cancelar
+            </button>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>

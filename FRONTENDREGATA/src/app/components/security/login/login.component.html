@@ -1,0 +1,70 @@
+<div class="login-container">
+  <div class="login-card">
+    <div class="header">
+      <h1>RegataOnline</h1>
+      <h2>Iniciar Sesión</h2>
+      <p>Bienvenido de nuevo, ingresa tus credenciales</p>
+    </div>
+
+    @if (error()) {
+      <div class="error">{{ error() }}</div>
+    }
+
+    <form (ngSubmit)="login()" #loginForm="ngForm">
+      <div class="form-group">
+        <label for="email">Email</label>
+        <input 
+          type="email" 
+          id="email"
+          name="email"
+          #email="ngModel"
+          [(ngModel)]="loginDto().email"
+          required
+          email
+          class="form-control"
+          placeholder="tu@email.com"
+          [disabled]="loading()">
+        @if (email.invalid && email.touched) {
+          <div class="field-error">Por favor ingresa un email válido</div>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="password">Contraseña</label>
+        <input 
+          type="password" 
+          id="password"
+          name="password"
+          #password="ngModel"
+          [(ngModel)]="loginDto().password"
+          required
+          minlength="3"
+          class="form-control"
+          placeholder="Tu contraseña"
+          [disabled]="loading()">
+        @if (password.invalid && password.touched) {
+          <div class="field-error">La contraseña es requerida</div>
+        }
+      </div>
+
+      <div class="form-actions">
+        <button 
+          type="submit" 
+          class="btn btn-primary btn-block"
+          [disabled]="loading() || loginForm.invalid">
+          @if (loading()) {
+            <span>Iniciando sesión...</span>
+          } @else {
+            <span>Ingresar</span>
+          }
+        </button>
+      </div>
+    </form>
+
+    <div class="footer">
+      <p>¿No tienes cuenta? 
+        <a routerLink="/register" class="link">Regístrate aquí</a>
+      </p>
+    </div>
+  </div>
+</div>

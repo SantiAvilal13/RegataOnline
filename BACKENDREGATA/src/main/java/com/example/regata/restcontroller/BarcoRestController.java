@@ -3,6 +3,7 @@ package com.example.regata.restcontroller;
 import com.example.regata.dto.BarcoDTO;
 import com.example.regata.mapper.BarcoMapper;
 import com.example.regata.model.Barco;
+import com.example.regata.model.Usuario;
 import com.example.regata.service.BarcoService;
 import com.example.regata.service.UsuarioService;
 import com.example.regata.service.ModeloService;
@@ -14,6 +15,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,6 +43,7 @@ public class BarcoRestController {
     private ModeloService modeloService;
     
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Listar todos los barcos", description = "Obtiene una lista de todos los barcos registrados")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de barcos obtenida exitosamente"),
@@ -57,6 +62,7 @@ public class BarcoRestController {
     }
     
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Obtener barco por ID", description = "Obtiene un barco específico por su identificador único")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Barco encontrado exitosamente"),
@@ -76,22 +82,40 @@ public class BarcoRestController {
     }
     
     @PostMapping
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Crear nuevo barco", description = "Crea un nuevo barco en el sistema")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Barco creado exitosamente"),
         @ApiResponse(responseCode = "400", description = "Datos de entrada inválidos"),
+        @ApiResponse(responseCode = "403", description = "No autorizado para crear barco para otro usuario"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     public ResponseEntity<BarcoDTO> crearBarco(
             @Parameter(description = "Datos del barco a crear", required = true) @RequestBody BarcoDTO barcoDTO) {
         try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            String emailUsuario = auth.getName();
+            Usuario usuarioAutenticado = usuarioService.findByEmail(emailUsuario).orElse(null);
+            
+            if (usuarioAutenticado == null) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+            
+            if (barcoDTO.getUsuarioId() != null && !barcoDTO.getUsuarioId().equals(usuarioAutenticado.getIdUsuario())) {
+                if (!usuarioAutenticado.getRol().equals(Usuario.Rol.ADMIN)) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+                }
+            }
+            
             Barco barco = new Barco();
             barco.setAlias(barcoDTO.getAlias());
             
-            // Cargar usuario y modelo desde los IDs
             if (barcoDTO.getUsuarioId() != null) {
                 barco.setUsuario(usuarioService.findById(barcoDTO.getUsuarioId()).orElse(null));
+            } else {
+                barco.setUsuario(usuarioAutenticado);
             }
+            
             if (barcoDTO.getModeloId() != null) {
                 barco.setModelo(modeloService.findById(barcoDTO.getModeloId()).orElse(null));
             }
@@ -105,13 +129,32 @@ public class BarcoRestController {
     }
     
     @PutMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<BarcoDTO> actualizarBarco(@PathVariable Long id, @RequestBody BarcoDTO barcoDTO) {
         try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            String emailUsuario = auth.getName();
+            Usuario usuarioAutenticado = usuarioService.findByEmail(emailUsuario).orElse(null);
+            
+            if (usuarioAutenticado == null) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+            
+            Optional<Barco> barcoExistente = barcoService.findById(id);
+            if (barcoExistente.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            if (!barcoExistente.get().getUsuario().getIdUsuario().equals(usuarioAutenticado.getIdUsuario())) {
+                if (!usuarioAutenticado.getRol().equals(Usuario.Rol.ADMIN)) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+                }
+            }
+            
             Barco barco = new Barco();
             barco.setIdBarco(id);
             barco.setAlias(barcoDTO.getAlias());
             
-            // Cargar usuario y modelo desde los IDs
             if (barcoDTO.getUsuarioId() != null) {
                 barco.setUsuario(usuarioService.findById(barcoDTO.getUsuarioId()).orElse(null));
             }
@@ -128,15 +171,36 @@ public class BarcoRestController {
     }
     
     @DeleteMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Eliminar barco", description = "Elimina un barco del sistema por su ID")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "204", description = "Barco eliminado exitosamente"),
+        @ApiResponse(responseCode = "403", description = "No autorizado para eliminar este barco"),
         @ApiResponse(responseCode = "404", description = "Barco no encontrado"),
         @ApiResponse(responseCode = "500", description = "Error interno del servidor")
     })
     public ResponseEntity<Void> eliminarBarco(
             @Parameter(description = "ID único del barco a eliminar", required = true) @PathVariable Long id) {
         try {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            String emailUsuario = auth.getName();
+            Usuario usuarioAutenticado = usuarioService.findByEmail(emailUsuario).orElse(null);
+            
+            if (usuarioAutenticado == null) {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
+            
+            Optional<Barco> barcoExistente = barcoService.findById(id);
+            if (barcoExistente.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+            
+            if (!barcoExistente.get().getUsuario().getIdUsuario().equals(usuarioAutenticado.getIdUsuario())) {
+                if (!usuarioAutenticado.getRol().equals(Usuario.Rol.ADMIN)) {
+                    return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+                }
+            }
+            
             barcoService.deleteById(id);
             return ResponseEntity.noContent().build();
         } catch (Exception e) {

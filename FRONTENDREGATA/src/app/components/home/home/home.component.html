@@ -33,12 +33,14 @@
       <button class="btn btn-primary" [routerLink]="['/partidas']">Ver Partidas</button>
     </div>
 
-    <div class="feature-card">
-      <div class="feature-icon">🎮</div>
-      <h3>Juego</h3>
-      <p>Participa en regatas en tiempo real</p>
-        <button class="btn btn-success" [routerLink]="['/game']">Jugar</button>
-    </div>
+    @if (!authService.isAdmin()) {
+      <div class="feature-card">
+        <div class="feature-icon">🎮</div>
+        <h3>Juego</h3>
+        <p>Participa en regatas en tiempo real</p>
+          <button class="btn btn-success" [routerLink]="['/game']">Jugar</button>
+      </div>
+    }
 
     <div class="feature-card">
       <div class="feature-icon">📊</div>
@@ -51,10 +53,14 @@
   <div class="quick-actions">
     <h2>Acciones Rápidas</h2>
     <div class="action-buttons">
-      <button class="btn btn-outline-primary" [routerLink]="['/usuarios/new']">Crear Usuario</button>
+      @if (authService.isAdmin()) {
+        <button class="btn btn-outline-primary" [routerLink]="['/usuarios/new']">Crear Usuario</button>
+      }
       <button class="btn btn-outline-primary" [routerLink]="['/barcos/new']">Crear Barco</button>
       <button class="btn btn-outline-primary" [routerLink]="['/modelos/new']">Crear Modelo</button>
-      <button class="btn btn-outline-success" [routerLink]="['/partidas/new']">Nueva Partida</button>
+      @if (!authService.isAdmin()) {
+        <button class="btn btn-outline-success" [routerLink]="['/partidas/new']">Nueva Partida</button>
+      }
     </div>
   </div>
 </div>

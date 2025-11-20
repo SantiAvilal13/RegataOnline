@@ -1,10 +1,12 @@
-import { Component, inject, signal, OnInit } from '@angular/core';
+import { Component, inject, signal, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { switchMap, map } from 'rxjs';
 import { MapaJuegoService } from '../../../shared/services/juego/mapa-juego.service';
 import { MovimientoJuegoService } from '../../../shared/services/juego/movimiento-juego.service';
+import { PartidaService } from '../../../shared/services/partidas/partida.service';
+import { AuthService } from '../../../services/auth.service';
 import { Mapa, Celda, Movimiento } from '../../../models';
 import { CeldaTipo } from '../../../models/enums/celda-tipo';
 
@@ -15,20 +17,34 @@ import { CeldaTipo } from '../../../models/enums/celda-tipo';
   templateUrl: './game-board.component.html',
   styleUrl: './game-board.component.css'
 })
-export class GameBoardComponent implements OnInit {
+export class GameBoardComponent implements OnInit, OnDestroy {
   mapaService = inject(MapaJuegoService);
   movimientoService = inject(MovimientoJuegoService);
+  partidaService = inject(PartidaService);
+  authService = inject(AuthService);
   route = inject(ActivatedRoute);
   router = inject(Router);
 
-      // Estados del juego
-      mapa = signal<Mapa | null>(null);
-      celdas = signal<Celda[]>([]);
-      estadoActual = signal<Movimiento | null>(null);
-      estadoAnterior = signal<Movimiento | null>(null);
-      destinosPosibles = signal<any[]>([]);
-      loading = signal(false);
-      error = signal<string | null>(null);
+  // Estados del juego
+  mapa = signal<Mapa | null>(null);
+  celdas = signal<Celda[]>([]);
+  estadoActual = signal<Movimiento | null>(null);
+  estadoAnterior = signal<Movimiento | null>(null);
+  destinosPosibles = signal<any[]>([]);
+  loading = signal(false);
+  error = signal<string | null>(null);
+  
+  // Estado multijugador
+  todosLosJugadores = signal<any[]>([]);
+  partidaId = signal<number | null>(null);
+  miParticipacionId = signal<number | null>(null);
+  private autoRefreshInterval: any = null;
+  private readonly REFRESH_INTERVAL = 3000; // 3 segundos
+  
+  // Sistema de notificaciones
+  notificaciones = signal<{id: number, mensaje: string, tipo: 'ganador' | 'perdedor' | 'info'}[]>([]);
+  private notificacionIdCounter = 0;
+  private eventosNotificados = new Set<string>(); // Para evitar notificaciones duplicadas
   
   // Controles de movimiento
   deltaVx = signal(0);
@@ -51,71 +67,217 @@ export class GameBoardComponent implements OnInit {
   private cacheSeleccionable = new Map<string, boolean>();
 
   ngOnInit() {
-    this.route.params.pipe(
-      switchMap(params => {
-        const mapaId = params['mapaId'];
-        const participacionId = params['participacionId'];
+    // Verificar que el usuario no es administrador
+    if (this.authService.isAdmin()) {
+      this.error.set('Los administradores no pueden jugar. Solo pueden realizar operaciones CRUD.');
+      setTimeout(() => this.router.navigate(['/home']), 2000);
+      return;
+    }
+
+    const participacionId = this.route.snapshot.params['participacionId'];
+    
+    if (participacionId) {
+      this.miParticipacionId.set(participacionId);
+      this.loading.set(true);
+      
+      // Cargar estado inicial
+      this.movimientoService.obtenerEstadoActual(participacionId).subscribe({
+        next: (movimiento) => {
+          console.log('📍 Estado inicial recibido:', movimiento);
+          this.estadoActual.set(movimiento);
+          
+          // Obtener partidaId desde el movimiento
+          if (movimiento.partidaId) {
+            this.partidaId.set(movimiento.partidaId);
+            console.log('🎮 Partida ID:', movimiento.partidaId);
+          }
+          
+          // Cargar mapa y luego destinos posibles
+          this.cargarMapaYDestinos(movimiento, participacionId);
+        },
+        error: (err) => {
+          console.error('❌ Error al cargar estado:', err);
+          this.error.set('Error al cargar el estado: ' + err.message);
+          this.loading.set(false);
+        }
+      });
+    } else {
+      // Modo solo visualización de mapa
+      const mapaId = this.route.snapshot.params['mapaId'];
+      if (mapaId) {
+        this.loading.set(true);
+        this.mapaService.getMapa(mapaId).subscribe({
+          next: (mapa) => {
+            this.mapa.set(mapa);
+            this.cargarCeldas(mapa.idMapa!);
+            this.loading.set(false);
+          },
+          error: (err) => {
+            this.error.set('Error al cargar el mapa: ' + err.message);
+            this.loading.set(false);
+          }
+        });
+      }
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.autoRefreshInterval) {
+      clearInterval(this.autoRefreshInterval);
+    }
+  }
+
+  iniciarAutoRefresh() {
+    // Limpiar cualquier interval existente
+    if (this.autoRefreshInterval) {
+      clearInterval(this.autoRefreshInterval);
+    }
+
+    // Cargar inmediatamente
+    this.cargarEstadoCompleto();
+
+    // Configurar refresh automático
+    this.autoRefreshInterval = setInterval(() => {
+      this.cargarEstadoCompleto();
+    }, this.REFRESH_INTERVAL);
+  }
+
+  cargarEstadoCompleto() {
+    const partidaId = this.partidaId();
+    if (!partidaId) return;
+
+    this.partidaService.obtenerEstadoCompleto(partidaId).subscribe({
+      next: (estadoCompleto) => {
+        console.log('🔄 Estado completo actualizado:', estadoCompleto);
         
-        if (mapaId) {
-          this.loading.set(true);
-          console.log('Cargando mapa con ID:', mapaId);
-          return this.mapaService.getMapa(mapaId);
-        } else if (participacionId) {
-          // Si tenemos participacionId, cargar el estado actual primero
-          this.loading.set(true);
-          return this.movimientoService.obtenerEstadoActual(participacionId);
-        } else {
-          // Cargar el primer mapa disponible por defecto
-          this.loading.set(true);
-          return this.mapaService.getMapas().pipe(
-            map(mapas => mapas.length > 0 ? mapas[0] : null)
-          );
+        // Actualizar lista de todos los jugadores
+        this.todosLosJugadores.set(estadoCompleto.participaciones || []);
+        
+        // Actualizar mi estado actual
+        const miParticipacion = estadoCompleto.participaciones?.find(
+          (p: any) => p.participacionId === this.miParticipacionId()
+        );
+        
+        if (miParticipacion && miParticipacion.ultimoMovimiento) {
+          const estadoAnterior = this.estadoActual();
+          if (estadoAnterior) {
+            this.estadoAnterior.set(estadoAnterior);
+          }
+          this.estadoActual.set(miParticipacion.ultimoMovimiento);
+          this.verificarEstadoJuego();
         }
-      })
-    ).subscribe({
-      next: (data) => {
-        console.log('Datos recibidos:', data);
-        if (data instanceof Mapa) {
-          this.mapa.set(data);
-          this.cargarCeldas(data.idMapa!);
-        } else if (data instanceof Movimiento) {
-          // Si recibimos un movimiento, significa que tenemos una participación
-          this.estadoActual.set(data);
-          // Necesitamos obtener el mapa de la partida
-          this.cargarMapaDesdeParticipacion(data);
-        }
-        this.loading.set(false);
+        
+        // Verificar si algún otro jugador ganó o perdió
+        this.verificarResultadosOtrosJugadores(estadoCompleto.participaciones || []);
       },
       error: (err) => {
-        this.error.set('Error al cargar los datos: ' + err.message);
+        console.error('Error al cargar estado completo:', err);
+      }
+    });
+  }
+
+  verificarResultadosOtrosJugadores(participaciones: any[]) {
+    const miId = this.miParticipacionId();
+    
+    for (const participacion of participaciones) {
+      if (participacion.participacionId === miId) continue; // Saltar mi propia participación
+      
+      const movimiento = participacion.ultimoMovimiento;
+      if (!movimiento) continue;
+      
+      // Crear ID único para este evento
+      const eventoIdGanador = `ganador-${participacion.participacionId}`;
+      const eventoIdPerdedor = `perdedor-${participacion.participacionId}`;
+      
+      // Verificar si ganó
+      if (movimiento.llegoAMeta && !this.eventosNotificados.has(eventoIdGanador)) {
+        this.mostrarNotificacion(
+          `🏆 ${participacion.usuarioNombre} (${participacion.barcoAlias}) ha llegado a la meta!`,
+          'ganador'
+        );
+        this.eventosNotificados.add(eventoIdGanador);
+      }
+      
+      // Verificar si perdió
+      if ((movimiento.colision || movimiento.salioDelMapa) && !this.eventosNotificados.has(eventoIdPerdedor)) {
+        const razon = movimiento.colision ? 'chocó con una pared' : 'salió del mapa';
+        this.mostrarNotificacion(
+          `💥 ${participacion.usuarioNombre} (${participacion.barcoAlias}) ha perdido: ${razon}`,
+          'perdedor'
+        );
+        this.eventosNotificados.add(eventoIdPerdedor);
+      }
+    }
+  }
+
+  mostrarNotificacion(mensaje: string, tipo: 'ganador' | 'perdedor' | 'info') {
+    const id = this.notificacionIdCounter++;
+    const notificacionesActuales = this.notificaciones();
+    
+    // Agregar nueva notificación
+    this.notificaciones.set([...notificacionesActuales, { id, mensaje, tipo }]);
+    
+    // Auto-eliminar después de 5 segundos
+    setTimeout(() => {
+      this.eliminarNotificacion(id);
+    }, 5000);
+  }
+
+  eliminarNotificacion(id: number) {
+    const notificacionesActuales = this.notificaciones();
+    this.notificaciones.set(notificacionesActuales.filter(n => n.id !== id));
+  }
+
+  cargarMapaYDestinos(movimiento: Movimiento, participacionId: number) {
+    console.log('🗺️ Cargando mapa y destinos...');
+    // Obtener el mapa de la partida (por ahora usamos el primer mapa disponible)
+    // TODO: En el futuro, obtener el mapaId desde la partida
+    this.mapaService.getMapas().subscribe({
+      next: (mapas) => {
+        console.log('📦 Mapas disponibles:', mapas.length);
+        if (mapas.length > 0) {
+          this.mapa.set(mapas[0]);
+          console.log('🗺️ Mapa seleccionado:', mapas[0].nombre);
+          
+          // Cargar celdas del mapa
+          this.cargarCeldas(mapas[0].idMapa!);
+          
+          // Cargar el estado anterior si hay un turno mayor a 0
+          if (movimiento.turno && movimiento.turno > 0) {
+            this.cargarEstadoAnterior(movimiento.participacionId!, movimiento.turno - 1);
+          }
+          
+          // Cargar destinos posibles
+          this.cargarDestinosPosibles(participacionId);
+          
+          // Verificar estado del juego
+          this.verificarEstadoJuego();
+          
+          // Iniciar auto-refresh solo si tenemos partidaId
+          if (this.partidaId()) {
+            console.log('🔄 Iniciando auto-refresh...');
+            this.iniciarAutoRefresh();
+          }
+          
+          // Marcar como cargado
+          this.loading.set(false);
+          console.log('✅ Tablero cargado completamente');
+        } else {
+          this.error.set('No hay mapas disponibles');
+          this.loading.set(false);
+        }
+      },
+      error: (err) => {
+        console.error('❌ Error al cargar mapas:', err);
+        this.error.set('Error al cargar el mapa: ' + err.message);
         this.loading.set(false);
       }
     });
   }
 
   cargarMapaDesdeParticipacion(movimiento: Movimiento) {
-    // Aquí necesitaríamos obtener el mapa desde la partida
-    // Por ahora, cargaremos el primer mapa disponible
-    this.mapaService.getMapas().subscribe({
-      next: (mapas) => {
-        if (mapas.length > 0) {
-          this.mapa.set(mapas[0]);
-          this.cargarCeldas(mapas[0].idMapa!);
-          // Cargar el estado anterior si hay un turno mayor a 0
-          if (movimiento.turno && movimiento.turno > 0) {
-            this.cargarEstadoAnterior(movimiento.participacionId!, movimiento.turno - 1);
-          }
-          // Cargar destinos posibles
-          this.cargarDestinosPosibles(movimiento.participacionId!);
-          
-          // Verificar estado del juego
-          this.verificarEstadoJuego();
-        }
-      },
-      error: (err) => {
-        this.error.set('Error al cargar el mapa: ' + err.message);
-      }
-    });
+    // Método legacy - redirige al nuevo método
+    this.cargarMapaYDestinos(movimiento, movimiento.participacionId!);
   }
 
   cargarEstadoAnterior(participacionId: number, turnoAnterior: number) {
@@ -371,25 +533,30 @@ export class GameBoardComponent implements OnInit {
     });
 
     // Verificar si llegó a la meta
-    if (estado.llegoAMeta) {
+    if (estado.llegoAMeta && !this.juegoTerminado()) {
       console.log('🏆 DEBUG - Juego ganado!');
       this.juegoTerminado.set(true);
       this.resultadoJuego.set('ganado');
+      this.mostrarNotificacion('🏆 ¡Felicidades! Has llegado a la meta', 'ganador');
       return;
     }
 
     // Verificar si hubo colisión o salió del mapa
-    if (estado.colision || estado.salioDelMapa) {
+    if ((estado.colision || estado.salioDelMapa) && !this.juegoTerminado()) {
       console.log('💥 DEBUG - Juego perdido!', { colision: estado.colision, salioDelMapa: estado.salioDelMapa });
       this.juegoTerminado.set(true);
       this.resultadoJuego.set('perdido');
+      const razon = estado.colision ? 'Has chocado con una pared' : 'Has salido del mapa';
+      this.mostrarNotificacion(`💥 ¡Perdiste! ${razon}`, 'perdedor');
       return;
     }
 
     // El juego continúa
-    console.log('🎮 DEBUG - Juego continúa...');
-    this.juegoTerminado.set(false);
-    this.resultadoJuego.set(null);
+    if (!estado.llegoAMeta && !estado.colision && !estado.salioDelMapa) {
+      console.log('🎮 DEBUG - Juego continúa...');
+      this.juegoTerminado.set(false);
+      this.resultadoJuego.set(null);
+    }
   }
 
   reiniciarJuego() {
@@ -504,5 +671,45 @@ export class GameBoardComponent implements OnInit {
       this.movimientoValido.set(false);
       this.mensajeValidacion.set("⚠️ Destino no válido según las reglas del juego");
     }
+  }
+
+  // Método para obtener jugadores en una celda específica (excepto yo)
+  obtenerJugadoresEnCelda(x: number, y: number): any[] {
+    const jugadores = this.todosLosJugadores();
+    const miId = this.miParticipacionId();
+    
+    // Debug: mostrar todos los jugadores una sola vez (cuando x=0 y y=0)
+    if (x === 0 && y === 0 && jugadores.length > 0) {
+      console.log('👥 Total jugadores:', jugadores.length);
+      console.log('👤 Mi participación ID:', miId);
+      jugadores.forEach((j, idx) => {
+        console.log(`  Jugador ${idx + 1}:`, {
+          participacionId: j.participacionId,
+          usuario: j.usuarioNombre,
+          barco: j.barcoAlias,
+          color: j.barcoColor,
+          tieneMovimiento: !!j.ultimoMovimiento,
+          posicion: j.ultimoMovimiento ? `(${j.ultimoMovimiento.posX}, ${j.ultimoMovimiento.posY})` : 'Sin movimiento'
+        });
+      });
+    }
+    
+    return jugadores.filter(jugador => {
+      // Filtrar mi propio barco
+      if (jugador.participacionId === miId) return false;
+      
+      // Verificar si el jugador tiene un movimiento actual
+      const movimiento = jugador.ultimoMovimiento;
+      if (!movimiento) {
+        return false;
+      }
+      
+      // Verificar si está en esta celda
+      const estaAqui = movimiento.posX === x && movimiento.posY === y;
+      if (estaAqui) {
+        console.log(`⛵ Barco encontrado en (${x},${y}):`, jugador.barcoAlias);
+      }
+      return estaAqui;
+    });
   }
 }

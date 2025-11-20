@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.DirtiesContext.ClassMode;
 import org.springframework.test.context.ActiveProfiles;
@@ -13,29 +14,32 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.example.regata.restcontroller.BarcoRestController;
+import com.example.regata.config.TestSecurityConfig;
 import com.example.regata.dto.BarcoDTO;
+import com.example.regata.model.Barco;
 import com.example.regata.model.Usuario;
 import com.example.regata.model.Modelo;
+import com.example.regata.service.BarcoService;
 import com.example.regata.service.UsuarioService;
 import com.example.regata.service.ModeloService;
 
 
 @SpringBootTest(webEnvironment = WebEnvironment.DEFINED_PORT)
 @ActiveProfiles("integration-testing")
+@Import(TestSecurityConfig.class)
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
 public class BarcoRestControllerIntegrationTest {
 
     private final String SERVER_URL;
 
     @Autowired
-    private BarcoRestController barcoRestController;
-    
-    @Autowired
     private UsuarioService usuarioService;
     
     @Autowired
     private ModeloService modeloService;
+    
+    @Autowired
+    private BarcoService barcoService;
     
     private Usuario usuarioTest;
     private Modelo modeloTest;
@@ -72,21 +76,21 @@ public class BarcoRestControllerIntegrationTest {
         barcoTestDTO.setUsuarioId(usuarioTest.getIdUsuario());
         barcoTestDTO.setModeloId(modeloTest.getIdModelo());
         
-        // Crear algunos barcos de prueba
-        BarcoDTO barco1 = new BarcoDTO();
+        // Crear algunos barcos de prueba usando el servicio directamente
+        Barco barco1 = new Barco();
         barco1.setAlias("Barco Alpha");
-        barco1.setUsuarioId(usuarioTest.getIdUsuario());
-        barco1.setModeloId(modeloTest.getIdModelo());
-        barcoRestController.crearBarco(barco1);
+        barco1.setUsuario(usuarioTest);
+        barco1.setModelo(modeloTest);
+        barcoService.save(barco1);
         
-        BarcoDTO barco2 = new BarcoDTO();
+        Barco barco2 = new Barco();
         barco2.setAlias("Barco Beta");
-        barco2.setUsuarioId(usuarioTest.getIdUsuario());
-        barco2.setModeloId(modeloTest.getIdModelo());
-        barcoRestController.crearBarco(barco2);
+        barco2.setUsuario(usuarioTest);
+        barco2.setModelo(modeloTest);
+        barcoService.save(barco2);
     }
     
-    // Método helper para obtener el ID de un barco por su alias
+    // Método helper para obtener el ID de un barco por su alias ya que h2 los selecciona automáticamente y mejora la robustez en caso de que se agregue otro barco de test
     private Long obtenerBarcoIdPorAlias(String alias) {
         return webTestClient.get()
             .uri(SERVER_URL + "/barcos/buscar?alias=" + alias)
@@ -154,6 +158,7 @@ public class BarcoRestControllerIntegrationTest {
         
         webTestClient.post()
             .uri(SERVER_URL + "/barcos")
+            .headers(headers -> headers.setBasicAuth("test@test.com", "password"))
             .bodyValue(nuevoBarco)
             .exchange()
             .expectStatus().isCreated()
@@ -178,6 +183,7 @@ public class BarcoRestControllerIntegrationTest {
         
         webTestClient.put()
             .uri(SERVER_URL + "/barcos/" + barcoId)
+            .headers(headers -> headers.setBasicAuth("test@test.com", "password"))
             .bodyValue(barcoActualizado)
             .exchange()
             .expectStatus().isOk()
@@ -293,6 +299,7 @@ public class BarcoRestControllerIntegrationTest {
         
         webTestClient.delete()
             .uri(SERVER_URL + "/barcos/" + barcoId)
+            .headers(headers -> headers.setBasicAuth("test@test.com", "password"))
             .exchange()
             .expectStatus().isNoContent();
         

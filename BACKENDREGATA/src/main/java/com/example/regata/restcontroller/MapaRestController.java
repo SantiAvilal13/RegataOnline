@@ -7,6 +7,7 @@ import com.example.regata.service.MapaService;
 import com.example.regata.service.CeldaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/mapas")
+@PreAuthorize("isAuthenticated()")
 public class MapaRestController {
     
     @Autowired

@@ -9,6 +9,7 @@ import com.example.regata.service.MovimientoService;
 import com.example.regata.mapper.ParticipacionMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/participaciones")
 @CrossOrigin(origins = "*")
+@PreAuthorize("isAuthenticated()")
 public class ParticipacionRestController {
     
     @Autowired

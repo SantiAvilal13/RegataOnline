@@ -1,0 +1,94 @@
+<div class="unirse-container">
+  <div class="card">
+    <div class="card-header">
+      <h2>🚢 Unirse a Partida #{{ partidaId() }}</h2>
+    </div>
+    
+    <div class="card-body">
+      @if (error()) {
+        <div class="error-message">
+          {{ error() }}
+        </div>
+      }
+
+      @if (loading()) {
+        <div class="loading">
+          <div class="spinner"></div>
+          <p>Uniéndote a la partida...</p>
+        </div>
+      } @else {
+        <div class="info-section">
+          <h3>📋 Información de la Partida</h3>
+          @if (partida()) {
+            <div class="partida-info">
+              <p><strong>Estado:</strong> <span class="badge">{{ partida()?.estado }}</span></p>
+              <p><strong>Mapa:</strong> Mapa #{{ partida()?.mapaId }}</p>
+            </div>
+          }
+        </div>
+
+        <div class="barcos-section">
+          <h3>⛵ Selecciona tu Barco</h3>
+          
+          @if (barcos().length === 0) {
+            <div class="no-barcos">
+              <p>❌ No tienes barcos disponibles</p>
+              <p>Debes crear al menos un barco antes de unirte a una partida.</p>
+              <button class="btn btn-primary" [routerLink]="['/barcos/new']">
+                Crear Barco
+              </button>
+            </div>
+          } @else {
+            <div class="barcos-grid">
+              @for (barco of barcos(); track barco.idBarco) {
+                <div 
+                  class="barco-card" 
+                  [class.selected]="barcoSeleccionado() === barco.idBarco"
+                  (click)="seleccionarBarco(barco.idBarco!)">
+                  
+                  <div class="barco-header">
+                    <h4>{{ barco.alias }}</h4>
+                    @if (barcoSeleccionado() === barco.idBarco) {
+                      <span class="check-icon">✓</span>
+                    }
+                  </div>
+                  
+                  <div class="barco-details">
+                    <div class="detail-item">
+                      <span class="label">Modelo:</span>
+                      <span class="value">{{ barco.modeloNombre }}</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="label">Color:</span>
+                      <span 
+                        class="color-preview" 
+                        [style.background-color]="barco.modeloColorHex">
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+        @if (barcos().length > 0) {
+          <div class="actions">
+            <button 
+              class="btn btn-success btn-lg" 
+              (click)="unirse()"
+              [disabled]="!barcoSeleccionado()">
+              ✅ Unirse a la Partida
+            </button>
+
+            <button 
+              class="btn btn-secondary btn-lg" 
+              (click)="cancelar()">
+              ❌ Cancelar
+            </button>
+          </div>
+        }
+      }
+    </div>
+  </div>
+</div>

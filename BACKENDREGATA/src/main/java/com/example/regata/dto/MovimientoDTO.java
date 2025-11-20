@@ -39,6 +39,8 @@ public class MovimientoDTO {
     
     private String participacionInfo;
     
+    private Long partidaId; // ID de la partida a la que pertenece esta participación
+    
     private Long celdaDestinoId;
     
     private String celdaDestinoInfo;
@@ -160,6 +162,14 @@ public class MovimientoDTO {
     
     public void setParticipacionInfo(String participacionInfo) {
         this.participacionInfo = participacionInfo;
+    }
+    
+    public Long getPartidaId() {
+        return partidaId;
+    }
+    
+    public void setPartidaId(Long partidaId) {
+        this.partidaId = partidaId;
     }
     
     public Long getCeldaDestinoId() {
